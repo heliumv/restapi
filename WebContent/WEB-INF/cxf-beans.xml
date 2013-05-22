@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	 http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+	 http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
+	 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+	<import resource="classpath:META-INF/cxf/cxf.xml" />
+ 	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+ 	
+ 	 	
+	<jaxws:endpoint xmlns:tns="http://hello.heliumv.com/"
+		id="deepthought" implementor="com.heliumv.hello.DeepThought"
+		wsdlLocation="wsdl/deepthought.wsdl" endpointName="tns:DeepThoughtPort"
+		serviceName="tns:DeepThoughtService" address="/DeepThoughtPort">
+		<jaxws:features>
+			<bean class="org.apache.cxf.feature.LoggingFeature" />
+		</jaxws:features>
+	</jaxws:endpoint>
+
+	<jaxrs:server id="restContainer" address="/rest">
+		<jaxrs:providers>
+    		<bean class="org.apache.cxf.jaxrs.provider.json.JSONProvider">
+	    	    <property name="dropRootElement" value="true" />
+        		<property name="supportUnwrapped" value="true" />
+    		</bean>
+		</jaxrs:providers>
+		
+<!--
+   		<jaxrs:extensionMappings> 
+      		<entry key="xml" value="application/xml" /> 
+      		<entry key="json" value="application/json" /> 
+    	</jaxrs:extensionMappings> 
+ -->
+ 		
+		<jaxrs:serviceBeans>
+			<ref bean="deepThought" />
+			<ref bean="hvUser" />
+			<ref bean="hvWorktime" />
+			<ref bean="hvOrder" />
+		</jaxrs:serviceBeans>
+	</jaxrs:server>	
+	
+	<bean id="deepThought" class="com.heliumv.hello.DeepThought" />
+	<bean id="hvUser" class="com.heliumv.api.benutzer.UserApi" />
+	<bean id="hvWorktime" class="com.heliumv.api.worktime.WorktimeApi" />
+	<bean id="hvOrder" class="com.heliumv.api.order.OrderApi" />
+</beans>

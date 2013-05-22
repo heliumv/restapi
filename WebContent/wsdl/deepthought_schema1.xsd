@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://hello.heliumv.com/" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified" targetNamespace="http://hello.heliumv.com/" version="1.0">
+<xs:element name="whatIsTheAnswer" type="tns:whatIsTheAnswer"/>
+<xs:element name="whatIsTheAnswerResponse" type="tns:whatIsTheAnswerResponse"/>
+<xs:complexType name="whatIsTheAnswer">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="whatIsTheAnswerResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
