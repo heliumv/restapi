@@ -7,6 +7,8 @@ import java.util.UUID;
 
 import javax.naming.NamingException;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.heliumv.api.order.OrderEntry;
 import com.heliumv.factory.Globals;
 import com.heliumv.factory.IParameterCall;
@@ -17,14 +19,25 @@ import com.lp.server.util.fastlanereader.service.query.QueryParameters;
 import com.lp.server.util.fastlanereader.service.query.QueryResult;
 
 public class AuftragQuery extends FastLaneReaderCall {
-	private transient IParameterCall parameterCall ;
+	@Autowired
+	private IParameterCall parameterCall ;
 	
 	public AuftragQuery() throws NamingException {
 		super(UUID.randomUUID().toString(), QueryParameters.UC_ID_AUFTRAG) ;
 	}
 	
+	public AuftragQuery(IParameterCall parameterCall) throws NamingException {
+		super(UUID.randomUUID().toString(), QueryParameters.UC_ID_AUFTRAG) ;
+		this.parameterCall = parameterCall ;
+	}
+	
+	@Autowired 
 	public void setParameterCall(IParameterCall parameterCall) {
 		this.parameterCall = parameterCall ;
+	}
+
+	private IParameterCall getParameterCall() {
+		return parameterCall ;
 	}
 	
 	public List<OrderEntry> asOrderEntry(QueryResult result) {
@@ -68,7 +81,7 @@ public class AuftragQuery extends FastLaneReaderCall {
 		filters.add(getMandantFilter()) ;
 		
 		try {
-			if(parameterCall.isZeitdatenAufErledigteBuchbar()) {
+			if(getParameterCall().isZeitdatenAufErledigteBuchbar()) {
 				filters.add(getFilterErledigteBuchbar()) ;
 			} else {
 				filters.add(getFiltersErledigteNichtBuchbar()) ;

@@ -37,15 +37,22 @@
  -->
  		
 		<jaxrs:serviceBeans>
-			<ref bean="deepThought" />
+<!-- 			<ref bean="deepThought" />  -->
 			<ref bean="hvUser" />
 			<ref bean="hvWorktime" />
 			<ref bean="hvOrder" />
 		</jaxrs:serviceBeans>
 	</jaxrs:server>	
 	
-	<bean id="deepThought" class="com.heliumv.hello.DeepThought" />
-	<bean id="hvUser" class="com.heliumv.api.benutzer.UserApi" />
+	<context:annotation-config />	
+	<bean id="clientCall" class="com.heliumv.factory.impl.ClientCall" lazy-init="true" />
+	<bean id="logonCall" class="com.heliumv.factory.impl.LogonCall" lazy-init="true" />
+	<bean id="parameterCall" class="com.heliumv.factory.impl.ParameterCall" lazy-init="true" />
+	<bean id="server" class="com.heliumv.factory.impl.ServerCall" lazy-init="true" />
+	
+<!-- <bean id="deepThought" class="com.heliumv.hello.DeepThought" />  -->	
+ 	<bean id="hvUser" class="com.heliumv.api.benutzer.UserApi" />
 	<bean id="hvWorktime" class="com.heliumv.api.worktime.WorktimeApi" />
 	<bean id="hvOrder" class="com.heliumv.api.order.OrderApi" />
+
 </beans>

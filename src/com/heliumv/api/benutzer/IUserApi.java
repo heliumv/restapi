@@ -3,7 +3,7 @@ package com.heliumv.api.benutzer;
 import javax.ws.rs.core.Response;
 
 
-public interface UserApiI {	
+public interface IUserApi {	
 	/**
 	 * Ermoeglicht das Anmelden als Helium V Benutzer an einem Helium V Server
 	 * 

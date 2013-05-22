@@ -2,6 +2,8 @@ package com.heliumv.factory.impl;
 
 import javax.naming.NamingException;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.heliumv.factory.IClientCall;
 import com.heliumv.factory.IJudgeCall;
 import com.heliumv.factory.ILogonCall;
@@ -14,10 +16,14 @@ import com.heliumv.factory.IZeiterfassungCall;
 public class ServerCall implements IServerCall {
 
 	private ILogonCall logonCall ;
+
+	@Autowired
 	private IClientCall clientCall ;
 	private IPersonalCall personalCall ;
 	private IZeiterfassungCall zeiterfassungCall ;
 	private IJudgeCall judgeCall ;
+
+	@Autowired
 	private IParameterCall parameterCall ;
 	
 	

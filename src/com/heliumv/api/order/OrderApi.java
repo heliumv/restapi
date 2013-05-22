@@ -11,10 +11,13 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.heliumv.api.BaseApi;
 import com.heliumv.factory.Globals;
+import com.heliumv.factory.IClientCall;
+import com.heliumv.factory.IParameterCall;
 import com.heliumv.factory.impl.AuftragQuery;
 import com.heliumv.tools.FilterKriteriumCollector;
 import com.lp.server.auftrag.service.AuftragFac;
@@ -31,8 +34,13 @@ import com.lp.server.util.fastlanereader.service.query.SortierKriterium;
 
 @Service("hvOrder")
 @Path("/api/v1/order/")
-public class OrderApi extends BaseApi {
+public class OrderApi extends BaseApi implements IOrderApi  {
 
+	@Autowired
+	private IClientCall clientCall ;
+	@Autowired
+	private IParameterCall parameterCall ;
+	
 	@GET
 	@Path("/{userid}")
 	@Produces({"application/json", "application/xml"})
@@ -52,7 +60,8 @@ public class OrderApi extends BaseApi {
 		}
 	
 		try {
-			TheClientDto theClientDto = getServer().getClientCall().theClientFindByUserLoggedIn(userId) ;
+//			TheClientDto theClientDto = getServer().getClientCall().theClientFindByUserLoggedIn(userId) ;
+			TheClientDto theClientDto = clientCall.theClientFindByUserLoggedIn(userId) ;
 			if (null == theClientDto || null == theClientDto.getIDPersonal()) {
 				respondUnauthorized() ; 
 				return orders ;
@@ -67,8 +76,8 @@ public class OrderApi extends BaseApi {
 			collector.add(buildFilterWithHidden(filterWithHidden)) ;
 			FilterBlock filterCrits = new FilterBlock(collector.asArray(), "AND")  ;
 			
-			AuftragQuery query = new AuftragQuery() ;
-			query.setParameterCall(getServer().getParameterCall()) ;
+			AuftragQuery query = new AuftragQuery(parameterCall) ;
+//			query.setParameterCall(getServer().getParameterCall()) ;
 			
 			ArrayList<?> listOfExtraData = new ArrayList() ;
 			SortierKriterium[] sortCrits = new SortierKriterium[0] ;
@@ -114,7 +123,10 @@ public class OrderApi extends BaseApi {
 	private FilterKriterium buildFilterCustomer(String customer) throws NamingException, RemoteException {
 		if(null == customer || customer.trim().length() == 0) return null ;
 
-		int percentType = getServer().getParameterCall()
+//		int percentType = getServer().getParameterCall()
+//				.isPartnerSucheWildcardBeidseitig() ? FilterKriteriumDirekt.PROZENT_BOTH : FilterKriteriumDirekt.PROZENT_TRAILING ;
+
+		int percentType = parameterCall
 				.isPartnerSucheWildcardBeidseitig() ? FilterKriteriumDirekt.PROZENT_BOTH : FilterKriteriumDirekt.PROZENT_TRAILING ;
 
 		FilterKriteriumDirekt fk = new FilterKriteriumDirekt(AuftragFac.FLR_AUFTRAG_FLRKUNDE

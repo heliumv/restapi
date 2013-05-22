@@ -9,6 +9,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.apache.cxf.jaxrs.impl.ResponseBuilderImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.heliumv.factory.IServerCall;
 import com.heliumv.factory.impl.ServerCall;
@@ -18,6 +19,7 @@ public class BaseApi {
 	@Context
 	private HttpServletResponse response ;
 	
+	@Autowired
 	private IServerCall server ;
 
 	private ResponseBuilder getResponseBuilder() {

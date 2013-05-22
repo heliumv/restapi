@@ -3,7 +3,6 @@ package com.heliumv.api.benutzer;
 import java.rmi.RemoteException;
 import java.util.Locale;
 
-import javax.naming.NamingException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -13,15 +12,18 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.cxf.jaxrs.impl.ResponseBuilderImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.heliumv.api.BaseApi;
+import com.heliumv.factory.IClientCall;
+import com.heliumv.factory.ILogonCall;
 import com.heliumv.tools.StringHelper;
 import com.lp.server.system.service.TheClientDto;
 
 @Service("hvUser")
 @Path("/api/v1/")
-public class UserApi extends BaseApi implements UserApiI {
+public class UserApi extends BaseApi implements IUserApi {
 	
 //	@Context
 //	private HttpServletResponse response ;
@@ -29,6 +31,12 @@ public class UserApi extends BaseApi implements UserApiI {
 //	public void setHttpServletResponse(HttpServletResponse theResponse) {
 //		response = theResponse ;
 //	}
+
+	@Autowired
+	private ILogonCall logonCall ;
+	
+	@Autowired
+	private IClientCall clientCall ;
 	
 	@GET
 	@Path("/logon/{username}/{password}/{mandant}/{locale}")
@@ -50,16 +58,14 @@ public class UserApi extends BaseApi implements UserApiI {
 		
 		TheClientDto theClientDto = null ;
 		try {
-			theClientDto = getServer().getLogonCall().logon(username, password.toCharArray(), l, mandant) ;
+//			theClientDto = getServer().getLogonCall().logon(username, password.toCharArray(), l, mandant) ;
+			theClientDto = logonCall.logon(username, password.toCharArray(), l, mandant) ;
 			if(theClientDto != null) {
 				ResponseBuilder rBuild = Response.ok(theClientDto.getIDUser()) ;
 				return rBuild.build();
-//				builder.status(Response.Status.OK) ; 
-//				builder.header("token", theClientDto.getIDUser()) ;
-//				return builder.build() ;
 			} 
-		} catch(NamingException e) {
-			return builder.status(Response.Status.SERVICE_UNAVAILABLE).build() ;
+//		} catch(NamingException e) {
+//			return builder.status(Response.Status.SERVICE_UNAVAILABLE).build() ;
 		} catch(RemoteException e) {
 			return builder.status(Response.Status.SERVICE_UNAVAILABLE).build() ;			
 		}
@@ -88,15 +94,16 @@ public class UserApi extends BaseApi implements UserApiI {
 		
 		TheClientDto theClientDto = null ;
 		try {
-			theClientDto = getServer().getLogonCall().logon(username, password.toCharArray(), l, mandant) ;
+//			theClientDto = getServer().getLogonCall().logon(username, password.toCharArray(), l, mandant) ;
+			theClientDto = logonCall.logon(username, password.toCharArray(), l, mandant) ;
 			if(theClientDto != null) {
 				getServletResponse().setStatus(Response.Status.OK.getStatusCode()) ;
 //				getServletResponse().setStatus(Response.Status.SERVICE_UNAVAILABLE.getStatusCode()) ;
 				String id = theClientDto.getIDUser() ;
 				return id ;
 			} 
-		} catch(NamingException e) {
-			return "" ;
+//		} catch(NamingException e) {
+//			return "" ;
 		} catch(RemoteException e) {
 			return "" ;
 		}
@@ -112,12 +119,14 @@ public class UserApi extends BaseApi implements UserApiI {
 		if(StringHelper.isEmpty(token)) return Response.status(Status.BAD_REQUEST).build() ;
 		
 		try {
-			TheClientDto theClientDto = getServer().getClientCall().theClientFindByUserLoggedIn(token) ;
+//			TheClientDto theClientDto = getServer().getClientCall().theClientFindByUserLoggedIn(token) ;
+			TheClientDto theClientDto = clientCall.theClientFindByUserLoggedIn(token) ;
 			if(theClientDto != null) {
-				getServer().getLogonCall().logout(theClientDto) ;
+//				getServer().getLogonCall().logout(theClientDto) ;
+				logonCall.logout(theClientDto) ;
 			}
-		} catch(NamingException e) {
-			e.printStackTrace() ;
+//		} catch(NamingException e) {
+//			e.printStackTrace() ;
 		} catch(RemoteException e) {
 			return Response.status(Status.SERVICE_UNAVAILABLE.getStatusCode()).build() ;
 		}
@@ -131,12 +140,4 @@ public class UserApi extends BaseApi implements UserApiI {
 		Locale locale = new Locale(localeString.substring(0, 2), localeString.substring(2, 4)) ;
 		return locale ;
 	}	
-
-	
-//	private IServerCall getServer() {
-//		if(server == null) {
-//			server = new ServerCall() ; 
-//		}
-//		return server ;
-//	}
 }
