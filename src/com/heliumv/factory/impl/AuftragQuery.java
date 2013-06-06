@@ -10,6 +10,8 @@ import javax.naming.NamingException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.heliumv.api.order.OrderEntry;
+import com.heliumv.api.order.OrderEntryTransformer;
+import com.heliumv.api.project.ProjectEntry;
 import com.heliumv.factory.Globals;
 import com.heliumv.factory.IParameterCall;
 import com.lp.server.auftrag.service.AuftragFac;
@@ -21,6 +23,8 @@ import com.lp.server.util.fastlanereader.service.query.QueryResult;
 public class AuftragQuery extends FastLaneReaderCall {
 	@Autowired
 	private IParameterCall parameterCall ;
+	
+	private OrderEntryTransformer entryTransformer = new OrderEntryTransformer() ;
 	
 	public AuftragQuery() throws NamingException {
 		super(UUID.randomUUID().toString(), QueryParameters.UC_ID_AUFTRAG) ;
@@ -40,6 +44,10 @@ public class AuftragQuery extends FastLaneReaderCall {
 		return parameterCall ;
 	}
 	
+	public List<OrderEntry> getResultList(QueryResult result) {
+		return entryTransformer.transform(result.getRowData()) ;
+	}
+		
 	public List<OrderEntry> asOrderEntry(QueryResult result) {
 		ArrayList<OrderEntry> orders = new ArrayList<OrderEntry>() ;
 		if(result.getRowData() == null || result.getRowData().length == 0) return orders ;
@@ -60,22 +68,8 @@ public class AuftragQuery extends FastLaneReaderCall {
 		return orders ;
 	}
 	
-	@Override
-	public QueryResult setQuery(QueryParameters queryParams) {
-		FilterKriterium[] knownFilters = queryParams.getFilterBlock().filterKrit ;
-
-		List<FilterKriterium> myFilters = getDefaultFilters() ;
-		if(knownFilters != null && knownFilters.length > 0) {
-			for(int i = 0 ; i < knownFilters.length; i++) {
-				myFilters.add(knownFilters[i]) ;
-			}
-		}
-		
-		queryParams.getFilterBlock().filterKrit = myFilters.toArray(new FilterKriterium[0]);
-		return super.setQuery(queryParams);
-	}
 	
-	public List<FilterKriterium> getDefaultFilters() {
+	protected List<FilterKriterium> getRequiredFilters() {
 		List<FilterKriterium> filters = new ArrayList<FilterKriterium>() ;
 
 		filters.add(getMandantFilter()) ;
@@ -90,7 +84,7 @@ public class AuftragQuery extends FastLaneReaderCall {
 			filters.add(getFiltersErledigteNichtBuchbar()) ;
  		}
 		
-		return filters ;
+		return filters ;		
 	}
 	
 	private FilterKriterium getMandantFilter() {

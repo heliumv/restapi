@@ -41,6 +41,7 @@
 			<ref bean="hvUser" />
 			<ref bean="hvWorktime" />
 			<ref bean="hvOrder" />
+			<ref bean="hvProject" />
 		</jaxrs:serviceBeans>
 	</jaxrs:server>	
 	
@@ -54,5 +55,5 @@
  	<bean id="hvUser" class="com.heliumv.api.benutzer.UserApi" />
 	<bean id="hvWorktime" class="com.heliumv.api.worktime.WorktimeApi" />
 	<bean id="hvOrder" class="com.heliumv.api.order.OrderApi" />
-
+	<bean id="hvProject" class="com.heliumv.api.project.ProjectApi" />
 </beans>

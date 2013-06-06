@@ -77,16 +77,12 @@ public class OrderApi extends BaseApi implements IOrderApi  {
 			FilterBlock filterCrits = new FilterBlock(collector.asArray(), "AND")  ;
 			
 			AuftragQuery query = new AuftragQuery(parameterCall) ;
-//			query.setParameterCall(getServer().getParameterCall()) ;
-			
-			ArrayList<?> listOfExtraData = new ArrayList() ;
-			SortierKriterium[] sortCrits = new SortierKriterium[0] ;
-			QueryParameters params = new QueryParameters(
-					query.getUsecaseId(), sortCrits, filterCrits, startIndex, listOfExtraData) ;
+			QueryParameters params = query.getDefaultQueryParameters(filterCrits) ;
 			params.setLimit(limit) ;
-			
+			params.setKeyOfSelectedRow(startIndex) ;
+
 			QueryResult result = query.setQuery(params) ;
-			orders = query.asOrderEntry(result) ;
+			orders = query.getResultList(result) ;
 		} catch(NamingException e) {
 			e.printStackTrace() ;
 		} catch(RemoteException e) {

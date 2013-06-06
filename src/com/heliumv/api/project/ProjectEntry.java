@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class ProjectEntry {
 	private Integer id ;
 	private String cnr ;
-	
+	private String customerName ;
 	
 	public Integer getId() {
 		return id;
@@ -19,5 +19,11 @@ public class ProjectEntry {
 	}
 	public void setCnr(String cnr) {
 		this.cnr = cnr;
+	}
+	public String getCustomerName() {
+		return customerName;
+	}
+	public void setCustomerName(String customerName) {
+		this.customerName = customerName;
 	}	
 }
