@@ -1,23 +1,25 @@
 package com.heliumv.factory;
 
+import javax.naming.NamingException;
+
 import com.lp.server.system.service.ModulberechtigungDto;
 import com.lp.server.system.service.ZusatzfunktionberechtigungDto;
 
 public interface IMandantCall {
-	ModulberechtigungDto[] modulberechtigungFindByMandantCnr(String mandantCnr) ;
+	ModulberechtigungDto[] modulberechtigungFindByMandantCnr(String mandantCnr) throws NamingException ;
 
-	ZusatzfunktionberechtigungDto[] zusatzfunktionberechtigungFindByMandantCnr(String mandantCnr) ;
+	ZusatzfunktionberechtigungDto[] zusatzfunktionberechtigungFindByMandantCnr(String mandantCnr) throws NamingException ;
 	
-	boolean hasModulAngebot(String mandantCnr) ;
+	boolean hasModulAngebot(String mandantCnr) throws NamingException ;
 
-	boolean hasModulAuftrag(String mandantCnr) ;
+	boolean hasModulAuftrag(String mandantCnr) throws NamingException ;
 	
-	boolean hasModulProjekt(String mandantCnr) ;
+	boolean hasModulProjekt(String mandantCnr) throws NamingException ;
 	
-	boolean hasModulLos(String mandantCnr) ;
+	boolean hasModulLos(String mandantCnr) throws NamingException ;
 	
-	boolean hasFunctionProjektZeiterfassung(String mandantCnr) ;
+	boolean hasFunctionProjektZeiterfassung(String mandantCnr) throws NamingException ;
 
-	boolean hasFunctionAngebotsZeiterfassung(String mandantCnr) ;
+	boolean hasFunctionAngebotsZeiterfassung(String mandantCnr) throws NamingException ;
 	
 }

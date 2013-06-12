@@ -20,11 +20,11 @@ import com.lp.util.EJBExceptionLP;
 
 public class ZeiterfassungCall extends BaseCall<ZeiterfassungFac> implements IZeiterfassungCall {
 
-	public ZeiterfassungCall() throws NamingException {
+	public ZeiterfassungCall()  {
 		super(ZeiterfassungFacBean) ;
 	}
 	
-	public TaetigkeitDto taetigkeitFindByCNr(String cNr, TheClientDto theClientDto) {
+	public TaetigkeitDto taetigkeitFindByCNr(String cNr, TheClientDto theClientDto) throws NamingException {
 		return getFac().taetigkeitFindByCNr(cNr, theClientDto) ;
 	}
 
@@ -36,22 +36,22 @@ public class ZeiterfassungCall extends BaseCall<ZeiterfassungFac> implements IZe
 	public Integer createZeitdaten(ZeitdatenDto zeitdatenDto,
 			boolean bBucheAutoPausen, boolean bBucheMitternachtssprung,
 			boolean bZeitverteilen, TheClientDto theClientDto)
-			throws EJBExceptionLP, RemoteException {
+			throws EJBExceptionLP, NamingException, RemoteException {
 		return getFac().createZeitdaten(zeitdatenDto, bBucheAutoPausen, bBucheMitternachtssprung, bZeitverteilen, theClientDto) ;
 	}
 	
-	public List<SpecialActivity> getAllSprSondertaetigkeitenNurBDEBuchbar(String language) throws RemoteException {
+	public List<SpecialActivity> getAllSprSondertaetigkeitenNurBDEBuchbar(String language) throws NamingException, RemoteException {
 		Map<?, ?> m =  getFac().getAllSprSondertaetigkeitenNurBDEBuchbar(language) ;
 		return convertFromActivities(m) ;
 	}
 	
-	public List<SpecialActivity> getAllSprSondertaetigkeiten(String language) throws RemoteException {
+	public List<SpecialActivity> getAllSprSondertaetigkeiten(String language) throws NamingException, RemoteException {
 		Map<?, ?> m =  getFac().getAllSprSondertaetigkeiten(language) ;
 		return convertFromActivities(m) ;
 	}
 	
 	
-	public List<DocumentType> getBebuchbareBelegarten(TheClientDto theClientDto) {
+	public List<DocumentType> getBebuchbareBelegarten(TheClientDto theClientDto) throws NamingException {
 		Map<String, String> m = getFac().getBebuchbareBelegarten(theClientDto) ;
 		return convertFromBelegarten(m) ;
 	}

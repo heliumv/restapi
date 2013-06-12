@@ -42,18 +42,23 @@
 			<ref bean="hvWorktime" />
 			<ref bean="hvOrder" />
 			<ref bean="hvProject" />
+			<ref bean="hvProduction" />
 		</jaxrs:serviceBeans>
 	</jaxrs:server>	
 	
 	<context:annotation-config />	
-	<bean id="clientCall" class="com.heliumv.factory.impl.ClientCall" lazy-init="true" />
-	<bean id="logonCall" class="com.heliumv.factory.impl.LogonCall" lazy-init="true" />
-	<bean id="parameterCall" class="com.heliumv.factory.impl.ParameterCall" lazy-init="true" />
-	<bean id="server" class="com.heliumv.factory.impl.ServerCall" lazy-init="true" />
-	
+	<bean id="clientCall" class="com.heliumv.factory.impl.ClientCall" lazy-init="true"/>
+	<bean id="fertigungCall" class="com.heliumv.factory.impl.FertigungCall" lazy-init="true"/>
+	<bean id="judgeCall" class="com.heliumv.factory.impl.JudgeCall" lazy-init="true"/>
+	<bean id="logonCall" class="com.heliumv.factory.impl.LogonCall" lazy-init="true"/>
+	<bean id="parameterCall" class="com.heliumv.factory.impl.ParameterCall" lazy-init="true"/>
+	<bean id="server" class="com.heliumv.factory.impl.ServerCall" lazy-init="true"/>
+	<bean id="stuecklisteCall" class="com.heliumv.factory.impl.StuecklisteCall" lazy-init="true"/>
+
 <!-- <bean id="deepThought" class="com.heliumv.hello.DeepThought" />  -->	
- 	<bean id="hvUser" class="com.heliumv.api.benutzer.UserApi" />
-	<bean id="hvWorktime" class="com.heliumv.api.worktime.WorktimeApi" />
-	<bean id="hvOrder" class="com.heliumv.api.order.OrderApi" />
-	<bean id="hvProject" class="com.heliumv.api.project.ProjectApi" />
+ 	<bean id="hvUser" class="com.heliumv.api.benutzer.UserApi" lazy-init="true" />
+	<bean id="hvWorktime" class="com.heliumv.api.worktime.WorktimeApi" lazy-init="true"/>
+	<bean id="hvOrder" class="com.heliumv.api.order.OrderApi" lazy-init="true"/>
+	<bean id="hvProject" class="com.heliumv.api.project.ProjectApi" lazy-init="true"/>
+	<bean id="hvProduction" class="com.heliumv.api.production.ProductionApi" lazy-init="true" />
 </beans>

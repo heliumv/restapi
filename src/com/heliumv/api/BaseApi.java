@@ -11,8 +11,11 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import org.apache.cxf.jaxrs.impl.ResponseBuilderImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.heliumv.factory.Globals;
+import com.heliumv.factory.IClientCall;
 import com.heliumv.factory.IServerCall;
 import com.heliumv.factory.impl.ServerCall;
+import com.lp.server.system.service.TheClientDto;
 import com.lp.util.EJBExceptionLP;
 
 public class BaseApi {
@@ -20,12 +23,34 @@ public class BaseApi {
 	private HttpServletResponse response ;
 	
 	@Autowired
-	private IServerCall server ;
+	private IServerCall serverCall ;
 
+	@Autowired
+	private IClientCall clientCall ;
+	
 	private ResponseBuilder getResponseBuilder() {
 		return new ResponseBuilderImpl() ;
 	}
 	
+	
+	public TheClientDto connectClient(String userId) {
+		Globals.setTheClientDto(null) ;
+		
+		if(null == userId || 0 == userId.trim().length()) {
+			respondBadRequest("userid", "{empty}") ;
+			return null ;
+		}
+
+		TheClientDto theClientDto = clientCall.theClientFindByUserLoggedIn(userId) ;
+		if (null == theClientDto || null == theClientDto.getIDPersonal()) {
+			respondUnauthorized() ; 
+		} else {
+			Globals.setTheClientDto(theClientDto) ;			
+		}
+		
+		return theClientDto ;
+	}
+
 	/**
 	 * Den Servlet Response auf "UNAUTHORIZED" setzen
 	 */
@@ -98,6 +123,13 @@ public class BaseApi {
 		getServletResponse().setStatus(Response.Status.BAD_REQUEST.getStatusCode()) ;		
 	}
 	
+	public void respondNotFound(String key, String value) {
+		getServletResponse().setHeader("x-hv-error-code", "4") ;
+		getServletResponse().setHeader("x-hv-error-key", key) ;
+		getServletResponse().setHeader("x-hv-error-value", value) ;
+		getServletResponse().setStatus(Response.Status.NOT_FOUND.getStatusCode()) ;				
+	}
+	
 	public void setHttpServletResponse(HttpServletResponse theResponse) {
 		response = theResponse ;
 	}
@@ -108,9 +140,19 @@ public class BaseApi {
 
 
 	protected IServerCall getServer() {
-		if(server == null) {
-			server = new ServerCall() ; 
+		if(serverCall == null) {
+			serverCall = new ServerCall() ; 
 		}
-		return server ;
+		return serverCall ;
+	}
+	
+	@Autowired(required=false)
+	protected void setServer(IServerCall newServer) {
+		serverCall = newServer ;
+	}
+	
+	@Autowired(required=false)
+	protected void setClient(IClientCall newClient) {
+		clientCall = newClient ;
 	}
 }

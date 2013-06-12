@@ -15,22 +15,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.heliumv.api.BaseApi;
-import com.heliumv.factory.Globals;
 import com.heliumv.factory.IClientCall;
 import com.heliumv.factory.IParameterCall;
 import com.heliumv.factory.impl.AuftragQuery;
 import com.heliumv.tools.FilterKriteriumCollector;
+import com.heliumv.tools.StringHelper;
 import com.lp.server.auftrag.service.AuftragFac;
 import com.lp.server.partner.service.KundeFac;
 import com.lp.server.partner.service.PartnerFac;
-import com.lp.server.system.service.TheClientDto;
 import com.lp.server.util.Facade;
 import com.lp.server.util.fastlanereader.service.query.FilterBlock;
 import com.lp.server.util.fastlanereader.service.query.FilterKriterium;
 import com.lp.server.util.fastlanereader.service.query.FilterKriteriumDirekt;
 import com.lp.server.util.fastlanereader.service.query.QueryParameters;
 import com.lp.server.util.fastlanereader.service.query.QueryResult;
-import com.lp.server.util.fastlanereader.service.query.SortierKriterium;
 
 @Service("hvOrder")
 @Path("/api/v1/order/")
@@ -53,21 +51,9 @@ public class OrderApi extends BaseApi implements IOrderApi  {
 			@QueryParam("filter_project") String filterProject,
 			@QueryParam("filter_withHidden") Boolean filterWithHidden) {
 		List<OrderEntry> orders = new ArrayList<OrderEntry>() ;
-
-		if(null == userId || 0 == userId.trim().length()) {
-			respondBadRequest("userid", "{empty}") ;
-			return orders ;
-		}
 	
 		try {
-//			TheClientDto theClientDto = getServer().getClientCall().theClientFindByUserLoggedIn(userId) ;
-			TheClientDto theClientDto = clientCall.theClientFindByUserLoggedIn(userId) ;
-			if (null == theClientDto || null == theClientDto.getIDPersonal()) {
-				respondUnauthorized() ; 
-				return orders ;
-			}
-			
-			Globals.setTheClientDto(theClientDto) ;
+			if(null == connectClient(userId)) return orders ;
 			
 			FilterKriteriumCollector collector = new FilterKriteriumCollector() ;
 			collector.add(buildFilterCnr(filterCnr)) ;
@@ -77,6 +63,7 @@ public class OrderApi extends BaseApi implements IOrderApi  {
 			FilterBlock filterCrits = new FilterBlock(collector.asArray(), "AND")  ;
 			
 			AuftragQuery query = new AuftragQuery(parameterCall) ;
+//			AuftragQuery query = new AuftragQuery() ;
 			QueryParameters params = query.getDefaultQueryParameters(filterCrits) ;
 			params.setLimit(limit) ;
 			params.setKeyOfSelectedRow(startIndex) ;
@@ -95,7 +82,7 @@ public class OrderApi extends BaseApi implements IOrderApi  {
 	private FilterKriterium buildFilterCnr(String cnr) {
 		if(cnr == null || cnr.trim().length() == 0) return null ;
 		
-		FilterKriteriumDirekt fk = new FilterKriteriumDirekt("c_nr", cnr.trim().replace("'", ""), 
+		FilterKriteriumDirekt fk = new FilterKriteriumDirekt("c_nr", StringHelper.removeSqlDelimiters(cnr), 
 				FilterKriterium.OPERATOR_LIKE, "", 
 				FilterKriteriumDirekt.PROZENT_LEADING, 
 				true, false, Facade.MAX_UNBESCHRAENKT) ;
@@ -107,7 +94,7 @@ public class OrderApi extends BaseApi implements IOrderApi  {
 	private FilterKriterium buildFilterProject(String project) {
 		if(null == project || project.trim().length() == 0) return null ;
 		
-		FilterKriteriumDirekt fk = new FilterKriteriumDirekt("c_bez", project.trim().replace("'", ""), 
+		FilterKriteriumDirekt fk = new FilterKriteriumDirekt("c_bez", StringHelper.removeSqlDelimiters(project), 
 				FilterKriterium.OPERATOR_LIKE, "",
 				FilterKriteriumDirekt.PROZENT_TRAILING, 
 				true, true, Facade.MAX_UNBESCHRAENKT) ;
@@ -127,7 +114,7 @@ public class OrderApi extends BaseApi implements IOrderApi  {
 
 		FilterKriteriumDirekt fk = new FilterKriteriumDirekt(AuftragFac.FLR_AUFTRAG_FLRKUNDE
 				+ "." + KundeFac.FLR_PARTNER + "."
-				+ PartnerFac.FLR_PARTNER_NAME1NACHNAMEFIRMAZEILE1, customer.trim().replace("'", ""),
+				+ PartnerFac.FLR_PARTNER_NAME1NACHNAMEFIRMAZEILE1, StringHelper.removeSqlDelimiters(customer),
 				FilterKriterium.OPERATOR_LIKE, "",
 				percentType, true, true, Facade.MAX_UNBESCHRAENKT); 
 		fk.wrapWithProzent() ;

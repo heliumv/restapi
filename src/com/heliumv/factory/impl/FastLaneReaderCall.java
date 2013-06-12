@@ -45,6 +45,8 @@ public abstract class FastLaneReaderCall extends BaseCall<FastLaneReader> implem
 			e.printStackTrace() ;
 		} catch(EJBExceptionLP e) {
 			e.printStackTrace() ;
+		} catch(NamingException e) {
+			e.printStackTrace() ;
 		}
 		
 		return new QueryResult(new Object[0][0], 0, 0, 0, 0) ;

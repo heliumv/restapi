@@ -14,12 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.heliumv.api.BaseApi;
-import com.heliumv.factory.Globals;
-import com.heliumv.factory.IClientCall;
 import com.heliumv.factory.IParameterCall;
 import com.heliumv.factory.impl.ProjectQuery;
 import com.heliumv.tools.FilterKriteriumCollector;
-import com.lp.server.system.service.TheClientDto;
+import com.heliumv.tools.StringHelper;
 import com.lp.server.util.Facade;
 import com.lp.server.util.fastlanereader.service.query.FilterBlock;
 import com.lp.server.util.fastlanereader.service.query.FilterKriterium;
@@ -29,10 +27,10 @@ import com.lp.server.util.fastlanereader.service.query.QueryResult;
 
 @Service("hvProject")
 @Path("/api/v1/project/")
-public class ProjectApi extends BaseApi {
+public class ProjectApi extends BaseApi implements IProjectApi {
 
-	@Autowired
-	private IClientCall clientCall ;
+//	@Autowired
+//	private IClientCall clientCall ;
 	@Autowired
 	private IParameterCall parameterCall ;
 
@@ -48,19 +46,11 @@ public class ProjectApi extends BaseApi {
 			@QueryParam("filter_withCancelled") Boolean filterWithHidden) {
 		List<ProjectEntry> projects = new ArrayList<ProjectEntry>() ;
 
-		if(null == userId || 0 == userId.trim().length()) {
-			respondBadRequest("userid", "{empty}") ;
-			return projects ;
-		}
-		
 		try {
-			TheClientDto theClientDto = clientCall.theClientFindByUserLoggedIn(userId) ;
-			if(null == theClientDto || null == theClientDto.getIDPersonal()) {
-				respondUnauthorized() ;
+			if(null == connectClient(userId)) {
 				return projects ;
 			}
-
-			Globals.setTheClientDto(theClientDto) ;	
+			
 			FilterKriteriumCollector collector = new FilterKriteriumCollector() ;
 			collector.add(buildFilterCnr(filterCnr)) ;
 			collector.add(buildFilterCompanyName(filterCompany)) ;
@@ -87,7 +77,7 @@ public class ProjectApi extends BaseApi {
 	private FilterKriterium buildFilterCnr(String cnr) {
 		if(cnr == null || cnr.trim().length() == 0) return null ;
 		
-		FilterKriteriumDirekt fk = new FilterKriteriumDirekt("c_nr", cnr.trim().replace("'", ""), 
+		FilterKriteriumDirekt fk = new FilterKriteriumDirekt("c_nr", StringHelper.removeSqlDelimiters(cnr), 
 				FilterKriterium.OPERATOR_LIKE, "", 
 				FilterKriteriumDirekt.PROZENT_LEADING, 
 				true, false, Facade.MAX_UNBESCHRAENKT) ;
@@ -101,7 +91,7 @@ public class ProjectApi extends BaseApi {
 		if(companyName == null || companyName.trim().length() == 0) return null ;
 		
 		FilterKriteriumDirekt fk = new FilterKriteriumDirekt(
-				"flrpartner.c_name1nachnamefirmazeile1", companyName.trim().replace("'", ""),
+				"flrpartner.c_name1nachnamefirmazeile1",StringHelper.removeSqlDelimiters(companyName),
 				FilterKriterium.OPERATOR_LIKE, "",
 				FilterKriteriumDirekt.PROZENT_TRAILING,
 				true, 

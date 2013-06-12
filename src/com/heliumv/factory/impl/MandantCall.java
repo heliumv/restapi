@@ -16,11 +16,11 @@ public class MandantCall extends BaseCall<MandantFac> implements IMandantCall {
 	private HashMap<String, String> moduls ;
 	private HashMap<String, String> functions ;
 	
-	public MandantCall() throws NamingException {
+	public MandantCall() {
 		super(MandantFacBean) ;
 	}
 
-	public ModulberechtigungDto[] modulberechtigungFindByMandantCnr(String mandantCnr) {
+	public ModulberechtigungDto[] modulberechtigungFindByMandantCnr(String mandantCnr) throws NamingException {
 		try {
 			return getFac().modulberechtigungFindByMandantCNr(mandantCnr) ;
 		} catch(RemoteException e) {			
@@ -29,7 +29,7 @@ public class MandantCall extends BaseCall<MandantFac> implements IMandantCall {
 		return new ModulberechtigungDto[0] ;
 	}
 
-	public ZusatzfunktionberechtigungDto[] zusatzfunktionberechtigungFindByMandantCnr(String mandantCnr) {
+	public ZusatzfunktionberechtigungDto[] zusatzfunktionberechtigungFindByMandantCnr(String mandantCnr) throws NamingException  {
 		try {
 			return getFac().zusatzfunktionberechtigungFindByMandantCNr(mandantCnr) ;
 		} catch(RemoteException e) {			
@@ -58,31 +58,31 @@ public class MandantCall extends BaseCall<MandantFac> implements IMandantCall {
 		}
 	}
 
-	public boolean hasModulAngebot(String mandantCnr) {
+	public boolean hasModulAngebot(String mandantCnr) throws NamingException {
 		return hasModul(LocaleFac.BELEGART_ANGEBOT, mandantCnr) ;
 	}
 
-	public boolean hasModulAuftrag(String mandantCnr) {
+	public boolean hasModulAuftrag(String mandantCnr) throws NamingException {
 		return hasModul(LocaleFac.BELEGART_AUFTRAG, mandantCnr) ;
 	}
 	
-	public boolean hasModulProjekt(String mandantCnr) {
+	public boolean hasModulProjekt(String mandantCnr) throws NamingException {
 		return hasModul(LocaleFac.BELEGART_PROJEKT, mandantCnr) ;
 	}
 	
-	public boolean hasModulLos(String mandantCnr) {
+	public boolean hasModulLos(String mandantCnr) throws NamingException {
 		return hasModul(LocaleFac.BELEGART_LOS, mandantCnr) ;
 	}	
 	
-	public boolean hasFunctionProjektZeiterfassung(String mandantCnr) {
+	public boolean hasFunctionProjektZeiterfassung(String mandantCnr) throws NamingException {
 		return hasFunction(MandantFac.ZUSATZFUNKTION_PROJEKTZEITERFASSUNG, mandantCnr) ;
 	}
 
-	public boolean hasFunctionAngebotsZeiterfassung(String mandantCnr) {
+	public boolean hasFunctionAngebotsZeiterfassung(String mandantCnr) throws NamingException  {
 		return hasFunction(MandantFac.ZUSATZFUNKTION_ANGEBOTSZEITERFASSUNG, mandantCnr) ;		
 	}
 	
-	private boolean hasModul(String whichModul, String mandantCnr) {
+	private boolean hasModul(String whichModul, String mandantCnr) throws NamingException  {
 		if(moduls == null) {
 			setModulBerechtigung(modulberechtigungFindByMandantCnr(mandantCnr)) ;
 		}
@@ -90,7 +90,7 @@ public class MandantCall extends BaseCall<MandantFac> implements IMandantCall {
 		return moduls.containsKey(whichModul.trim()) ;
 	}
 	
-	private boolean hasFunction(String whichFunction, String mandantCnr) {
+	private boolean hasFunction(String whichFunction, String mandantCnr) throws NamingException {
 		if(functions == null) {
 			setZusatzFunktionen(zusatzfunktionberechtigungFindByMandantCnr(mandantCnr)) ;
 		}

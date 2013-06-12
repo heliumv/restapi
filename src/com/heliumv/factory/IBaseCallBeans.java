@@ -7,10 +7,12 @@ package com.heliumv.factory;
  */
 public interface IBaseCallBeans {
 	static final String FastLaneReaderBean = "FastLaneReaderBean" ;
+	static final String FertigungFacBean = "FertigungFacBean" ;
 	static final String LogonFacBean = "LogonFacBean" ;
 	static final String MandantFacBean = "MandantFacBean" ;
 	static final String ParameterFacBean = "ParameterFacBean" ;
 	static final String PersonalFacBean = "PersonalFacBean" ;
+	static final String StuecklisteFacBean = "StuecklisteFacBean" ;
 	static final String TheClientFacBean = "TheClientFacBean" ;
 	static final String TheJudgeFacBean  = "TheJudgeFacBean" ;
 	static final String ZeiterfassungFacBean = "ZeiterfassungFacBean" ;

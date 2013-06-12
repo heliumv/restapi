@@ -14,12 +14,12 @@ import com.lp.util.Helper;
 
 public class LogonCall extends BaseCall<LogonFac> implements ILogonCall {
 
-	public LogonCall() throws NamingException {
+	public LogonCall() {
 		super(LogonFacBean) ;
 	}
 	
 	public TheClientDto logon(String benutzer, char[] kennwort,
-			Locale uILocale, String sMandantI) throws RemoteException {
+			Locale uILocale, String sMandantI) throws NamingException, RemoteException {
 
 		String logonCredential = benutzer ;
 		int indexPipe = benutzer.indexOf("|") ;
@@ -36,7 +36,7 @@ public class LogonCall extends BaseCall<LogonFac> implements ILogonCall {
 	}
 	
 
-	public void logout(TheClientDto theClientDto) throws RemoteException {
+	public void logout(TheClientDto theClientDto) throws NamingException, RemoteException {
 		getFac().logout(theClientDto) ;
 	}	
 }

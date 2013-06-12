@@ -11,4 +11,16 @@ public class StringHelper {
 	public static boolean isEmpty(String value) {
 		return value == null || value.trim().length() == 0 ;
 	}
+	
+	/**
+	 * Poor Mans Sql Delimiters entfernen
+	 * 
+	 * Einfache Anfuehrungszeichen entfernen
+	 * 
+	 * @param value
+	 * @return
+	 */
+	public static String removeSqlDelimiters(String value) {
+		return value.trim().replace("'", "") ;
+	}
 }

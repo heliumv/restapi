@@ -3,6 +3,7 @@ package com.heliumv.api.benutzer;
 import java.rmi.RemoteException;
 import java.util.Locale;
 
+import javax.naming.NamingException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -64,8 +65,8 @@ public class UserApi extends BaseApi implements IUserApi {
 				ResponseBuilder rBuild = Response.ok(theClientDto.getIDUser()) ;
 				return rBuild.build();
 			} 
-//		} catch(NamingException e) {
-//			return builder.status(Response.Status.SERVICE_UNAVAILABLE).build() ;
+		} catch(NamingException e) {
+			return builder.status(Response.Status.SERVICE_UNAVAILABLE).build() ;
 		} catch(RemoteException e) {
 			return builder.status(Response.Status.SERVICE_UNAVAILABLE).build() ;			
 		}
@@ -102,8 +103,8 @@ public class UserApi extends BaseApi implements IUserApi {
 				String id = theClientDto.getIDUser() ;
 				return id ;
 			} 
-//		} catch(NamingException e) {
-//			return "" ;
+		} catch(NamingException e) {
+			return "" ;
 		} catch(RemoteException e) {
 			return "" ;
 		}
@@ -125,8 +126,8 @@ public class UserApi extends BaseApi implements IUserApi {
 //				getServer().getLogonCall().logout(theClientDto) ;
 				logonCall.logout(theClientDto) ;
 			}
-//		} catch(NamingException e) {
-//			e.printStackTrace() ;
+		} catch(NamingException e) {
+			return Response.status(Status.SERVICE_UNAVAILABLE.getStatusCode()).build() ;
 		} catch(RemoteException e) {
 			return Response.status(Status.SERVICE_UNAVAILABLE.getStatusCode()).build() ;
 		}

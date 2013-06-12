@@ -10,11 +10,13 @@ import javax.naming.NamingException;
 public class BaseCall<T> implements IBaseCallBeans {
 	private Context context = null ;
 	private T callFac = null ;
+	private String beanName = null ;
 	
-  	protected BaseCall(String beanName) throws NamingException {
+  	protected BaseCall(String beanName) {
   		if(null == beanName || beanName.trim().length() == 0) throw new IllegalArgumentException("beanName == null or empty") ;
-		context = getInitialContext() ;
-		callFac = (T) context.lookup(getServerBeanName(beanName)) ;
+  		this.beanName = beanName ;
+//		context = getInitialContext() ;
+//		callFac = (T) context.lookup(getServerBeanName(beanName)) ;
 	}
 
 	private String getServerBeanName(String beanName) {
@@ -49,7 +51,12 @@ public class BaseCall<T> implements IBaseCallBeans {
 		return new InitialContext(environment);
 	}
 	
-	protected T getFac() {
+	protected T getFac() throws NamingException {
+		if(callFac == null) {
+			context = getInitialContext() ;
+			callFac = (T) context.lookup(getServerBeanName(beanName)) ;			
+		}
+		
 		return callFac ;
 	}
 }

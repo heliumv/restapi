@@ -12,7 +12,7 @@ import com.lp.util.EJBExceptionLP;
 
 public class ClientCall extends BaseCall<TheClientFac>  implements IClientCall {
 
-	public ClientCall() throws NamingException {
+	public ClientCall() {
 		super(TheClientFacBean) ;
 	}
 
@@ -23,6 +23,7 @@ public class ClientCall extends BaseCall<TheClientFac>  implements IClientCall {
 //			e.printStackTrace() ;
 		} catch(RemoteException e) {
 //			e.printStackTrace() ;
+		} catch(NamingException e) {
 		}
 
 		return null ;

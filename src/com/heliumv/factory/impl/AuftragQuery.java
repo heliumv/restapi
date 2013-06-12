@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.heliumv.api.order.OrderEntry;
 import com.heliumv.api.order.OrderEntryTransformer;
-import com.heliumv.api.project.ProjectEntry;
 import com.heliumv.factory.Globals;
 import com.heliumv.factory.IParameterCall;
 import com.lp.server.auftrag.service.AuftragFac;
@@ -30,6 +29,7 @@ public class AuftragQuery extends FastLaneReaderCall {
 		super(UUID.randomUUID().toString(), QueryParameters.UC_ID_AUFTRAG) ;
 	}
 	
+	@Autowired
 	public AuftragQuery(IParameterCall parameterCall) throws NamingException {
 		super(UUID.randomUUID().toString(), QueryParameters.UC_ID_AUFTRAG) ;
 		this.parameterCall = parameterCall ;
@@ -47,27 +47,7 @@ public class AuftragQuery extends FastLaneReaderCall {
 	public List<OrderEntry> getResultList(QueryResult result) {
 		return entryTransformer.transform(result.getRowData()) ;
 	}
-		
-	public List<OrderEntry> asOrderEntry(QueryResult result) {
-		ArrayList<OrderEntry> orders = new ArrayList<OrderEntry>() ;
-		if(result.getRowData() == null || result.getRowData().length == 0) return orders ;
-		
-		for (Object[] objects : result.getRowData()) {
-			OrderEntry entry = new OrderEntry() ;
-			entry.setId((Integer) objects[0]) ;
-			entry.setOrderType((String) objects[1]) ;
-			entry.setCnr((String) objects[2]) ;
-			entry.setCustomerName((String) objects[3]) ;
-			entry.setCustomerAddress((String) objects[4]) ;
-			entry.setProjectName((String) objects[5]) ;
-//			entry.setOrderState((String) data[i][9]) ;
-			
-			orders.add(entry) ;			
-		}
 
-		return orders ;
-	}
-	
 	
 	protected List<FilterKriterium> getRequiredFilters() {
 		List<FilterKriterium> filters = new ArrayList<FilterKriterium>() ;
@@ -80,6 +60,8 @@ public class AuftragQuery extends FastLaneReaderCall {
 			} else {
 				filters.add(getFiltersErledigteNichtBuchbar()) ;
 			}
+		} catch(NamingException e) {			
+			filters.add(getFiltersErledigteNichtBuchbar()) ;
 		} catch(RemoteException e) {
 			filters.add(getFiltersErledigteNichtBuchbar()) ;
  		}
