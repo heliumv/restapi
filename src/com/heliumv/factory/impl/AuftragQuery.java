@@ -13,6 +13,7 @@ import com.heliumv.api.order.OrderEntry;
 import com.heliumv.api.order.OrderEntryTransformer;
 import com.heliumv.factory.Globals;
 import com.heliumv.factory.IParameterCall;
+import com.heliumv.tools.StringHelper;
 import com.lp.server.auftrag.service.AuftragFac;
 import com.lp.server.auftrag.service.AuftragServiceFac;
 import com.lp.server.util.fastlanereader.service.query.FilterKriterium;
@@ -25,7 +26,7 @@ public class AuftragQuery extends FastLaneReaderCall {
 	
 	private OrderEntryTransformer entryTransformer = new OrderEntryTransformer() ;
 	
-	public AuftragQuery() throws NamingException {
+	public AuftragQuery() {
 		super(UUID.randomUUID().toString(), QueryParameters.UC_ID_AUFTRAG) ;
 	}
 	
@@ -71,23 +72,23 @@ public class AuftragQuery extends FastLaneReaderCall {
 	
 	private FilterKriterium getMandantFilter() {
 		return new FilterKriterium(
-				AuftragFac.FLR_AUFTRAG_MANDANT_C_NR, true, "'"
-						+ Globals.getTheClientDto().getMandant() + "'",
+				AuftragFac.FLR_AUFTRAG_MANDANT_C_NR, true, 
+				StringHelper.asSqlString(Globals.getTheClientDto().getMandant()),
 				FilterKriterium.OPERATOR_EQUAL, false);		
 	}
 	
 	private FilterKriterium getFilterErledigteBuchbar() {
 		return new FilterKriterium(
-				AuftragFac.FLR_AUFTRAG_AUFTRAGSTATUS_C_NR, true, "('"
-						+ AuftragServiceFac.AUFTRAGSTATUS_STORNIERT + "')",
+				AuftragFac.FLR_AUFTRAG_AUFTRAGSTATUS_C_NR, true, "(" +
+						StringHelper.asSqlString(AuftragServiceFac.AUFTRAGSTATUS_STORNIERT) + ")",
 				FilterKriterium.OPERATOR_NOT_IN, false);
 	}
 
 	private FilterKriterium getFiltersErledigteNichtBuchbar() {
 		return new FilterKriterium(
-				AuftragFac.FLR_AUFTRAG_AUFTRAGSTATUS_C_NR, true, "('"
-						+ AuftragServiceFac.AUFTRAGSTATUS_ERLEDIGT + "','"
-						+ AuftragServiceFac.AUFTRAGSTATUS_STORNIERT + "')",
+				AuftragFac.FLR_AUFTRAG_AUFTRAGSTATUS_C_NR, true, "(" +
+						StringHelper.asSqlString(AuftragServiceFac.AUFTRAGSTATUS_ERLEDIGT) + "," +
+						StringHelper.asSqlString(AuftragServiceFac.AUFTRAGSTATUS_STORNIERT) + ")",
 				FilterKriterium.OPERATOR_NOT_IN, false);
 	}
 }

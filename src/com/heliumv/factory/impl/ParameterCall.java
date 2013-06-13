@@ -54,8 +54,8 @@ public class ParameterCall extends BaseCall<ParameterFac> implements IParameterC
 		
 		ParametermandantDto parameter = getFac()
 				.getMandantparameter(Globals.getTheClientDto().getMandant(),
-						ParameterFac.PARAMETER_ARTIKEL_MAXIMALELAENGE_ARTIKELNUMMER,
-						ParameterFac.KATEGORIE_ARTIKEL);
+						ParameterFac.KATEGORIE_ARTIKEL,
+						ParameterFac.PARAMETER_ARTIKEL_MAXIMALELAENGE_ARTIKELNUMMER);
 		if (parameter.getCWertAsObject() != null) {
 			defaultLaenge = ((Integer) parameter.getCWertAsObject()).intValue();
 		}

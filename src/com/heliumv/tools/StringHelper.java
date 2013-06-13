@@ -13,7 +13,7 @@ public class StringHelper {
 	}
 	
 	/**
-	 * Poor Mans Sql Delimiters entfernen
+	 * Poor Mans SQL Delimiters entfernen
 	 * 
 	 * Einfache Anfuehrungszeichen entfernen
 	 * 
@@ -22,5 +22,15 @@ public class StringHelper {
 	 */
 	public static String removeSqlDelimiters(String value) {
 		return value.trim().replace("'", "") ;
+	}
+	
+	/**
+	 * Poor Mans SQL "String" Darstellung erzeugen
+	 * 
+	 * @param value
+	 * @return den um Hochkomma erweiterten String
+	 */
+	public static String asSqlString(String value) {
+		return "'" + value + "'" ;
 	}
 }

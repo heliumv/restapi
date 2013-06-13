@@ -13,6 +13,7 @@ public interface IBaseCallBeans {
 	static final String ParameterFacBean = "ParameterFacBean" ;
 	static final String PersonalFacBean = "PersonalFacBean" ;
 	static final String StuecklisteFacBean = "StuecklisteFacBean" ;
+	static final String SystemFacBean = "SystemFacBean" ;
 	static final String TheClientFacBean = "TheClientFacBean" ;
 	static final String TheJudgeFacBean  = "TheJudgeFacBean" ;
 	static final String ZeiterfassungFacBean = "ZeiterfassungFacBean" ;

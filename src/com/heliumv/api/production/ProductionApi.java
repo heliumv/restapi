@@ -37,6 +37,7 @@ import com.lp.server.util.fastlanereader.service.query.FilterKriterium;
 import com.lp.server.util.fastlanereader.service.query.FilterKriteriumDirekt;
 import com.lp.server.util.fastlanereader.service.query.QueryParameters;
 import com.lp.server.util.fastlanereader.service.query.QueryResult;
+import com.lp.util.EJBExceptionLP;
 
 @Service("hvProduction")
 @Path("/api/v1/production/")
@@ -66,10 +67,7 @@ public class ProductionApi extends BaseApi implements IProductionApi {
 			@QueryParam("filter_withHidden") Boolean filterWithHidden) {
 		List<ProductionEntry> productions = new ArrayList<ProductionEntry>() ;
 
-		if(connectClient(userId) == null) {
-			respondUnauthorized() ;
-			return productions ;
-		}
+		if(connectClient(userId) == null)  return productions ;
 
 		FilterKriteriumCollector collector = new FilterKriteriumCollector() ;
 		collector.add(buildFilterCnr(filterCnr)) ;
@@ -115,6 +113,8 @@ public class ProductionApi extends BaseApi implements IProductionApi {
 		} catch(RemoteException e) {
 			e.printStackTrace() ;
 			respondUnavailable(e) ;
+		} catch(EJBExceptionLP e) {
+			respondBadRequest(e) ;
 		}
 	}
 

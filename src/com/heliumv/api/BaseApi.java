@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.heliumv.factory.Globals;
 import com.heliumv.factory.IClientCall;
+import com.heliumv.factory.IGlobalInfo;
 import com.heliumv.factory.IServerCall;
 import com.heliumv.factory.impl.ServerCall;
 import com.lp.server.system.service.TheClientDto;
@@ -28,12 +29,16 @@ public class BaseApi {
 	@Autowired
 	private IClientCall clientCall ;
 	
+	@Autowired
+	private IGlobalInfo globalInfo ;
+	
 	private ResponseBuilder getResponseBuilder() {
 		return new ResponseBuilderImpl() ;
 	}
 	
 	
 	public TheClientDto connectClient(String userId) {
+		globalInfo.setTheClientDto(null) ;
 		Globals.setTheClientDto(null) ;
 		
 		if(null == userId || 0 == userId.trim().length()) {
@@ -46,6 +51,7 @@ public class BaseApi {
 			respondUnauthorized() ; 
 		} else {
 			Globals.setTheClientDto(theClientDto) ;			
+			globalInfo.setTheClientDto(theClientDto) ;
 		}
 		
 		return theClientDto ;
@@ -106,11 +112,25 @@ public class BaseApi {
 		getServletResponse().setStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()) ;		
 	}
 
+	public void respondBadRequest(EJBExceptionLP e) {
+		getServletResponse().setHeader("x-hv-error-code", "5") ;
+		getServletResponse().setHeader("x-hv-error-code-extended", new Integer(e.getCode()).toString()) ;
+		getServletResponse().setHeader("x-hv-error-description", e.getCause().getMessage()) ;		
+		getServletResponse().setStatus(Response.Status.BAD_REQUEST.getStatusCode()) ;		
+	}
+
 	public Response getBadRequest(String key, Object value) {
-		return getResponseBuilder().status(Response.Status.BAD_GATEWAY)
+		return getResponseBuilder().status(Response.Status.BAD_REQUEST)
 				.header("x-hv-error-code", 3)
 				.header("x-hv-error-key", key)
 				.header("x-hv-error-value", value).build() ;
+	}
+	
+	public Response getBadRequest(EJBExceptionLP e) {
+		return getResponseBuilder().status(Response.Status.BAD_REQUEST)
+				.header("x-hv-error-code", "5")
+				.header("x-hv-error-code-extended", new Integer(e.getCode()).toString())
+				.header("x-hv-error-description", e.getCause().getMessage()).build() ;
 	}
 	
 	/**

@@ -22,7 +22,7 @@ public abstract class FastLaneReaderCall extends BaseCall<FastLaneReader> implem
 	private String uuid ;
 	private Integer usecaseId ;
 	
-	protected FastLaneReaderCall(String theUuid, Integer theUsecaseId) throws NamingException {
+	protected FastLaneReaderCall(String theUuid, Integer theUsecaseId) {
 		super(FastLaneReaderBean) ;
 		
 		uuid = theUuid ;

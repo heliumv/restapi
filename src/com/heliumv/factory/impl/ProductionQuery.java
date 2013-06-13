@@ -12,6 +12,7 @@ import com.heliumv.api.production.ProductionEntry;
 import com.heliumv.api.production.ProductionEntryTransformer;
 import com.heliumv.factory.Globals;
 import com.heliumv.factory.IParameterCall;
+import com.heliumv.tools.StringHelper;
 import com.lp.server.util.fastlanereader.service.query.FilterKriterium;
 import com.lp.server.util.fastlanereader.service.query.QueryParameters;
 import com.lp.server.util.fastlanereader.service.query.QueryResult;
@@ -22,7 +23,7 @@ public class ProductionQuery extends FastLaneReaderCall {
 
 	private ProductionEntryTransformer entryTransformer = new ProductionEntryTransformer() ;
 	
-	public ProductionQuery() throws NamingException {
+	public ProductionQuery() {
 		super(UUID.randomUUID().toString(), QueryParameters.UC_ID_LOS) ;
 	}
 	
@@ -46,7 +47,7 @@ public class ProductionQuery extends FastLaneReaderCall {
 
 	private FilterKriterium getMandantFilter() {
 		return new FilterKriterium("flrlos.mandant_c_nr", true,
-				"'" + Globals.getTheClientDto().getMandant()  + "'",
+				StringHelper.asSqlString( Globals.getTheClientDto().getMandant()),
 				FilterKriterium.OPERATOR_EQUAL, false);
 	}
 }

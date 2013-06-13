@@ -12,6 +12,7 @@ import com.heliumv.api.project.ProjectEntry;
 import com.heliumv.api.project.ProjectEntryTransformer;
 import com.heliumv.factory.Globals;
 import com.heliumv.factory.IParameterCall;
+import com.heliumv.tools.StringHelper;
 import com.lp.server.projekt.service.ProjektFac;
 import com.lp.server.util.fastlanereader.service.query.FilterKriterium;
 import com.lp.server.util.fastlanereader.service.query.QueryParameters;
@@ -23,7 +24,7 @@ public class ProjectQuery extends FastLaneReaderCall {
 
 	private ProjectEntryTransformer entryTransformer = new ProjectEntryTransformer() ;
 	
-	public ProjectQuery() throws NamingException {
+	public ProjectQuery() {
 		super(UUID.randomUUID().toString(), QueryParameters.UC_ID_PROJEKT) ;
 	}
 
@@ -53,8 +54,8 @@ public class ProjectQuery extends FastLaneReaderCall {
 	
 	private FilterKriterium getMandantFilter() {
 		return new FilterKriterium(
-				ProjektFac.FLR_PROJEKT_MANDANT_C_NR, true, "'"
-						+ Globals.getTheClientDto().getMandant() + "'",
+				ProjektFac.FLR_PROJEKT_MANDANT_C_NR, true, 
+				StringHelper.asSqlString(Globals.getTheClientDto().getMandant()),
 				FilterKriterium.OPERATOR_EQUAL, false);		
 	}
 }

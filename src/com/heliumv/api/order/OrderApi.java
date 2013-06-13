@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.heliumv.api.BaseApi;
-import com.heliumv.factory.IClientCall;
 import com.heliumv.factory.IParameterCall;
 import com.heliumv.factory.impl.AuftragQuery;
 import com.heliumv.tools.FilterKriteriumCollector;
@@ -35,9 +34,10 @@ import com.lp.server.util.fastlanereader.service.query.QueryResult;
 public class OrderApi extends BaseApi implements IOrderApi  {
 
 	@Autowired
-	private IClientCall clientCall ;
-	@Autowired
 	private IParameterCall parameterCall ;
+	
+	@Autowired
+	private AuftragQuery orderQuery ;
 	
 	@GET
 	@Path("/{userid}")
@@ -62,14 +62,14 @@ public class OrderApi extends BaseApi implements IOrderApi  {
 			collector.add(buildFilterWithHidden(filterWithHidden)) ;
 			FilterBlock filterCrits = new FilterBlock(collector.asArray(), "AND")  ;
 			
-			AuftragQuery query = new AuftragQuery(parameterCall) ;
+//			AuftragQuery query = new AuftragQuery(parameterCall) ;
 //			AuftragQuery query = new AuftragQuery() ;
-			QueryParameters params = query.getDefaultQueryParameters(filterCrits) ;
+			QueryParameters params = orderQuery.getDefaultQueryParameters(filterCrits) ;
 			params.setLimit(limit) ;
 			params.setKeyOfSelectedRow(startIndex) ;
 
-			QueryResult result = query.setQuery(params) ;
-			orders = query.getResultList(result) ;
+			QueryResult result = orderQuery.setQuery(params) ;
+			orders = orderQuery.getResultList(result) ;
 		} catch(NamingException e) {
 			e.printStackTrace() ;
 		} catch(RemoteException e) {
