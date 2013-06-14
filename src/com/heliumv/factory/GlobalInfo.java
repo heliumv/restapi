@@ -15,4 +15,11 @@ public class GlobalInfo implements IGlobalInfo {
 	public void setTheClientDto(TheClientDto theClientDto) {
 		this.theClientDto = theClientDto ;
 	}
+	
+	@Override
+	public String getMandant() {
+		if(theClientDto == null) return null ;
+		
+		return theClientDto.getMandant() ;
+	}
 }

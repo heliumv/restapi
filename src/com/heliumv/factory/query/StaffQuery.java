@@ -1,8 +1,7 @@
-package com.heliumv.factory.impl;
+package com.heliumv.factory.query;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import javax.naming.NamingException;
 
@@ -13,6 +12,7 @@ import com.heliumv.api.staff.StaffEntryTransformer;
 import com.heliumv.factory.IGlobalInfo;
 import com.heliumv.factory.IJudgeCall;
 import com.heliumv.factory.IPersonalCall;
+import com.heliumv.factory.impl.FastLaneReaderCall;
 import com.heliumv.tools.StringHelper;
 import com.lp.server.personal.service.PersonalDto;
 import com.lp.server.util.fastlanereader.service.query.FilterKriterium;
@@ -32,7 +32,7 @@ public class StaffQuery extends FastLaneReaderCall {
 	private StaffEntryTransformer entryTransformer = new StaffEntryTransformer() ;
 	
 	public StaffQuery() {
-		super(UUID.randomUUID().toString(), QueryParameters.UC_ID_PERSONAL) ;
+		super(QueryParameters.UC_ID_PERSONAL) ;
 	}
 	
 	@Override

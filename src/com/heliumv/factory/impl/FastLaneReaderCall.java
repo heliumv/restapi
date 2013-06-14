@@ -3,6 +3,7 @@ package com.heliumv.factory.impl;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.naming.NamingException;
 
@@ -21,6 +22,10 @@ public abstract class FastLaneReaderCall extends BaseCall<FastLaneReader> implem
 	
 	private String uuid ;
 	private Integer usecaseId ;
+	
+	protected FastLaneReaderCall(Integer theUsercaseId) {
+		this(UUID.randomUUID().toString(), theUsercaseId) ;
+	}
 	
 	protected FastLaneReaderCall(String theUuid, Integer theUsecaseId) {
 		super(FastLaneReaderBean) ;

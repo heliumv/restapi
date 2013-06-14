@@ -4,9 +4,10 @@ import java.sql.Timestamp;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.heliumv.api.BaseEntryId;
+
 @XmlRootElement
-public class OrderEntry {
-	private Integer id ;
+public class OrderEntry extends BaseEntryId {
 	private String cnr ;
 	
 	private String orderType ;
@@ -17,12 +18,6 @@ public class OrderEntry {
 	private String customerName ;
 	private String customerAddress ;
 	
-	public Integer getId() {
-		return id;
-	}
-	public void setId(Integer id) {
-		this.id = id;
-	}
 	public String getCnr() {
 		return cnr;
 	}

@@ -1,9 +1,8 @@
-package com.heliumv.factory.impl;
+package com.heliumv.factory.query;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import javax.naming.NamingException;
 
@@ -15,6 +14,7 @@ import com.heliumv.factory.Globals;
 import com.heliumv.factory.IMandantCall;
 import com.heliumv.factory.IParameterCall;
 import com.heliumv.factory.ISystemCall;
+import com.heliumv.factory.impl.FastLaneReaderCall;
 import com.heliumv.tools.StringHelper;
 import com.lp.server.artikel.service.ArtikelFac;
 import com.lp.server.util.fastlanereader.service.query.FilterKriterium;
@@ -33,7 +33,7 @@ public class ArtikelArbeitszeitQuery extends FastLaneReaderCall {
 	private ItemEntryTransformer entryTransformer = new ItemEntryTransformer() ;
 	
 	public ArtikelArbeitszeitQuery() {
-		super(UUID.randomUUID().toString(), QueryParameters.UC_ID_ARTIKELLISTE) ;
+		super(QueryParameters.UC_ID_ARTIKELLISTE) ;
 	}
 	
 	public List<ItemEntry> getResultList(QueryResult result) {

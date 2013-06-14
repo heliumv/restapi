@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 import com.heliumv.api.BaseApi;
 import com.heliumv.factory.IParameterCall;
-import com.heliumv.factory.impl.AuftragQuery;
+import com.heliumv.factory.query.AuftragQuery;
 import com.heliumv.tools.FilterKriteriumCollector;
 import com.heliumv.tools.StringHelper;
 import com.lp.server.auftrag.service.AuftragFac;
@@ -62,8 +62,6 @@ public class OrderApi extends BaseApi implements IOrderApi  {
 			collector.add(buildFilterWithHidden(filterWithHidden)) ;
 			FilterBlock filterCrits = new FilterBlock(collector.asArray(), "AND")  ;
 			
-//			AuftragQuery query = new AuftragQuery(parameterCall) ;
-//			AuftragQuery query = new AuftragQuery() ;
 			QueryParameters params = orderQuery.getDefaultQueryParameters(filterCrits) ;
 			params.setLimit(limit) ;
 			params.setKeyOfSelectedRow(startIndex) ;
@@ -105,9 +103,6 @@ public class OrderApi extends BaseApi implements IOrderApi  {
 	
 	private FilterKriterium buildFilterCustomer(String customer) throws NamingException, RemoteException {
 		if(null == customer || customer.trim().length() == 0) return null ;
-
-//		int percentType = getServer().getParameterCall()
-//				.isPartnerSucheWildcardBeidseitig() ? FilterKriteriumDirekt.PROZENT_BOTH : FilterKriteriumDirekt.PROZENT_TRAILING ;
 
 		int percentType = parameterCall
 				.isPartnerSucheWildcardBeidseitig() ? FilterKriteriumDirekt.PROZENT_BOTH : FilterKriteriumDirekt.PROZENT_TRAILING ;

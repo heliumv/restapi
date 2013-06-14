@@ -4,20 +4,14 @@ import java.math.BigDecimal;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.heliumv.api.BaseEntryId;
+
 @XmlRootElement
-public class ProductionEntry {
-	private Integer id ;
+public class ProductionEntry extends BaseEntryId {
 	private String cnr ;
 	private Integer amount ;
 	private String orderOrItemCnr ;
-	
-	
-	public Integer getId() {
-		return id;
-	}
-	public void setId(Integer id) {
-		this.id = id;
-	}
+		
 	public String getCnr() {
 		return cnr;
 	}

@@ -33,4 +33,22 @@ public interface IFertigungCall {
 	 * @return null wenn das Los nicht vorhanden ist, ansonsten das dto
 	 */
 	LosDto losFindByPrimaryKeyOhneExc(Integer losId) ;
+
+	/**
+	 * Los ueber seine Nummer im angemeldeten Mandanten finden
+	 * 
+	 * @param cNr
+	 * @return
+	 * @throws NamingException
+	 */
+	LosDto losFindByCNrMandantCNrOhneExc(String cNr) throws NamingException ;
+
+	/**
+	 * Los ueber seine Nummer in einem beliebigen Mandanten finden
+	 * @param cNr
+	 * @param mandantCNr
+	 * @return
+	 * @throws NamingException
+	 */
+	LosDto losFindByCNrMandantCNrOhneExc(String cNr, String mandantCNr) throws NamingException ;
 }

@@ -21,13 +21,15 @@ import org.springframework.stereotype.Service;
 
 import com.heliumv.api.BaseApi;
 import com.heliumv.factory.Globals;
+import com.heliumv.factory.IFertigungCall;
 import com.heliumv.factory.IGlobalInfo;
 import com.heliumv.factory.IJudgeCall;
 import com.heliumv.factory.IMandantCall;
 import com.heliumv.factory.IPersonalCall;
 import com.heliumv.factory.IZeiterfassungCall;
-import com.heliumv.factory.impl.ArtikelArbeitszeitQuery;
+import com.heliumv.factory.query.ArtikelArbeitszeitQuery;
 import com.heliumv.tools.FilterKriteriumCollector;
+import com.lp.server.fertigung.service.LosDto;
 import com.lp.server.personal.service.PersonalDto;
 import com.lp.server.personal.service.TaetigkeitDto;
 import com.lp.server.personal.service.ZeitdatenDto;
@@ -45,6 +47,9 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 	
 	@Autowired
 	private IJudgeCall judgeCall ;
+	
+	@Autowired
+	private IFertigungCall fertigungCall ;
 	
 	@Autowired
 	private IMandantCall mandantCall ;
@@ -105,9 +110,16 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 		if(connectClient(entry.getUserId()) == null) return getUnauthorized() ;
 		try {
 			if(!mandantCall.hasModulProjekt()) return getUnauthorized() ;
-	
+			if(!isValidPersonalId(entry.getForUserId())) {
+				entry.setForUserId(globalInfo.getTheClientDto().getIDPersonal()) ;
+			}
+
+			if(!isValidProductionId(entry.getProductionId())) {
+				return getBadRequest("productionId",  entry.getProductionId().toString()) ;
+			}
+			
 			ZeitdatenDto zDto = new ZeitdatenDto() ;
-			zDto.setPersonalIId(globalInfo.getTheClientDto().getIDPersonal()) ;
+			zDto.setPersonalIId(entry.getForUserId()) ;
 			zDto.setCBelegartnr(LocaleFac.BELEGART_LOS) ;
 			zDto.setIBelegartid(entry.getProductionId()) ;
 			zDto.setArtikelIId(entry.getWorkItemId()) ;
@@ -125,6 +137,27 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 			return getBadRequest(e) ;
 		}
 		return getNoContent() ;
+	}
+	
+	private boolean isValidProductionId(Integer productionId) {
+		LosDto losDto = fertigungCall.losFindByPrimaryKeyOhneExc(productionId) ;
+		return losDto.getMandantCNr().equals(globalInfo.getMandant()) ;
+	}
+	
+	private boolean isValidPersonalId(Integer forUserId) throws NamingException {
+		if(forUserId == null) return false ;
+		
+		if(judgeCall.hasPersSichtbarkeitAlle()) return true ;
+		if(judgeCall.hasPersSichtbarkeitAbteilung()) {
+			PersonalDto forPers = personalCall.byPrimaryKeySmall(forUserId) ;
+			if(forPers == null) return false ;
+			PersonalDto mePers = personalCall.byPrimaryKeySmall(globalInfo.getTheClientDto().getIDPersonal()) ;
+			if(mePers.getKostenstelleIIdAbteilung() == null) return false ;
+			
+			return mePers.getKostenstelleIIdAbteilung().equals(forPers.getKostenstelleIIdAbteilung()) ;
+		}
+
+		return false ;
 	}
 	
 //	@GET

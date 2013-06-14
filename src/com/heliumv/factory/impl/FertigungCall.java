@@ -6,17 +6,22 @@ import java.util.ArrayList;
 
 import javax.naming.NamingException;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.heliumv.factory.BaseCall;
-import com.heliumv.factory.Globals;
 import com.heliumv.factory.IFertigungCall;
+import com.heliumv.factory.IGlobalInfo;
 import com.lp.server.fertigung.service.BucheSerienChnrAufLosDto;
 import com.lp.server.fertigung.service.FertigungFac;
 import com.lp.server.fertigung.service.LosDto;
 import com.lp.server.fertigung.service.LosablieferungDto;
-import com.lp.server.system.service.TheClientDto;
 import com.lp.util.EJBExceptionLP;
 
 public class FertigungCall extends BaseCall<FertigungFac> implements IFertigungCall {
+
+	@Autowired
+	private IGlobalInfo globalInfo ;
+	
 	public FertigungCall() {
 		super(FertigungFacBean) ;
 	}
@@ -39,7 +44,7 @@ public class FertigungCall extends BaseCall<FertigungFac> implements IFertigungC
 		try {
 			getFac().bucheMaterialAufLos(losDto, menge, bHandausgabe, 
 					bNurFehlmengenAnlegenUndReservierungenLoeschen, bUnterstuecklistenAbbuchen, 
-					Globals.getTheClientDto(), bucheSerienChnrAufLosDtos, throwExceptionWhenCreate) ;
+					globalInfo.getTheClientDto(), bucheSerienChnrAufLosDtos, throwExceptionWhenCreate) ;
 		} catch(NamingException e) {
 			e.printStackTrace() ;
 		}
@@ -49,7 +54,7 @@ public class FertigungCall extends BaseCall<FertigungFac> implements IFertigungC
 	@Override
 	public LosablieferungDto createLosablieferung(
 			LosablieferungDto losablieferungDto, boolean bErledigt) throws NamingException, RemoteException, EJBExceptionLP {
-		return getFac().createLosablieferung(losablieferungDto, Globals.getTheClientDto(), bErledigt) ;
+		return getFac().createLosablieferung(losablieferungDto, globalInfo.getTheClientDto(), bErledigt) ;
 	}
 
 
@@ -59,7 +64,7 @@ public class FertigungCall extends BaseCall<FertigungFac> implements IFertigungC
 		try {
 			losDto = getFac().losFindByPrimaryKeyOhneExc(losId) ;
 			if(losDto != null) {
-				if(!losDto.getMandantCNr().equals(Globals.getTheClientDto().getMandant())) {
+				if(!losDto.getMandantCNr().equals(globalInfo.getMandant())) {
 					losDto = null ;
 				}
 			}
@@ -67,4 +72,13 @@ public class FertigungCall extends BaseCall<FertigungFac> implements IFertigungC
 		}
 		return losDto ;
 	}	
+	
+	public LosDto losFindByCNrMandantCNrOhneExc(String cNr) throws NamingException {
+		return losFindByCNrMandantCNrOhneExc(cNr, globalInfo.getMandant()) ;
+	}
+
+	public LosDto losFindByCNrMandantCNrOhneExc(String cNr, String mandantCNr) throws NamingException {
+		return getFac().losFindByCNrMandantCNrOhneExc(cNr, mandantCNr) ;
+	}
+	
 }

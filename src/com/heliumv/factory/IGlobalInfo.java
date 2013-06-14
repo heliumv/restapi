@@ -6,4 +6,6 @@ public interface IGlobalInfo {
 	
 	TheClientDto getTheClientDto() ;
 	void setTheClientDto(TheClientDto theClientDto) ;
+	
+	String getMandant() ;
 }

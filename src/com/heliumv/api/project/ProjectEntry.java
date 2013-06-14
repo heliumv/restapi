@@ -2,18 +2,13 @@ package com.heliumv.api.project;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.heliumv.api.BaseEntryId;
+
 @XmlRootElement
-public class ProjectEntry {
-	private Integer id ;
+public class ProjectEntry extends BaseEntryId {
 	private String cnr ;
 	private String customerName ;
 	
-	public Integer getId() {
-		return id;
-	}
-	public void setId(Integer id) {
-		this.id = id;
-	}
 	public String getCnr() {
 		return cnr;
 	}

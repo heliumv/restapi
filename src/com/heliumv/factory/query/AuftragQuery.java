@@ -1,9 +1,8 @@
-package com.heliumv.factory.impl;
+package com.heliumv.factory.query;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import javax.naming.NamingException;
 
@@ -18,21 +17,20 @@ import com.lp.server.auftrag.service.AuftragFac;
 import com.lp.server.auftrag.service.AuftragServiceFac;
 import com.lp.server.util.fastlanereader.service.query.FilterKriterium;
 import com.lp.server.util.fastlanereader.service.query.QueryParameters;
-import com.lp.server.util.fastlanereader.service.query.QueryResult;
 
-public class AuftragQuery extends FastLaneReaderCall {
+public class AuftragQuery extends BaseQuery<OrderEntry> {
 	@Autowired
 	private IParameterCall parameterCall ;
-	
-	private OrderEntryTransformer entryTransformer = new OrderEntryTransformer() ;
-	
+
 	public AuftragQuery() {
-		super(UUID.randomUUID().toString(), QueryParameters.UC_ID_AUFTRAG) ;
+		super(QueryParameters.UC_ID_AUFTRAG) ;
+		setTransformer(new OrderEntryTransformer()) ;
 	}
 	
 	@Autowired
 	public AuftragQuery(IParameterCall parameterCall) throws NamingException {
-		super(UUID.randomUUID().toString(), QueryParameters.UC_ID_AUFTRAG) ;
+		super(QueryParameters.UC_ID_AUFTRAG) ;
+		setTransformer(new OrderEntryTransformer()) ;
 		this.parameterCall = parameterCall ;
 	}
 	
@@ -45,9 +43,9 @@ public class AuftragQuery extends FastLaneReaderCall {
 		return parameterCall ;
 	}
 	
-	public List<OrderEntry> getResultList(QueryResult result) {
-		return entryTransformer.transform(result.getRowData()) ;
-	}
+//	public List<OrderEntry> getResultList(QueryResult result) {
+//		return entryTransformer.transform(result.getRowData()) ;
+//	}
 
 	
 	protected List<FilterKriterium> getRequiredFilters() {

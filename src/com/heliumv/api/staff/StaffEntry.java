@@ -2,21 +2,16 @@ package com.heliumv.api.staff;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.heliumv.api.BaseEntryId;
+
 @XmlRootElement
-public class StaffEntry {
-	private Integer id ;
+public class StaffEntry extends BaseEntryId {
 	private Integer personalNr ;
 	private String  identityCnr ;
 	private String  shortMark ;
 	private String  name ;
 	private String  firstName ;
 	
-	public Integer getId() {
-		return id;
-	}
-	public void setId(Integer id) {
-		this.id = id;
-	}
 	public Integer getPersonalNr() {
 		return personalNr;
 	}

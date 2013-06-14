@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.heliumv.api.BaseApi;
 import com.heliumv.factory.IMandantCall;
-import com.heliumv.factory.impl.StaffQuery;
+import com.heliumv.factory.query.StaffQuery;
 import com.heliumv.tools.FilterKriteriumCollector;
 import com.lp.server.util.fastlanereader.service.query.FilterBlock;
 import com.lp.server.util.fastlanereader.service.query.QueryParameters;
