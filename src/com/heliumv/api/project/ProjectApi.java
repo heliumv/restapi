@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.heliumv.api.BaseApi;
 import com.heliumv.factory.IParameterCall;
-import com.heliumv.factory.impl.ProjectQuery;
+import com.heliumv.factory.query.ProjectQuery;
 import com.heliumv.tools.FilterKriteriumCollector;
 import com.heliumv.tools.StringHelper;
 import com.lp.server.util.Facade;
@@ -29,8 +29,6 @@ import com.lp.server.util.fastlanereader.service.query.QueryResult;
 @Path("/api/v1/project/")
 public class ProjectApi extends BaseApi implements IProjectApi {
 
-//	@Autowired
-//	private IClientCall clientCall ;
 	@Autowired
 	private IParameterCall parameterCall ;
 

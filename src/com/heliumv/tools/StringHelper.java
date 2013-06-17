@@ -24,6 +24,14 @@ public class StringHelper {
 		return value.trim().replace("'", "") ;
 	}
 	
+	
+	public static String removeXssDelimiters(String value) {
+		String s = value.trim().replace("<", "") ;
+		s = s.replace(">", "") ;
+		s = s.replace("&", "") ;
+		return s ;
+	}
+	
 	/**
 	 * Poor Mans SQL "String" Darstellung erzeugen
 	 * 

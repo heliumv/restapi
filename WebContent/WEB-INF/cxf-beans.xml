@@ -48,6 +48,8 @@
 	
 	<context:annotation-config />
 	<bean id="globalInfo" class="com.heliumv.factory.GlobalInfo" />
+	<bean id="auftragCall" class="com.heliumv.factory.impl.AuftragCall" lazy-init="true"/>
+	<bean id="auftragpositionCall" class="com.heliumv.factory.impl.AuftragpositionCall" lazy-init="true"/>
 	<bean id="clientCall" class="com.heliumv.factory.impl.ClientCall" lazy-init="true"/>
 	<bean id="fertigungCall" class="com.heliumv.factory.impl.FertigungCall" lazy-init="true"/>
 	<bean id="judgeCall" class="com.heliumv.factory.impl.JudgeCall" lazy-init="true"/>
@@ -60,9 +62,12 @@
 	<bean id="systemCall" class="com.heliumv.factory.impl.SystemCall" lazy-init="true"/>
 	<bean id="zeiterfassungCall" class="com.heliumv.factory.impl.ZeiterfassungCall" lazy-init="true"/>
 	
-	<bean id="workItemQuery" class="com.heliumv.factory.impl.ArtikelArbeitszeitQuery" lazy-init="true"/>
-	<bean id="orderQuery" class="com.heliumv.factory.impl.AuftragQuery" lazy-init="true"/>
-	<bean id="staffQuery" class="com.heliumv.factory.impl.StaffQuery" lazy-init="true"/>
+	<bean id="workItemQuery" class="com.heliumv.factory.query.ArtikelArbeitszeitQuery" lazy-init="true"/>
+	<bean id="orderQuery" class="com.heliumv.factory.query.AuftragQuery" lazy-init="true"/>
+	<bean id="orderPositionQuery" class="com.heliumv.factory.query.AuftragpositionQuery" lazy-init="true"/>
+	<bean id="productionQuery" class="com.heliumv.factory.query.ProductionQuery" lazy-init="true"/>
+	<bean id="projectQuery" class="com.heliumv.factory.query.ProjectQuery" lazy-init="true"/>
+	<bean id="staffQuery" class="com.heliumv.factory.query.StaffQuery" lazy-init="true"/>
 	
  	<bean id="hvUser" class="com.heliumv.api.benutzer.UserApi" lazy-init="true" />
 	<bean id="hvWorktime" class="com.heliumv.api.worktime.WorktimeApi" lazy-init="true"/>

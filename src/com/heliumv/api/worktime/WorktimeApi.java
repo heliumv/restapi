@@ -21,14 +21,18 @@ import org.springframework.stereotype.Service;
 
 import com.heliumv.api.BaseApi;
 import com.heliumv.factory.Globals;
+import com.heliumv.factory.IAuftragCall;
 import com.heliumv.factory.IFertigungCall;
 import com.heliumv.factory.IGlobalInfo;
 import com.heliumv.factory.IJudgeCall;
 import com.heliumv.factory.IMandantCall;
 import com.heliumv.factory.IPersonalCall;
 import com.heliumv.factory.IZeiterfassungCall;
+import com.heliumv.factory.impl.IAuftragpositionCall;
 import com.heliumv.factory.query.ArtikelArbeitszeitQuery;
 import com.heliumv.tools.FilterKriteriumCollector;
+import com.lp.server.auftrag.service.AuftragDto;
+import com.lp.server.auftrag.service.AuftragpositionDto;
 import com.lp.server.fertigung.service.LosDto;
 import com.lp.server.personal.service.PersonalDto;
 import com.lp.server.personal.service.TaetigkeitDto;
@@ -44,6 +48,12 @@ import com.lp.util.EJBExceptionLP;
 @Service("hvWorktime")
 @Path("/api/v1/worktime/")
 public class WorktimeApi extends BaseApi implements IWorktimeApi {
+	
+	@Autowired
+	private IAuftragCall auftragCall ;
+	
+	@Autowired
+	private IAuftragpositionCall auftragpositionCall ;
 	
 	@Autowired
 	private IJudgeCall judgeCall ;
@@ -102,6 +112,47 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 	public Response bookPausing(TimeRecordingEntry entry) {
 		return bookTimeEntryImpl(entry, ZeiterfassungFac.TAETIGKEIT_UNTER) ;
 	}
+	
+	@POST
+	@Path("/order/")
+	@Consumes({"application/json", "application/xml"})
+	public Response bookOrder(OrderRecordingEntry entry) {
+		if(connectClient(entry.getUserId()) == null) return getUnauthorized() ;
+
+		try {
+			if(!mandantCall.hasModulAuftrag()) return getUnauthorized() ;
+			if(!isValidPersonalId(entry.getForUserId())) {
+				entry.setForUserId(globalInfo.getTheClientDto().getIDPersonal()) ;
+			}
+			if(!isValidOrderId(entry.getOrderId())) {
+				return getBadRequest("orderId",  entry.getOrderId().toString()) ;				
+			}
+			if(!isValidOrderPositionId(entry.getOrderId(), entry.getOrderPositionId())) {
+				return getBadRequest("orderPositionId",  entry.getOrderPositionId().toString()) ;								
+			}
+
+			ZeitdatenDto zDto = new ZeitdatenDto() ;
+			zDto.setPersonalIId(entry.getForUserId()) ;
+			zDto.setCBelegartnr(LocaleFac.BELEGART_AUFTRAG) ;
+			zDto.setIBelegartid(entry.getOrderId()) ;
+			zDto.setArtikelIId(entry.getWorkItemId()) ;
+			zDto.setIBelegartpositionid(entry.getOrderPositionId()) ;
+			zDto.setCBemerkungZuBelegart(entry.getRemark()) ;
+			zDto.setXKommentar(entry.getExtendedRemark()) ;
+			Timestamp ts = new Timestamp(Calendar.getInstance().getTimeInMillis()) ;
+			zDto.setTZeit(ts) ;	
+
+			zeiterfassungCall.createZeitdaten(zDto, true, true, true, globalInfo.getTheClientDto()) ;
+		} catch(NamingException e) {
+			return getUnavailable(e) ;
+		} catch(RemoteException e) {
+			return getUnavailable(e) ;			
+		} catch(EJBExceptionLP e) {
+			return getBadRequest(e) ;
+		}
+	
+		return getNoContent() ;
+	}
 
 	@POST
 	@Path("/production/")
@@ -141,6 +192,8 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 	
 	private boolean isValidProductionId(Integer productionId) {
 		LosDto losDto = fertigungCall.losFindByPrimaryKeyOhneExc(productionId) ;
+		if(losDto == null) return false ;
+		
 		return losDto.getMandantCNr().equals(globalInfo.getMandant()) ;
 	}
 	
@@ -160,13 +213,22 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 		return false ;
 	}
 	
-//	@GET
-//	@Path("/activities/{userid}")
-//	@Produces({"application/json", "application/xml"})
-//	public List<Activity> getActivities(
-//			@PathParam("userid") String userId) {
-//	}
-
+	
+	private boolean isValidOrderId(Integer orderId) throws NamingException {
+		AuftragDto auftragDto = auftragCall.auftragFindByPrimaryKeyOhneExc(orderId) ;
+		if(auftragDto == null) return false ;
+		
+		return auftragDto.getMandantCNr().equals(globalInfo.getMandant()) ;
+	}
+	
+	
+	private boolean isValidOrderPositionId(Integer orderId, Integer positionId) throws NamingException {
+		AuftragpositionDto auftragPositionDto = auftragpositionCall.auftragpositionFindByPrimaryKeyOhneExc(positionId) ;
+		if(auftragPositionDto == null) return false ;
+		
+		return orderId.equals(auftragPositionDto.getAuftragIId()) ;
+	}
+	
 	@GET
 	@Path("/activities/{userid}")
 	@Produces({"application/json", "application/xml"})
@@ -180,9 +242,8 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 		try {
 			if(null == connectClient(userId)) return activities ;
 
-//			ArtikelArbeitszeitQuery query = new ArtikelArbeitszeitQuery() ;
 			FilterKriteriumCollector collector = new FilterKriteriumCollector() ;
-			collector.add(workItemQuery.getArtikelNummerFilter(filterCnr)) ;
+			collector.add(workItemQuery.getFilterArtikelNummer(filterCnr)) ;
 			FilterBlock filterCrits = new FilterBlock(collector.asArray(), "AND")  ;
 
 			QueryParameters params = workItemQuery.getDefaultQueryParameters(filterCrits) ;

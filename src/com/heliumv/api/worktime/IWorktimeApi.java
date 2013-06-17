@@ -2,8 +2,6 @@ package com.heliumv.api.worktime;
 
 import java.util.List;
 
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 
@@ -19,6 +17,8 @@ public interface IWorktimeApi {
 			Integer hour, Integer minute, Integer second) ;
 
 	Response bookProduction(ProductionRecordingEntry entry) ;
+
+	Response bookOrder(OrderRecordingEntry entry) ;
 
 	/**
 	 * Verfuegbare Sondertaetigketen fuer die Zeiterfassung durchgefuehrt werden kann

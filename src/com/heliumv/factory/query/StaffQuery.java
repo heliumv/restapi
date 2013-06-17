@@ -12,14 +12,12 @@ import com.heliumv.api.staff.StaffEntryTransformer;
 import com.heliumv.factory.IGlobalInfo;
 import com.heliumv.factory.IJudgeCall;
 import com.heliumv.factory.IPersonalCall;
-import com.heliumv.factory.impl.FastLaneReaderCall;
 import com.heliumv.tools.StringHelper;
 import com.lp.server.personal.service.PersonalDto;
 import com.lp.server.util.fastlanereader.service.query.FilterKriterium;
 import com.lp.server.util.fastlanereader.service.query.QueryParameters;
-import com.lp.server.util.fastlanereader.service.query.QueryResult;
 
-public class StaffQuery extends FastLaneReaderCall {
+public class StaffQuery extends BaseQuery<StaffEntry> {
 
 	@Autowired
 	private IGlobalInfo globalInfo ;
@@ -29,10 +27,10 @@ public class StaffQuery extends FastLaneReaderCall {
 	@Autowired
 	private IPersonalCall personalCall ;
 	
-	private StaffEntryTransformer entryTransformer = new StaffEntryTransformer() ;
 	
 	public StaffQuery() {
 		super(QueryParameters.UC_ID_PERSONAL) ;
+		setTransformer(new StaffEntryTransformer()) ;
 	}
 	
 	@Override
@@ -46,10 +44,7 @@ public class StaffQuery extends FastLaneReaderCall {
 		return filters ;
 	}
 
-	public List<StaffEntry> getResultList(QueryResult result) {
-		return entryTransformer.transform(result.getRowData()) ;
-	}
-	
+
 	private FilterKriterium getMandantFilter() {
 		return new FilterKriterium("mandant_c_nr", true,
 				StringHelper.asSqlString(globalInfo.getTheClientDto().getMandant()),

@@ -1,4 +1,4 @@
-package com.heliumv.factory.impl;
+package com.heliumv.factory.query;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +12,7 @@ import com.heliumv.api.project.ProjectEntry;
 import com.heliumv.api.project.ProjectEntryTransformer;
 import com.heliumv.factory.Globals;
 import com.heliumv.factory.IParameterCall;
+import com.heliumv.factory.impl.FastLaneReaderCall;
 import com.heliumv.tools.StringHelper;
 import com.lp.server.projekt.service.ProjektFac;
 import com.lp.server.util.fastlanereader.service.query.FilterKriterium;

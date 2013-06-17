@@ -23,7 +23,7 @@ import com.heliumv.factory.IFertigungCall;
 import com.heliumv.factory.IJudgeCall;
 import com.heliumv.factory.IParameterCall;
 import com.heliumv.factory.IStuecklisteCall;
-import com.heliumv.factory.impl.ProductionQuery;
+import com.heliumv.factory.query.ProductionQuery;
 import com.heliumv.tools.FilterKriteriumCollector;
 import com.heliumv.tools.StringHelper;
 import com.lp.server.fertigung.service.FertigungFac;

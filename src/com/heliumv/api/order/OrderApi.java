@@ -17,15 +17,10 @@ import org.springframework.stereotype.Service;
 import com.heliumv.api.BaseApi;
 import com.heliumv.factory.IParameterCall;
 import com.heliumv.factory.query.AuftragQuery;
+import com.heliumv.factory.query.AuftragpositionQuery;
 import com.heliumv.tools.FilterKriteriumCollector;
 import com.heliumv.tools.StringHelper;
-import com.lp.server.auftrag.service.AuftragFac;
-import com.lp.server.partner.service.KundeFac;
-import com.lp.server.partner.service.PartnerFac;
-import com.lp.server.util.Facade;
 import com.lp.server.util.fastlanereader.service.query.FilterBlock;
-import com.lp.server.util.fastlanereader.service.query.FilterKriterium;
-import com.lp.server.util.fastlanereader.service.query.FilterKriteriumDirekt;
 import com.lp.server.util.fastlanereader.service.query.QueryParameters;
 import com.lp.server.util.fastlanereader.service.query.QueryResult;
 
@@ -38,6 +33,9 @@ public class OrderApi extends BaseApi implements IOrderApi  {
 	
 	@Autowired
 	private AuftragQuery orderQuery ;
+	
+	@Autowired
+	private AuftragpositionQuery orderPositionQuery ;
 	
 	@GET
 	@Path("/{userid}")
@@ -56,10 +54,10 @@ public class OrderApi extends BaseApi implements IOrderApi  {
 			if(null == connectClient(userId)) return orders ;
 			
 			FilterKriteriumCollector collector = new FilterKriteriumCollector() ;
-			collector.add(buildFilterCnr(filterCnr)) ;
-			collector.add(buildFilterProject(filterProject)) ;
-			collector.add(buildFilterCustomer(filterCustomer)) ;
-			collector.add(buildFilterWithHidden(filterWithHidden)) ;
+			collector.add(orderQuery.getFilterCnr(StringHelper.removeXssDelimiters(filterCnr))) ;
+			collector.add(orderQuery.getFilterProject(StringHelper.removeXssDelimiters(filterProject))) ;
+			collector.add(orderQuery.getFilterCustomer(StringHelper.removeXssDelimiters(filterCustomer))) ;
+			collector.add(orderQuery.getFilterWithHidden(filterWithHidden)) ;
 			FilterBlock filterCrits = new FilterBlock(collector.asArray(), "AND")  ;
 			
 			QueryParameters params = orderQuery.getDefaultQueryParameters(filterCrits) ;
@@ -69,65 +67,49 @@ public class OrderApi extends BaseApi implements IOrderApi  {
 			QueryResult result = orderQuery.setQuery(params) ;
 			orders = orderQuery.getResultList(result) ;
 		} catch(NamingException e) {
+			respondUnavailable(e) ;
 			e.printStackTrace() ;
 		} catch(RemoteException e) {
+			respondUnavailable(e) ;
 			e.printStackTrace() ;
 		}
 		
 		return orders ;
 	}
 	
-	private FilterKriterium buildFilterCnr(String cnr) {
-		if(cnr == null || cnr.trim().length() == 0) return null ;
-		
-		FilterKriteriumDirekt fk = new FilterKriteriumDirekt("c_nr", StringHelper.removeSqlDelimiters(cnr), 
-				FilterKriterium.OPERATOR_LIKE, "", 
-				FilterKriteriumDirekt.PROZENT_LEADING, 
-				true, false, Facade.MAX_UNBESCHRAENKT) ;
-		fk.wrapWithProzent() ;
-		fk.wrapWithSingleQuotes() ;
-		return fk ;
-	}
 	
-	private FilterKriterium buildFilterProject(String project) {
-		if(null == project || project.trim().length() == 0) return null ;
-		
-		FilterKriteriumDirekt fk = new FilterKriteriumDirekt("c_bez", StringHelper.removeSqlDelimiters(project), 
-				FilterKriterium.OPERATOR_LIKE, "",
-				FilterKriteriumDirekt.PROZENT_TRAILING, 
-				true, true, Facade.MAX_UNBESCHRAENKT) ;
-		fk.wrapWithProzent() ;
-		fk.wrapWithSingleQuotes() ;
-		return fk ;
-	}
-	
-	private FilterKriterium buildFilterCustomer(String customer) throws NamingException, RemoteException {
-		if(null == customer || customer.trim().length() == 0) return null ;
+	@GET
+	@Path("/position/{orderid}/{userid}")
+	@Produces({"application/json", "application/xml"})
+	public List<OrderpositionEntry> getPositions(
+			@PathParam("orderid") Integer orderId,
+			@PathParam("userid") String userId,
+			@QueryParam("limit") Integer limit,
+			@QueryParam("startIndex") Integer startIndex) {
+		List<OrderpositionEntry> positions = new ArrayList<OrderpositionEntry>() ;
+		try {
+			if(connectClient(userId) == null) return positions ;
+			FilterKriteriumCollector collector = new FilterKriteriumCollector() ;
+			collector.add(orderPositionQuery.getOrderIdFilter(orderId)) ;
+			
+//			collector.add(buildFilterCnr(filterCnr)) ;
+//			collector.add(buildFilterProject(filterProject)) ;
+//			collector.add(buildFilterCustomer(filterCustomer)) ;
+//			collector.add(buildFilterWithHidden(filterWithHidden)) ;
+			FilterBlock filterCrits = new FilterBlock(collector.asArray(), "AND")  ;
+			
+			QueryParameters params = orderPositionQuery.getDefaultQueryParameters(filterCrits) ;
+			params.setLimit(limit) ;
+			params.setKeyOfSelectedRow(startIndex) ;
 
-		int percentType = parameterCall
-				.isPartnerSucheWildcardBeidseitig() ? FilterKriteriumDirekt.PROZENT_BOTH : FilterKriteriumDirekt.PROZENT_TRAILING ;
-
-		FilterKriteriumDirekt fk = new FilterKriteriumDirekt(AuftragFac.FLR_AUFTRAG_FLRKUNDE
-				+ "." + KundeFac.FLR_PARTNER + "."
-				+ PartnerFac.FLR_PARTNER_NAME1NACHNAMEFIRMAZEILE1, StringHelper.removeSqlDelimiters(customer),
-				FilterKriterium.OPERATOR_LIKE, "",
-				percentType, true, true, Facade.MAX_UNBESCHRAENKT); 
-		fk.wrapWithProzent() ;
-		fk.wrapWithSingleQuotes() ;
-		return fk ;
-	}
-	
-	private FilterKriterium buildFilterWithHidden(Boolean withHidden) {
-		if(null == withHidden) return null ;
-		
-		if(!withHidden) {
-			FilterKriterium fkVersteckt = new FilterKriterium(
-				AuftragFac.FLR_AUFTRAG_B_VERSTECKT, true, "(1)",
-				FilterKriterium.OPERATOR_NOT_IN, false);
-
-			return fkVersteckt;
+			QueryResult result = orderPositionQuery.setQuery(params) ;
+			positions = orderPositionQuery.getResultList(result) ;
+//		} catch(NamingException e) {
+//			respondUnavailable(e) ;
+//		} catch(RemoteException e) {
+//			respondUnavailable(e) ;
+		} finally {
 		}
-		
-		return null ;
+		return positions ;
 	}
 }

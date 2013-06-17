@@ -72,7 +72,7 @@ public class ArtikelArbeitszeitQuery extends FastLaneReaderCall {
 		}
 	}
 	
-	public FilterKriterium getArtikelNummerFilter(String filterCnr) throws NamingException, RemoteException {
+	public FilterKriterium getFilterArtikelNummer(String filterCnr) throws NamingException, RemoteException {
 		if(filterCnr == null || filterCnr.trim().length() == 0) return null ;
 		
 		int maxLength = parameterCall.getMaximaleLaengeArtikelnummer() ;

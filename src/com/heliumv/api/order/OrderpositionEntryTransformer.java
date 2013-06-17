@@ -17,7 +17,7 @@ public class OrderpositionEntryTransformer extends
 		entry.setItemCnr((String) flrObject[4]) ;
 		entry.setDescription((String) flrObject[5]) ;
 		entry.setPrice((BigDecimal) flrObject[6]) ;
-		entry.setStatus((String) flrObject[7]) ;
+		entry.setStatus((String) flrObject[8]) ;
 
 		return entry ;
 	}

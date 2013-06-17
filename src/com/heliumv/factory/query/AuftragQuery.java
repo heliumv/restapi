@@ -15,7 +15,11 @@ import com.heliumv.factory.IParameterCall;
 import com.heliumv.tools.StringHelper;
 import com.lp.server.auftrag.service.AuftragFac;
 import com.lp.server.auftrag.service.AuftragServiceFac;
+import com.lp.server.partner.service.KundeFac;
+import com.lp.server.partner.service.PartnerFac;
+import com.lp.server.util.Facade;
 import com.lp.server.util.fastlanereader.service.query.FilterKriterium;
+import com.lp.server.util.fastlanereader.service.query.FilterKriteriumDirekt;
 import com.lp.server.util.fastlanereader.service.query.QueryParameters;
 
 public class AuftragQuery extends BaseQuery<OrderEntry> {
@@ -43,10 +47,63 @@ public class AuftragQuery extends BaseQuery<OrderEntry> {
 		return parameterCall ;
 	}
 	
-//	public List<OrderEntry> getResultList(QueryResult result) {
-//		return entryTransformer.transform(result.getRowData()) ;
-//	}
+	public FilterKriterium getFilterCnr(String cnr) {
+		if(cnr == null || cnr.trim().length() == 0) return null ;
+		
+		FilterKriteriumDirekt fk = new FilterKriteriumDirekt("c_nr", StringHelper.removeSqlDelimiters(cnr), 
+				FilterKriterium.OPERATOR_LIKE, "", 
+				FilterKriteriumDirekt.PROZENT_LEADING, 
+				true, false, Facade.MAX_UNBESCHRAENKT) ;
+		fk.wrapWithProzent() ;
+		fk.wrapWithSingleQuotes() ;
+		return fk ;
+	}
+	
+	public FilterKriterium getFilterProject(String project) {
+		if(null == project || project.trim().length() == 0) return null ;
+		
+		FilterKriteriumDirekt fk = new FilterKriteriumDirekt("c_bez", StringHelper.removeSqlDelimiters(project), 
+				FilterKriterium.OPERATOR_LIKE, "",
+				FilterKriteriumDirekt.PROZENT_TRAILING, 
+				true, true, Facade.MAX_UNBESCHRAENKT) ;
+		fk.wrapWithProzent() ;
+		fk.wrapWithSingleQuotes() ;
+		return fk ;
+	}
+	
+	public FilterKriterium getFilterCustomer(String customer) throws NamingException, RemoteException {
+		if(null == customer || customer.trim().length() == 0) return null ;
 
+		int percentType = parameterCall
+				.isPartnerSucheWildcardBeidseitig() ? FilterKriteriumDirekt.PROZENT_BOTH : FilterKriteriumDirekt.PROZENT_TRAILING ;
+
+		FilterKriteriumDirekt fk = new FilterKriteriumDirekt(AuftragFac.FLR_AUFTRAG_FLRKUNDE
+				+ "." + KundeFac.FLR_PARTNER + "."
+				+ PartnerFac.FLR_PARTNER_NAME1NACHNAMEFIRMAZEILE1, StringHelper.removeSqlDelimiters(customer),
+				FilterKriterium.OPERATOR_LIKE, "",
+				percentType, true, true, Facade.MAX_UNBESCHRAENKT); 
+		fk.wrapWithProzent() ;
+		fk.wrapWithSingleQuotes() ;
+		return fk ;
+	}
+	
+	
+	public FilterKriterium getFilterWithHidden(Boolean withHidden) {
+		if(null == withHidden) {
+			withHidden = false ;
+		}
+		
+		if(!withHidden) {
+			FilterKriterium fkVersteckt = new FilterKriterium(
+				AuftragFac.FLR_AUFTRAG_B_VERSTECKT, true, "(1)",
+				FilterKriterium.OPERATOR_NOT_IN, false);
+
+			return fkVersteckt;
+		}
+		
+		return null ;
+	}
+	
 	
 	protected List<FilterKriterium> getRequiredFilters() {
 		List<FilterKriterium> filters = new ArrayList<FilterKriterium>() ;
