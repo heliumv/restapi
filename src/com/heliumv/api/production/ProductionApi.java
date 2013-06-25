@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.naming.NamingException;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -17,18 +18,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.heliumv.api.BaseApi;
-import com.heliumv.factory.Globals;
+import com.heliumv.factory.IArtikelCall;
 import com.heliumv.factory.IClientCall;
 import com.heliumv.factory.IFertigungCall;
+import com.heliumv.factory.IGlobalInfo;
 import com.heliumv.factory.IJudgeCall;
+import com.heliumv.factory.ILagerCall;
 import com.heliumv.factory.IParameterCall;
 import com.heliumv.factory.IStuecklisteCall;
 import com.heliumv.factory.query.ProductionQuery;
 import com.heliumv.tools.FilterKriteriumCollector;
 import com.heliumv.tools.StringHelper;
+import com.lp.server.artikel.service.ArtikelDto;
+import com.lp.server.artikel.service.LagerDto;
+import com.lp.server.artikel.service.SeriennrChargennrMitMengeDto;
 import com.lp.server.fertigung.service.FertigungFac;
 import com.lp.server.fertigung.service.LosDto;
 import com.lp.server.fertigung.service.LosablieferungDto;
+import com.lp.server.fertigung.service.LosistmaterialDto;
+import com.lp.server.fertigung.service.LoslagerentnahmeDto;
+import com.lp.server.fertigung.service.LossollmaterialDto;
+import com.lp.server.stueckliste.service.MontageartDto;
 import com.lp.server.stueckliste.service.StuecklisteDto;
 import com.lp.server.stueckliste.service.StuecklisteFac;
 import com.lp.server.util.Facade;
@@ -38,16 +48,24 @@ import com.lp.server.util.fastlanereader.service.query.FilterKriteriumDirekt;
 import com.lp.server.util.fastlanereader.service.query.QueryParameters;
 import com.lp.server.util.fastlanereader.service.query.QueryResult;
 import com.lp.util.EJBExceptionLP;
+import com.lp.util.Helper;
 
 @Service("hvProduction")
 @Path("/api/v1/production/")
 public class ProductionApi extends BaseApi implements IProductionApi {
 	@Autowired
-	private IClientCall clientCall ;
+	private IGlobalInfo globalInfo ;
+	@Autowired
+	private IClientCall clientCall ;	
+	@Autowired
+	private IArtikelCall artikelCall ;
 	@Autowired
 	private IParameterCall parameterCall ;
 	@Autowired
 	private IFertigungCall fertigungCall ;
+	@Autowired
+	private ILagerCall lagerCall ;
+	
 	@Autowired
 	private IStuecklisteCall stuecklisteCall ;
 	@Autowired
@@ -118,6 +136,178 @@ public class ProductionApi extends BaseApi implements IProductionApi {
 		}
 	}
 
+	@POST
+	@Path("/materialwithdrawal/")
+	@Consumes({"application/json", "application/xml"})
+	public void bucheMaterialNachtraeglichVomLagerAb(
+			MaterialWithdrawalEntry materialEntry,
+			@QueryParam("userId") String userId) {
+
+		ArtikelDto itemDto = null ;
+		LagerDto lagerDto = null ;
+		
+		try {
+			if(materialEntry == null) {
+				respondBadRequest("materialwithdrawal", "null") ;
+				return ;
+			}
+			
+			if(StringHelper.isEmpty(materialEntry.getLotCnr())) {
+				respondBadRequest("lotCnr", materialEntry.getLotCnr()) ;
+				return ;
+			}
+			if(StringHelper.isEmpty(materialEntry.getItemCnr())) {
+				respondBadRequest("itemCnr", materialEntry.getItemCnr()) ;
+				return ;
+			}
+
+			if(connectClient(userId) == null) return ;
+			if(!judgeCall.hasFertLosCUD()) {
+				respondUnauthorized() ;
+				return ;
+			}
+			
+			LosDto losDto = findLosByCnr(materialEntry.getLotCnr()) ;
+			if(losDto == null) {
+				respondNotFound("lotCnr", materialEntry.getLotCnr()) ;
+				return ;
+			}
+			
+			if(!isValidLosState(losDto)) return ;
+			
+			itemDto = findItemByCnr(materialEntry.getItemCnr()) ;
+			if(itemDto == null) {
+				respondNotFound("itemCnr", materialEntry.getItemCnr()) ;
+				return ;
+			}
+			
+			MontageartDto montageartDto = getMontageart() ;
+			if(montageartDto == null) {
+				respondBadRequest("", "") ;
+				return ;
+			}
+
+			lagerDto = getLager(losDto, itemDto) ;
+			if(lagerDto == null) {
+				respondBadRequest("stock", "") ;
+				return ;				
+			}
+
+			gebeMaterialNachtraeglichAus(lagerDto.getIId(), losDto, itemDto, montageartDto, 
+					materialEntry.getAmount(), materialEntry.getIdentities()) ;
+		} catch(NamingException e) {
+			respondUnavailable(e) ;
+			e.printStackTrace() ;
+		} catch(RemoteException e) {
+			respondUnavailable(e) ;
+			e.printStackTrace() ;
+		} catch(EJBExceptionLP e) {
+			respondBadRequest(e) ;
+			if(e.getCode() == EJBExceptionLP.FEHLER_ZUWENIG_AUF_LAGER) {
+				try {
+					BigDecimal lagerStand = lagerCall.getLagerstandOhneExc(itemDto.getIId(), lagerDto.getIId()) ;
+					appendBadRequestData("stock-available", lagerStand.toPlainString()) ;
+				} catch(NamingException n) {
+					respondUnavailable(n) ;
+				} catch(RemoteException r) {
+					respondUnavailable(r) ;
+				}
+			}
+		}
+	}
+	
+	private void gebeMaterialNachtraeglichAus(Integer stockId, LosDto losDto,
+			ArtikelDto itemDto, MontageartDto montageartDto, BigDecimal amount, List<IdentityAmountEntry> identities) 
+		throws NamingException, RemoteException, EJBExceptionLP {
+		BigDecimal sollPreis = getSollPreis(itemDto.getIId(), stockId) ;
+
+		LossollmaterialDto lossollmaterialDto = new LossollmaterialDto() ;
+		lossollmaterialDto.setBNachtraeglich(Helper.boolean2Short(true)) ;
+		lossollmaterialDto.setArtikelIId(itemDto.getIId()) ;
+		lossollmaterialDto.setEinheitCNr(itemDto.getEinheitCNr()) ;
+		lossollmaterialDto.setLosIId(losDto.getIId()) ;
+		lossollmaterialDto.setMontageartIId(montageartDto.getIId());
+		lossollmaterialDto.setNMenge(amount);
+		lossollmaterialDto.setNSollpreis(sollPreis);
+		
+		LosistmaterialDto losistmaterialDto = createLosistmaterialDto(stockId, amount) ;
+
+		fertigungCall.gebeMaterialNachtraeglichAus(lossollmaterialDto,
+				losistmaterialDto, transform(identities), false) ;
+	}
+	
+	private List<SeriennrChargennrMitMengeDto> transform(List<IdentityAmountEntry> identities) {
+		List<SeriennrChargennrMitMengeDto> hvIdentities = new ArrayList<SeriennrChargennrMitMengeDto>() ;
+		if(identities == null) return null ;
+
+		for (IdentityAmountEntry identity : identities) {
+			SeriennrChargennrMitMengeDto snrDto = new SeriennrChargennrMitMengeDto() ;
+			snrDto.setCSeriennrChargennr(identity.getIdentiy()) ;
+			snrDto.setNMenge(identity.getAmount()) ;
+			hvIdentities.add(snrDto) ;
+		}
+		
+		return hvIdentities.size() == 0 ? null : hvIdentities ;
+	}
+	
+ 	private MontageartDto getMontageart() throws NamingException, RemoteException, EJBExceptionLP {
+		MontageartDto[] montagearts = stuecklisteCall.montageartFindByMandantCNr() ;
+		return montagearts.length > 0 ? montagearts[0] : null ;
+	}
+	
+	private LagerDto getLager(LosDto losDto, ArtikelDto itemDto) throws NamingException, RemoteException {
+		LagerDto lagerDto = null ;
+		LoslagerentnahmeDto[] laeger = fertigungCall.loslagerentnahmeFindByLosIId(losDto.getIId()) ;
+		if (laeger.length > 0) {
+			lagerDto = findLagerDtoById(laeger[0].getLagerIId());
+		}
+		
+		return lagerDto ;
+	}
+	
+	private BigDecimal getSollPreis(Integer itemId, Integer stockId) throws NamingException, RemoteException {
+		return lagerCall.getGemittelterGestehungspreisEinesLagers(itemId, stockId);		
+	}
+	
+	
+	private LosistmaterialDto createLosistmaterialDto(Integer stockId, BigDecimal amount) {
+		LosistmaterialDto losistmaterialDto = new LosistmaterialDto();
+		losistmaterialDto.setLagerIId(stockId);
+		losistmaterialDto.setBAbgang(new Short((short) (amount.signum() > 0 ? 1 : 0))) ;
+		losistmaterialDto.setNMenge(amount);
+		return losistmaterialDto ;
+	}
+	
+	private boolean isValidLosState(LosDto losDto) {
+		if(FertigungFac.STATUS_STORNIERT.equals(losDto.getStatusCNr())) {
+			respondBadRequest(EJBExceptionLP.FEHLER_FERTIGUNG_DAS_LOS_IST_STORNIERT) ;
+			return false ;
+		}
+
+		if(FertigungFac.STATUS_ANGELEGT.equals(losDto.getStatusCNr())) {
+			respondBadRequest(EJBExceptionLP.FEHLER_FERTIGUNG_DAS_LOS_IST_NOCH_NICHT_AUSGEGEBEN) ;
+			return false ;
+		}
+		
+		if(FertigungFac.STATUS_ERLEDIGT.equals(losDto.getStatusCNr())) {
+			respondBadRequest(EJBExceptionLP.FEHLER_FERTIGUNG_DAS_LOS_IST_BEREITS_ERLEDIGT) ;
+			return false ;
+		}
+		
+		return true ;
+	}
+	
+	private LosDto findLosByCnr(String cnr) throws NamingException {
+		return fertigungCall.losFindByCNrMandantCNrOhneExc(cnr) ;
+	}
+	
+	private ArtikelDto findItemByCnr(String cnr) throws RemoteException, NamingException {
+		return artikelCall.artikelFindByCNrOhneExc(cnr) ;
+	}
+	
+	private LagerDto findLagerDtoById(Integer stockId) throws NamingException {
+		return lagerCall.lagerFindByPrimaryKeyOhneExc(stockId) ;
+	}
 	
 	private void processMaterialBuchung(LosDto losDto, BigDecimal menge) throws RemoteException, NamingException {
 		if(parameterCall.isKeineAutomatischeMaterialbuchung()) return ;
@@ -136,7 +326,7 @@ public class ProductionApi extends BaseApi implements IProductionApi {
 	
 	
 	private void processAblieferung(LosDto losDto, BigDecimal menge) throws NamingException, RemoteException {
-		boolean isLosErledigen = judgeCall.hasFertDarfLosErledigen(Globals.getTheClientDto()) ;
+		boolean isLosErledigen = judgeCall.hasFertDarfLosErledigen() ;
 		
 		LosablieferungDto losablieferungDto = new LosablieferungDto() ;
 		losablieferungDto.setLosIId(losDto.getIId()) ;

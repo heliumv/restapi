@@ -3,7 +3,6 @@ package com.heliumv.api.benutzer;
 import junit.framework.TestCase;
 
 public class TestWhenLoggingIn extends TestCase {
-
 	private UserApi sut ;
 	
 	@Override
@@ -14,6 +13,6 @@ public class TestWhenLoggingIn extends TestCase {
 	}
 	
 	public void testWithNullParameters() {
-		assertNull(sut.logon(null, null, null, null)) ;
+		assertNull(sut.logon(null)) ;
 	}
 }

@@ -1,11 +1,17 @@
 package com.heliumv.factory;
 
+import java.util.Locale;
+
 import javax.naming.NamingException;
 
 import com.lp.server.system.service.ModulberechtigungDto;
 import com.lp.server.system.service.ZusatzfunktionberechtigungDto;
+import com.lp.util.EJBExceptionLP;
 
 public interface IMandantCall {
+	
+	Locale getLocaleDesHauptmandanten() throws NamingException, EJBExceptionLP ;
+	
 	ModulberechtigungDto[] modulberechtigungFindByMandantCnr(String mandantCnr) throws NamingException ;
 
 	ZusatzfunktionberechtigungDto[] zusatzfunktionberechtigungFindByMandantCnr(String mandantCnr) throws NamingException ;

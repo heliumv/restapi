@@ -119,6 +119,17 @@ public class BaseApi {
 		getServletResponse().setStatus(Response.Status.BAD_REQUEST.getStatusCode()) ;		
 	}
 
+	public void respondBadRequest(Integer hvErrorCode) {
+		getServletResponse().setHeader("x-hv-error-code", "5") ;
+		getServletResponse().setHeader("x-hv-error-code-extended", hvErrorCode.toString()) ;
+		getServletResponse().setStatus(Response.Status.BAD_REQUEST.getStatusCode()) ;				
+	}
+	
+	public void appendBadRequestData(String key, String value) {
+		getServletResponse().setHeader("x-hv-error-additional-data-key", key) ;				
+		getServletResponse().setHeader("x-hv-error-additional-data-value", value) ;				
+	}
+	
 	public Response getBadRequest(String key, Object value) {
 		return getResponseBuilder().status(Response.Status.BAD_REQUEST)
 				.header("x-hv-error-code", 3)

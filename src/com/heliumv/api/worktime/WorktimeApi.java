@@ -22,13 +22,13 @@ import org.springframework.stereotype.Service;
 import com.heliumv.api.BaseApi;
 import com.heliumv.factory.Globals;
 import com.heliumv.factory.IAuftragCall;
+import com.heliumv.factory.IAuftragpositionCall;
 import com.heliumv.factory.IFertigungCall;
 import com.heliumv.factory.IGlobalInfo;
 import com.heliumv.factory.IJudgeCall;
 import com.heliumv.factory.IMandantCall;
 import com.heliumv.factory.IPersonalCall;
 import com.heliumv.factory.IZeiterfassungCall;
-import com.heliumv.factory.impl.IAuftragpositionCall;
 import com.heliumv.factory.query.ArtikelArbeitszeitQuery;
 import com.heliumv.tools.FilterKriteriumCollector;
 import com.lp.server.auftrag.service.AuftragDto;
@@ -270,7 +270,7 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 		
 		try {			
 			if(connectClient(userId) == null) return activities ;
-			boolean hasRechtNurBuchen = judgeCall.hasPersZeiteingabeNurBuchen(Globals.getTheClientDto()) ;
+			boolean hasRechtNurBuchen = judgeCall.hasPersZeiteingabeNurBuchen() ;
 			
 			if(hasRechtNurBuchen) {
 				activities = zeiterfassungCall.getAllSprSondertaetigkeitenNurBDEBuchbar(Globals.getTheClientDto().getLocUiAsString());

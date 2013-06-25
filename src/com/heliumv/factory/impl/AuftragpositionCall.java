@@ -3,6 +3,7 @@ package com.heliumv.factory.impl;
 import javax.naming.NamingException;
 
 import com.heliumv.factory.BaseCall;
+import com.heliumv.factory.IAuftragpositionCall;
 import com.lp.server.auftrag.service.AuftragpositionDto;
 import com.lp.server.auftrag.service.AuftragpositionFac;
 

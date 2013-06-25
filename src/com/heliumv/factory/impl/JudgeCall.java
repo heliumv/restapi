@@ -24,13 +24,27 @@ public class JudgeCall extends BaseCall<TheJudgeFac> implements IJudgeCall {
 	}
 	
 	@Override
+	public boolean hasPersZeiteingabeNurBuchen() throws NamingException {
+		return hatRechtImpl(RechteFac.RECHT_PERS_ZEITEINGABE_NUR_BUCHEN, globalInfo.getTheClientDto()) ;
+	}
+	
+	@Override
 	public boolean hasPersZeiteingabeNurBuchen(TheClientDto theClientDto) throws NamingException {
 		return hatRechtImpl(RechteFac.RECHT_PERS_ZEITEINGABE_NUR_BUCHEN, theClientDto) ;
 	}
 
 	@Override
+	public boolean hasFertDarfLosErledigen() throws NamingException {
+		return hatRechtImpl(RechteFac.RECHT_FERT_DARF_LOS_ERLEDIGEN, globalInfo.getTheClientDto()) ;
+	}
+	
+	@Override
 	public boolean hasFertDarfLosErledigen(TheClientDto theClientDto) throws NamingException {
 		return hatRechtImpl(RechteFac.RECHT_FERT_DARF_LOS_ERLEDIGEN, theClientDto) ;
+	}
+	
+	public boolean hasFertLosCUD() throws NamingException {
+		return hatRechtImpl(RechteFac.RECHT_FERT_LOS_CUD, globalInfo.getTheClientDto()) ;
 	}
 	
 	@Override

@@ -48,11 +48,13 @@
 	
 	<context:annotation-config />
 	<bean id="globalInfo" class="com.heliumv.factory.GlobalInfo" />
+	<bean id="artikelCall" class="com.heliumv.factory.impl.ArtikelCall" lazy-init="true"/>
 	<bean id="auftragCall" class="com.heliumv.factory.impl.AuftragCall" lazy-init="true"/>
 	<bean id="auftragpositionCall" class="com.heliumv.factory.impl.AuftragpositionCall" lazy-init="true"/>
 	<bean id="clientCall" class="com.heliumv.factory.impl.ClientCall" lazy-init="true"/>
 	<bean id="fertigungCall" class="com.heliumv.factory.impl.FertigungCall" lazy-init="true"/>
 	<bean id="judgeCall" class="com.heliumv.factory.impl.JudgeCall" lazy-init="true"/>
+	<bean id="lagerCall" class="com.heliumv.factory.impl.LagerCall" lazy-init="true"/>
 	<bean id="logonCall" class="com.heliumv.factory.impl.LogonCall" lazy-init="true"/>
 	<bean id="mandantCall" class="com.heliumv.factory.impl.MandantCall" lazy-init="true"/>
 	<bean id="parameterCall" class="com.heliumv.factory.impl.ParameterCall" lazy-init="true"/>

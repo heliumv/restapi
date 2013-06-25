@@ -1,4 +1,4 @@
-package com.heliumv.factory.impl;
+package com.heliumv.factory;
 
 import javax.naming.NamingException;
 

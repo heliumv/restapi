@@ -6,10 +6,12 @@ package com.heliumv.factory;
  * @author Gerold
  */
 public interface IBaseCallBeans {
+	static final String ArtikelFacBean         = "ArtikelFacBean" ;
 	static final String AuftragFacBean         = "AuftragFacBean" ;
 	static final String AuftragpositionFacBean = "AuftragpositionFacBean" ;
 	static final String FastLaneReaderBean     = "FastLaneReaderBean" ;
 	static final String FertigungFacBean       = "FertigungFacBean" ;
+	static final String LagerFacBean           = "LagerFacBean" ;
 	static final String LogonFacBean           = "LogonFacBean" ;
 	static final String MandantFacBean         = "MandantFacBean" ;
 	static final String ParameterFacBean       = "ParameterFacBean" ;

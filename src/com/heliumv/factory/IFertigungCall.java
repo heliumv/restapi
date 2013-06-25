@@ -3,12 +3,17 @@ package com.heliumv.factory;
 import java.math.BigDecimal;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.naming.NamingException;
 
+import com.lp.server.artikel.service.SeriennrChargennrMitMengeDto;
 import com.lp.server.fertigung.service.BucheSerienChnrAufLosDto;
 import com.lp.server.fertigung.service.LosDto;
 import com.lp.server.fertigung.service.LosablieferungDto;
+import com.lp.server.fertigung.service.LosistmaterialDto;
+import com.lp.server.fertigung.service.LoslagerentnahmeDto;
+import com.lp.server.fertigung.service.LossollmaterialDto;
 import com.lp.util.EJBExceptionLP;
 
 public interface IFertigungCall {
@@ -51,4 +56,12 @@ public interface IFertigungCall {
 	 * @throws NamingException
 	 */
 	LosDto losFindByCNrMandantCNrOhneExc(String cNr, String mandantCNr) throws NamingException ;
+	
+	LoslagerentnahmeDto[] loslagerentnahmeFindByLosIId(Integer losIId) throws NamingException, RemoteException, EJBExceptionLP ;
+	
+	public void gebeMaterialNachtraeglichAus(
+			LossollmaterialDto lossollmaterialDto, LosistmaterialDto losistmaterialDto, 
+			List<SeriennrChargennrMitMengeDto> listSnrChnr, boolean reduzierFehlmenge)
+		throws NamingException, RemoteException, EJBExceptionLP ;
+	
 }

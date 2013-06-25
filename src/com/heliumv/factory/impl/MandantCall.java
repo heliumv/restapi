@@ -2,6 +2,7 @@ package com.heliumv.factory.impl;
 
 import java.rmi.RemoteException;
 import java.util.HashMap;
+import java.util.Locale;
 
 import javax.naming.NamingException;
 
@@ -14,6 +15,7 @@ import com.lp.server.system.service.LocaleFac;
 import com.lp.server.system.service.MandantFac;
 import com.lp.server.system.service.ModulberechtigungDto;
 import com.lp.server.system.service.ZusatzfunktionberechtigungDto;
+import com.lp.util.EJBExceptionLP;
 
 public class MandantCall extends BaseCall<MandantFac> implements IMandantCall {
 	
@@ -125,6 +127,11 @@ public class MandantCall extends BaseCall<MandantFac> implements IMandantCall {
 	public boolean hasFunctionZentralerArtikelstamm() throws NamingException {
 		return hasFunction(MandantFac.ZUSATZFUNKTION_ZENTRALER_ARTIKELSTAMM, globals.getTheClientDto().getMandant()) ;
 	}
+	
+	public Locale getLocaleDesHauptmandanten() throws NamingException, EJBExceptionLP {
+		return getFac().getLocaleDesHauptmandanten() ;
+	}
+	
 	
 	private boolean hasModul(String whichModul, String mandantCnr) throws NamingException  {
 		if(moduls == null) {
