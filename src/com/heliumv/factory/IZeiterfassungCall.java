@@ -13,7 +13,7 @@ import com.lp.server.system.service.TheClientDto;
 import com.lp.util.EJBExceptionLP;
 
 public interface IZeiterfassungCall {
-	TaetigkeitDto taetigkeitFindByCNr(String cnr, TheClientDto theClientDto)  throws NamingException;
+	TaetigkeitDto taetigkeitFindByCNr(String cnr)  throws NamingException;
 	
 	TaetigkeitDto taetigkeitFindByCNrSmall(String cnr) ;	
 	

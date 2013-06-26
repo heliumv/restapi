@@ -8,9 +8,12 @@ import java.util.Map.Entry;
 
 import javax.naming.NamingException;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.heliumv.api.worktime.DocumentType;
 import com.heliumv.api.worktime.SpecialActivity;
 import com.heliumv.factory.BaseCall;
+import com.heliumv.factory.IGlobalInfo;
 import com.heliumv.factory.IZeiterfassungCall;
 import com.lp.server.personal.service.TaetigkeitDto;
 import com.lp.server.personal.service.ZeitdatenDto;
@@ -20,12 +23,15 @@ import com.lp.util.EJBExceptionLP;
 
 public class ZeiterfassungCall extends BaseCall<ZeiterfassungFac> implements IZeiterfassungCall {
 
+	@Autowired
+	private IGlobalInfo globalInfo ;
+	
 	public ZeiterfassungCall()  {
 		super(ZeiterfassungFacBean) ;
 	}
 	
-	public TaetigkeitDto taetigkeitFindByCNr(String cNr, TheClientDto theClientDto) throws NamingException {
-		return getFac().taetigkeitFindByCNr(cNr, theClientDto) ;
+	public TaetigkeitDto taetigkeitFindByCNr(String cNr) throws NamingException {
+		return getFac().taetigkeitFindByCNr(cNr, globalInfo.getTheClientDto()) ;
 	}
 
 	public TaetigkeitDto taetigkeitFindByCNrSmall(String cnr) {

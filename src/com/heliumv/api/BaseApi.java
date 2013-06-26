@@ -161,6 +161,10 @@ public class BaseApi {
 		getServletResponse().setStatus(Response.Status.NOT_FOUND.getStatusCode()) ;				
 	}
 	
+	public void respondNotFound() {
+		getServletResponse().setStatus(Response.Status.NOT_FOUND.getStatusCode()) ;		
+	}
+	
 	public void setHttpServletResponse(HttpServletResponse theResponse) {
 		response = theResponse ;
 	}

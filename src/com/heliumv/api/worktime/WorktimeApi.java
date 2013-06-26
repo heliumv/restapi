@@ -381,7 +381,7 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 	
 	
 	private Integer getTaetigkeitIId(String cNr) throws NamingException {
-		TaetigkeitDto taetigkeitDto = getServer().getZeiterfassungCall().taetigkeitFindByCNrSmall(cNr) ;
+		TaetigkeitDto taetigkeitDto = zeiterfassungCall.taetigkeitFindByCNr(cNr.trim()) ;
 		return taetigkeitDto == null ? null : taetigkeitDto.getIId() ;
 	}
 }

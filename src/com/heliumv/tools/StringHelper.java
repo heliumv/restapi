@@ -26,6 +26,8 @@ public class StringHelper {
 	
 	
 	public static String removeXssDelimiters(String value) {
+		if(value == null) return null ;
+
 		String s = value.trim().replace("<", "") ;
 		s = s.replace(">", "") ;
 		s = s.replace("&", "") ;

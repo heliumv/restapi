@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.heliumv.api.BaseApi;
+import com.heliumv.factory.IMandantCall;
 import com.heliumv.factory.IParameterCall;
 import com.heliumv.factory.query.AuftragQuery;
 import com.heliumv.factory.query.AuftragpositionQuery;
@@ -30,6 +31,9 @@ public class OrderApi extends BaseApi implements IOrderApi  {
 
 	@Autowired
 	private IParameterCall parameterCall ;
+	
+	@Autowired
+	private IMandantCall mandantCall ;
 	
 	@Autowired
 	private AuftragQuery orderQuery ;
@@ -52,6 +56,10 @@ public class OrderApi extends BaseApi implements IOrderApi  {
 	
 		try {
 			if(null == connectClient(userId)) return orders ;
+			if(!mandantCall.hasModulAuftrag()) {
+				respondNotFound() ;
+				return orders ;
+			}
 			
 			FilterKriteriumCollector collector = new FilterKriteriumCollector() ;
 			collector.add(orderQuery.getFilterCnr(StringHelper.removeXssDelimiters(filterCnr))) ;
@@ -89,6 +97,11 @@ public class OrderApi extends BaseApi implements IOrderApi  {
 		List<OrderpositionEntry> positions = new ArrayList<OrderpositionEntry>() ;
 		try {
 			if(connectClient(userId) == null) return positions ;
+			if(!mandantCall.hasModulAuftrag()) {
+				respondNotFound() ;
+				return positions ;
+			}
+			
 			FilterKriteriumCollector collector = new FilterKriteriumCollector() ;
 			collector.add(orderPositionQuery.getOrderIdFilter(orderId)) ;
 			
@@ -104,8 +117,8 @@ public class OrderApi extends BaseApi implements IOrderApi  {
 
 			QueryResult result = orderPositionQuery.setQuery(params) ;
 			positions = orderPositionQuery.getResultList(result) ;
-//		} catch(NamingException e) {
-//			respondUnavailable(e) ;
+		} catch(NamingException e) {
+			respondUnavailable(e) ;
 //		} catch(RemoteException e) {
 //			respondUnavailable(e) ;
 		} finally {
