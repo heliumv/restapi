@@ -14,6 +14,7 @@ import com.lp.server.fertigung.service.LosablieferungDto;
 import com.lp.server.fertigung.service.LosistmaterialDto;
 import com.lp.server.fertigung.service.LoslagerentnahmeDto;
 import com.lp.server.fertigung.service.LossollmaterialDto;
+import com.lp.server.system.service.TheClientDto;
 import com.lp.util.EJBExceptionLP;
 
 public interface IFertigungCall {
@@ -59,9 +60,18 @@ public interface IFertigungCall {
 	
 	LoslagerentnahmeDto[] loslagerentnahmeFindByLosIId(Integer losIId) throws NamingException, RemoteException, EJBExceptionLP ;
 	
-	public void gebeMaterialNachtraeglichAus(
+	void gebeMaterialNachtraeglichAus(
 			LossollmaterialDto lossollmaterialDto, LosistmaterialDto losistmaterialDto, 
 			List<SeriennrChargennrMitMengeDto> listSnrChnr, boolean reduzierFehlmenge)
 		throws NamingException, RemoteException, EJBExceptionLP ;
+	
+	LossollmaterialDto[] lossollmaterialFindByLosIIdOrderByISort(
+			Integer losIId) throws NamingException, RemoteException, EJBExceptionLP ;
+	
+	LosistmaterialDto[] losistmaterialFindByLossollmaterialIId(
+			Integer lossollmaterialIId) throws NamingException, RemoteException, EJBExceptionLP ;
+	
+	void updateLosistmaterialMenge(Integer losistmaterialIId, BigDecimal bdMengeNeu) 
+			throws NamingException, RemoteException, EJBExceptionLP ;	
 	
 }

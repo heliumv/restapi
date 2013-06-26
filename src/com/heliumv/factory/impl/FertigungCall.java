@@ -99,4 +99,19 @@ public class FertigungCall extends BaseCall<FertigungFac> implements IFertigungC
 		getFac().gebeMaterialNachtraeglichAus(lossollmaterialDto,
 				losistmaterialDto, listSnrChnr, reduzierFehlmenge, globalInfo.getTheClientDto());		
 	}
+	
+	public LossollmaterialDto[] lossollmaterialFindByLosIIdOrderByISort(
+			Integer losIId) throws NamingException, RemoteException, EJBExceptionLP {
+		return getFac().lossollmaterialFindByLosIIdOrderByISort(losIId) ;
+	}
+	
+	public LosistmaterialDto[] losistmaterialFindByLossollmaterialIId(
+			Integer lossollmaterialIId) throws NamingException, RemoteException, EJBExceptionLP {
+		return getFac().losistmaterialFindByLossollmaterialIId(lossollmaterialIId) ;
+	}
+	
+	public void updateLosistmaterialMenge(Integer losistmaterialIId,
+			BigDecimal bdMengeNeu) throws NamingException, RemoteException, EJBExceptionLP {
+		getFac().updateLosistmaterialMenge(losistmaterialIId, bdMengeNeu, globalInfo.getTheClientDto()) ;
+	}	
 }

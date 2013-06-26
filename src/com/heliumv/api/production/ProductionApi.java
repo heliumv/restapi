@@ -160,7 +160,11 @@ public class ProductionApi extends BaseApi implements IProductionApi {
 				respondBadRequest("itemCnr", materialEntry.getItemCnr()) ;
 				return ;
 			}
-
+			if(materialEntry.getAmount() == null || materialEntry.getAmount().signum() == 0) {
+				respondBadRequest("amount", "null/0") ;
+				return ;
+			}
+			
 			if(connectClient(userId) == null) return ;
 			if(!judgeCall.hasFertLosCUD()) {
 				respondUnauthorized() ;
@@ -193,8 +197,23 @@ public class ProductionApi extends BaseApi implements IProductionApi {
 				return ;				
 			}
 
-			gebeMaterialNachtraeglichAus(lagerDto.getIId(), losDto, itemDto, montageartDto, 
+			if(materialEntry.getAmount().signum() > 0) {
+				gebeMaterialNachtraeglichAus(lagerDto.getIId(), losDto, itemDto, montageartDto, 
 					materialEntry.getAmount(), materialEntry.getIdentities()) ;
+			} else {
+				BigDecimal amountToReturn = materialEntry.getAmount().abs() ;
+				BigDecimal amountNotReturned = nimmMaterialZurueck(
+						lagerDto.getIId(), losDto, itemDto, amountToReturn, false) ;
+				if(amountNotReturned.signum() == 0) {
+					amountNotReturned = nimmMaterialZurueck(
+							lagerDto.getIId(), losDto, itemDto, amountToReturn, true) ;
+				}
+				
+				if(amountNotReturned.signum() != 0) {
+					respondBadRequest(EJBExceptionLP.FEHLER_ZUWENIG_AUF_LAGER) ;
+					appendBadRequestData("stock-available", amountToReturn.subtract(amountNotReturned).toPlainString()) ;
+				}
+			}
 		} catch(NamingException e) {
 			respondUnavailable(e) ;
 			e.printStackTrace() ;
@@ -234,6 +253,47 @@ public class ProductionApi extends BaseApi implements IProductionApi {
 
 		fertigungCall.gebeMaterialNachtraeglichAus(lossollmaterialDto,
 				losistmaterialDto, transform(identities), false) ;
+	}
+	
+	private BigDecimal nimmMaterialZurueck(Integer stockId, LosDto losDto, 
+			ArtikelDto itemDto, BigDecimal amount, boolean updateDb) throws NamingException, RemoteException, EJBExceptionLP {
+		LossollmaterialDto[] sollDtos = fertigungCall.lossollmaterialFindByLosIIdOrderByISort(losDto.getIId()) ;
+		if(sollDtos.length < 1) return amount ;
+		
+		int startIndex = sollDtos.length ;
+		while(startIndex != -1 && amount.signum() != 0) {
+			startIndex = findAcceptableLossollmaterialDtoIndex(sollDtos, itemDto.getIId(), amount, startIndex) ;
+			if(-1 == startIndex) break ;
+
+			LosistmaterialDto[] istDtos = fertigungCall.losistmaterialFindByLossollmaterialIId(sollDtos[startIndex].getIId()) ;
+			for(int i = 0 ; i < istDtos.length && amount.signum() > 0; i++) {
+				if(istDtos[i].isAbgang()) {
+					BigDecimal amountToRemove = amount.min(istDtos[i].getNMenge().abs()) ;
+					if(amountToRemove.signum() > 0) {
+						BigDecimal newAmount = istDtos[i].getNMenge().subtract(amountToRemove) ;
+						if(updateDb) {
+							fertigungCall.updateLosistmaterialMenge(istDtos[i].getIId(), newAmount) ;
+						}
+						amount = amount.subtract(amountToRemove) ;
+					}
+				}
+			}
+		}
+		
+		return amount ;
+	}
+	
+	private int findAcceptableLossollmaterialDtoIndex(LossollmaterialDto[] sollDtos,
+			Integer itemId, BigDecimal amount, int startIndex) {
+		if(startIndex > sollDtos.length || startIndex <= 0) return -1 ;
+
+		for(int i = startIndex - 1; i >= 0; i--) {
+			if(itemId.equals(sollDtos[i].getArtikelIId())) {
+				return i ;
+			}
+		}
+
+		return -1 ;
 	}
 	
 	private List<SeriennrChargennrMitMengeDto> transform(List<IdentityAmountEntry> identities) {
