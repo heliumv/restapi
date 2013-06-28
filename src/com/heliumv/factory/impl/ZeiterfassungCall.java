@@ -9,18 +9,24 @@ import java.util.Map.Entry;
 import javax.naming.NamingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import com.heliumv.annotation.HvJudge;
+import com.heliumv.annotation.HvModul;
 import com.heliumv.api.worktime.DocumentType;
 import com.heliumv.api.worktime.SpecialActivity;
 import com.heliumv.factory.BaseCall;
 import com.heliumv.factory.IGlobalInfo;
 import com.heliumv.factory.IZeiterfassungCall;
+import com.lp.server.benutzer.service.RechteFac;
 import com.lp.server.personal.service.TaetigkeitDto;
 import com.lp.server.personal.service.ZeitdatenDto;
 import com.lp.server.personal.service.ZeiterfassungFac;
+import com.lp.server.system.service.LocaleFac;
 import com.lp.server.system.service.TheClientDto;
 import com.lp.util.EJBExceptionLP;
 
+@Component
 public class ZeiterfassungCall extends BaseCall<ZeiterfassungFac> implements IZeiterfassungCall {
 
 	@Autowired
@@ -30,6 +36,7 @@ public class ZeiterfassungCall extends BaseCall<ZeiterfassungFac> implements IZe
 		super(ZeiterfassungFacBean) ;
 	}
 	
+	@HvModul(name=LocaleFac.BELEGART_ZEITERFASSUNG)
 	public TaetigkeitDto taetigkeitFindByCNr(String cNr) throws NamingException {
 		return getFac().taetigkeitFindByCNr(cNr, globalInfo.getTheClientDto()) ;
 	}
@@ -39,6 +46,7 @@ public class ZeiterfassungCall extends BaseCall<ZeiterfassungFac> implements IZe
 //	 	return getFac().taetigkeitFindByCNrSmallOhneExc(cnr) ;
 	}
 	
+	@HvModul(name=LocaleFac.BELEGART_ZEITERFASSUNG)
 	public Integer createZeitdaten(ZeitdatenDto zeitdatenDto,
 			boolean bBucheAutoPausen, boolean bBucheMitternachtssprung,
 			boolean bZeitverteilen, TheClientDto theClientDto)
@@ -57,11 +65,23 @@ public class ZeiterfassungCall extends BaseCall<ZeiterfassungFac> implements IZe
 	}
 	
 	
+	@HvModul(name=LocaleFac.BELEGART_ZEITERFASSUNG)
 	public List<DocumentType> getBebuchbareBelegarten(TheClientDto theClientDto) throws NamingException {
 		Map<String, String> m = getFac().getBebuchbareBelegarten(theClientDto) ;
 		return convertFromBelegarten(m) ;
 	}
 
+	@HvJudge(name=RechteFac.RECHT_PERS_ZEITERFASSUNG_R) 
+	public ZeitdatenDto zeitdatenFindByPrimaryKey(Integer id) throws NamingException, RemoteException {
+//		return getFac().zeitdatenFindByPrimaryKeyOhneExc(id) ;
+		return getFac().zeitdatenFindByPrimaryKey(id, globalInfo.getTheClientDto()) ;
+	}
+	
+	@HvJudge(name=RechteFac.RECHT_PERS_ZEITEREFASSUNG_CUD) 
+	public void removeZeitdaten(ZeitdatenDto zeitdatenDto) throws NamingException, RemoteException, EJBExceptionLP {
+		getFac().removeZeitdaten(zeitdatenDto) ;
+	}
+	
 	private List<SpecialActivity> convertFromActivities(Map<?, ?> allActivities) {
 		List<SpecialActivity> activities = new ArrayList<SpecialActivity>() ;
 		for (Entry<?, ?> entry : allActivities.entrySet()) {

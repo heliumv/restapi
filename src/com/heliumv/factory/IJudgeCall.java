@@ -5,6 +5,9 @@ import javax.naming.NamingException;
 import com.lp.server.system.service.TheClientDto;
 
 public interface IJudgeCall {
+	
+	boolean hatRecht(String rechtCnr) throws NamingException ;
+	
 	boolean hasPersSichtbarkeitAlle() throws NamingException ;
 	boolean hasPersSichtbarkeitAlle(TheClientDto theClientDto) throws NamingException ;
 	

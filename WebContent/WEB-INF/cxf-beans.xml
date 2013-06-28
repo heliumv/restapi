@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
 	xmlns:jaxws="http://cxf.apache.org/jaxws"
 	xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:util="http://www.springframework.org/schema/util"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	 http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+	 http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
 	 http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
 	 http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
 	 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+ 	 
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
  	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
  	
@@ -47,6 +53,9 @@
 	</jaxrs:server>	
 	
 	<context:annotation-config />
+	<context:component-scan base-package="com.heliumv.*" />
+	<aop:aspectj-autoproxy/>
+	
 	<bean id="globalInfo" class="com.heliumv.factory.GlobalInfo" />
 	<bean id="artikelCall" class="com.heliumv.factory.impl.ArtikelCall" lazy-init="true"/>
 	<bean id="auftragCall" class="com.heliumv.factory.impl.AuftragCall" lazy-init="true"/>
@@ -59,6 +68,7 @@
 	<bean id="mandantCall" class="com.heliumv.factory.impl.MandantCall" lazy-init="true"/>
 	<bean id="parameterCall" class="com.heliumv.factory.impl.ParameterCall" lazy-init="true"/>
 	<bean id="personalCall" class="com.heliumv.factory.impl.PersonalCall" lazy-init="true"/>
+	<bean id="projektCall" class="com.heliumv.factory.impl.ProjektCall" lazy-init="true"/>
 	<bean id="server" class="com.heliumv.factory.impl.ServerCall" lazy-init="true"/>
 	<bean id="stuecklisteCall" class="com.heliumv.factory.impl.StuecklisteCall" lazy-init="true"/>
 	<bean id="systemCall" class="com.heliumv.factory.impl.SystemCall" lazy-init="true"/>
@@ -70,6 +80,7 @@
 	<bean id="productionQuery" class="com.heliumv.factory.query.ProductionQuery" lazy-init="true"/>
 	<bean id="projectQuery" class="com.heliumv.factory.query.ProjectQuery" lazy-init="true"/>
 	<bean id="staffQuery" class="com.heliumv.factory.query.StaffQuery" lazy-init="true"/>
+	<bean id="zeitdatenQuery" class="com.heliumv.factory.query.ZeitdatenQuery" lazy-init="true"/>
 	
  	<bean id="hvUser" class="com.heliumv.api.benutzer.UserApi" lazy-init="true" />
 	<bean id="hvWorktime" class="com.heliumv.api.worktime.WorktimeApi" lazy-init="true"/>

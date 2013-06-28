@@ -14,15 +14,13 @@ import com.heliumv.factory.Globals;
 import com.heliumv.factory.IMandantCall;
 import com.heliumv.factory.IParameterCall;
 import com.heliumv.factory.ISystemCall;
-import com.heliumv.factory.impl.FastLaneReaderCall;
 import com.heliumv.tools.StringHelper;
 import com.lp.server.artikel.service.ArtikelFac;
 import com.lp.server.util.fastlanereader.service.query.FilterKriterium;
 import com.lp.server.util.fastlanereader.service.query.FilterKriteriumDirekt;
 import com.lp.server.util.fastlanereader.service.query.QueryParameters;
-import com.lp.server.util.fastlanereader.service.query.QueryResult;
 
-public class ArtikelArbeitszeitQuery extends FastLaneReaderCall {
+public class ArtikelArbeitszeitQuery extends BaseQuery<ItemEntry> {
 	@Autowired 
 	private IMandantCall mandantCall ;
 	@Autowired
@@ -30,15 +28,11 @@ public class ArtikelArbeitszeitQuery extends FastLaneReaderCall {
 	@Autowired
 	private IParameterCall parameterCall ;
 
-	private ItemEntryTransformer entryTransformer = new ItemEntryTransformer() ;
-	
 	public ArtikelArbeitszeitQuery() {
 		super(QueryParameters.UC_ID_ARTIKELLISTE) ;
+		setTransformer(new ItemEntryTransformer()) ;
 	}
 	
-	public List<ItemEntry> getResultList(QueryResult result) {
-		return entryTransformer.transform(result.getRowData()) ;
-	}
 	
 	@Override
 	protected List<FilterKriterium> getRequiredFilters() {

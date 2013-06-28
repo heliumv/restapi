@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.naming.NamingException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -20,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.heliumv.api.BaseApi;
-import com.heliumv.factory.Globals;
 import com.heliumv.factory.IAuftragCall;
 import com.heliumv.factory.IAuftragpositionCall;
 import com.heliumv.factory.IFertigungCall;
@@ -28,8 +28,10 @@ import com.heliumv.factory.IGlobalInfo;
 import com.heliumv.factory.IJudgeCall;
 import com.heliumv.factory.IMandantCall;
 import com.heliumv.factory.IPersonalCall;
+import com.heliumv.factory.IProjektCall;
 import com.heliumv.factory.IZeiterfassungCall;
 import com.heliumv.factory.query.ArtikelArbeitszeitQuery;
+import com.heliumv.factory.query.ZeitdatenQuery;
 import com.heliumv.tools.FilterKriteriumCollector;
 import com.lp.server.auftrag.service.AuftragDto;
 import com.lp.server.auftrag.service.AuftragpositionDto;
@@ -38,6 +40,7 @@ import com.lp.server.personal.service.PersonalDto;
 import com.lp.server.personal.service.TaetigkeitDto;
 import com.lp.server.personal.service.ZeitdatenDto;
 import com.lp.server.personal.service.ZeiterfassungFac;
+import com.lp.server.projekt.service.ProjektDto;
 import com.lp.server.system.service.LocaleFac;
 import com.lp.server.system.service.TheClientDto;
 import com.lp.server.util.fastlanereader.service.query.FilterBlock;
@@ -65,6 +68,9 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 	private IMandantCall mandantCall ;
 	
 	@Autowired
+	private IProjektCall projektCall ;
+	
+	@Autowired
 	private IZeiterfassungCall zeiterfassungCall ;
 	
 	@Autowired
@@ -75,6 +81,74 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 	
 	@Autowired 
 	private IGlobalInfo globalInfo ;
+
+	@Autowired
+	private ZeitdatenQuery zeitdatenQuery ;
+	
+	@GET
+	@Path("{userId}/{year}/{month}/{day}")
+	@Produces({"application/json", "application/xml"})	
+	public List<ZeitdatenEntry> getWorktimeEntries(
+			@PathParam("userId") String userId,
+			@PathParam("year") Integer year,
+			@PathParam("month") Integer month,
+			@PathParam("day") Integer day,
+			@QueryParam("forUserId") Integer forUserId,
+			@QueryParam("limit") Integer limit) {
+		List<ZeitdatenEntry> entries = new ArrayList<ZeitdatenEntry>();
+		if(connectClient(userId) == null) return entries ;
+
+		Integer personalId = globalInfo.getTheClientDto().getIDPersonal() ;
+		try {
+			if(isValidPersonalId(forUserId)) {
+				personalId = forUserId ;
+			}
+			FilterKriteriumCollector collector = new FilterKriteriumCollector() ;
+			collector.add(zeitdatenQuery.getFilterForPersonalId(personalId)) ;
+			collector.addAll(zeitdatenQuery.getFilterForDate(year, month, day)) ;
+			FilterBlock filterCrits = new FilterBlock(collector.asArray(), "AND")  ;
+			
+			QueryParameters params = zeitdatenQuery.getDefaultQueryParameters(filterCrits) ;
+			params.setLimit(limit) ;
+//			params.setKeyOfSelectedRow(startIndex) ;
+
+			QueryResult result = zeitdatenQuery.setQuery(params) ;
+			entries = zeitdatenQuery.getResultList(result) ;
+		} catch(NamingException e) {
+			respondUnavailable(e) ;
+		}
+		
+		return entries ;
+	}
+	
+	@DELETE
+	@Path("{userId}/{worktimeId}")	
+	public void removeWorktime(
+			@PathParam("userId") String userId,
+			@PathParam("worktimeId") Integer worktimeId,
+			@QueryParam("forUserId") Integer forUserId) {
+		if(connectClient(userId) == null) return ;
+		Integer personalId = globalInfo.getTheClientDto().getIDPersonal() ;
+		try {
+			if(isValidPersonalId(forUserId)) {
+				personalId = forUserId ;				
+			}
+			ZeitdatenDto zDto = zeiterfassungCall.zeitdatenFindByPrimaryKey(worktimeId) ;
+			if(zDto == null) {
+				respondBadRequest("worktimeId", worktimeId.toString()) ;
+				return ;
+			}
+			if(zDto.getPersonalIId().equals(personalId)) {
+				zeiterfassungCall.removeZeitdaten(zDto) ;
+			}
+		} catch(NamingException e) {
+			respondUnavailable(e) ;
+		} catch(RemoteException e) {			
+			respondUnavailable(e) ;
+		} catch(EJBExceptionLP e) {
+			respondBadRequest(e) ;
+		}
+	}
 	
 	@POST
 	@Path("/coming/")
@@ -87,7 +161,7 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 	@POST
 	@Path("/coming/{userid}/{year}/{month}/{day}/{hour}/{minute}/{second}")
 	public Response bookComing(
-			@PathParam("userid") String userId,
+			@PathParam("userId") String userId,
 			@PathParam("year") Integer year,
 			@PathParam("month") Integer month,
 			@PathParam("day") Integer day,
@@ -131,17 +205,10 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 				return getBadRequest("orderPositionId",  entry.getOrderPositionId().toString()) ;								
 			}
 
-			ZeitdatenDto zDto = new ZeitdatenDto() ;
-			zDto.setPersonalIId(entry.getForUserId()) ;
+			ZeitdatenDto zDto = createDefaultZeitdatenDto(entry) ;
 			zDto.setCBelegartnr(LocaleFac.BELEGART_AUFTRAG) ;
 			zDto.setIBelegartid(entry.getOrderId()) ;
-			zDto.setArtikelIId(entry.getWorkItemId()) ;
 			zDto.setIBelegartpositionid(entry.getOrderPositionId()) ;
-			zDto.setCBemerkungZuBelegart(entry.getRemark()) ;
-			zDto.setXKommentar(entry.getExtendedRemark()) ;
-			Timestamp ts = new Timestamp(Calendar.getInstance().getTimeInMillis()) ;
-			zDto.setTZeit(ts) ;	
-
 			zeiterfassungCall.createZeitdaten(zDto, true, true, true, globalInfo.getTheClientDto()) ;
 		} catch(NamingException e) {
 			return getUnavailable(e) ;
@@ -160,7 +227,7 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 	public Response bookProduction(ProductionRecordingEntry entry) {
 		if(connectClient(entry.getUserId()) == null) return getUnauthorized() ;
 		try {
-			if(!mandantCall.hasModulProjekt()) return getUnauthorized() ;
+			if(!mandantCall.hasModulLos()) return getUnauthorized() ;
 			if(!isValidPersonalId(entry.getForUserId())) {
 				entry.setForUserId(globalInfo.getTheClientDto().getIDPersonal()) ;
 			}
@@ -169,16 +236,9 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 				return getBadRequest("productionId",  entry.getProductionId().toString()) ;
 			}
 			
-			ZeitdatenDto zDto = new ZeitdatenDto() ;
-			zDto.setPersonalIId(entry.getForUserId()) ;
+			ZeitdatenDto zDto = createDefaultZeitdatenDto(entry) ;
 			zDto.setCBelegartnr(LocaleFac.BELEGART_LOS) ;
 			zDto.setIBelegartid(entry.getProductionId()) ;
-			zDto.setArtikelIId(entry.getWorkItemId()) ;
-			zDto.setCBemerkungZuBelegart(entry.getRemark()) ;
-			zDto.setXKommentar(entry.getExtendedRemark()) ;
-			Timestamp ts = new Timestamp(Calendar.getInstance().getTimeInMillis()) ;
-			zDto.setTZeit(ts) ;	
-
 			zeiterfassungCall.createZeitdaten(zDto, true, true, true, globalInfo.getTheClientDto()) ;
 		} catch(NamingException e) {
 			return getUnavailable(e) ;
@@ -190,7 +250,55 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 		return getNoContent() ;
 	}
 	
-	private boolean isValidProductionId(Integer productionId) {
+	@POST
+	@Path("/project/")
+	@Consumes({"application/json", "application/xml"})
+	public Response bookProject(ProjectRecordingEntry entry) {
+		if(connectClient(entry.getUserId()) == null) return getUnauthorized() ;
+		try {
+			if(!mandantCall.hasModulProjekt()) return getUnauthorized() ;
+			if(!isValidPersonalId(entry.getForUserId())) {
+				entry.setForUserId(globalInfo.getTheClientDto().getIDPersonal()) ;
+			}
+
+			if(!isValidProjectId(entry.getProjectId())) {
+				return getBadRequest("projectId",  entry.getProjectId().toString()) ;
+			}
+			
+			ZeitdatenDto zDto = createDefaultZeitdatenDto(entry) ;
+			zDto.setArtikelIId(null) ;
+			zDto.setCBelegartnr(LocaleFac.BELEGART_PROJEKT) ;
+			zDto.setIBelegartid(entry.getProjectId()) ;
+			zDto.setArtikelIId(entry.getWorkItemId()) ;
+			zeiterfassungCall.createZeitdaten(zDto, true, true, true, globalInfo.getTheClientDto()) ;
+		} catch(NamingException e) {
+			return getUnavailable(e) ;
+		} catch(RemoteException e) {
+			return getUnavailable(e) ;			
+		} catch(EJBExceptionLP e) {
+			return getBadRequest(e) ;
+		}
+		return getNoContent() ;
+	}
+	
+	private ZeitdatenDto createDefaultZeitdatenDto(DocumentRecordingEntry entry) {
+		ZeitdatenDto zDto = new ZeitdatenDto() ;
+		zDto.setPersonalIId(entry.getForUserId()) ;
+		zDto.setArtikelIId(entry.getWorkItemId()) ;
+		zDto.setCBemerkungZuBelegart(entry.getRemark()) ;
+		zDto.setXKommentar(entry.getExtendedRemark()) ;
+		zDto.setTZeit(getTimestamp(entry)) ;	
+		return zDto ;
+	}	
+	
+	private boolean isValidProjectId(Integer projectId) throws NamingException, RemoteException {
+		ProjektDto projektDto = projektCall.projektFindByPrimaryKeyOhneExc(projectId) ;
+		if(projektDto == null) return false ;
+		
+		return projektDto.getMandantCNr().equals(globalInfo.getMandant()) ;
+	}
+		
+	private boolean isValidProductionId(Integer productionId) throws NamingException {
 		LosDto losDto = fertigungCall.losFindByPrimaryKeyOhneExc(productionId) ;
 		if(losDto == null) return false ;
 		
@@ -273,9 +381,9 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 			boolean hasRechtNurBuchen = judgeCall.hasPersZeiteingabeNurBuchen() ;
 			
 			if(hasRechtNurBuchen) {
-				activities = zeiterfassungCall.getAllSprSondertaetigkeitenNurBDEBuchbar(Globals.getTheClientDto().getLocUiAsString());
+				activities = zeiterfassungCall.getAllSprSondertaetigkeitenNurBDEBuchbar(globalInfo.getTheClientDto().getLocUiAsString());
 			} else {
-				activities = zeiterfassungCall.getAllSprSondertaetigkeiten(Globals.getTheClientDto().getLocUiAsString());
+				activities = zeiterfassungCall.getAllSprSondertaetigkeiten(globalInfo.getTheClientDto().getLocUiAsString());
 			}
 		} catch(RemoteException e) {
 			respondUnavailable(e) ;
@@ -297,7 +405,7 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 		try {
 			if(connectClient(userId) == null) return documentTypes ;
 
-			documentTypes = zeiterfassungCall.getBebuchbareBelegarten(Globals.getTheClientDto()) ;
+			documentTypes = zeiterfassungCall.getBebuchbareBelegarten(globalInfo.getTheClientDto()) ;
 		} catch(NamingException e) {
 			respondUnavailable(e) ;
 		}
@@ -312,7 +420,7 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 				return getBadRequest("userId", entry.getUserId()) ;
 			}
 			
-			PersonalDto personalDto = personalCall.byPrimaryKeySmall(Globals.getTheClientDto().getIDPersonal());
+			PersonalDto personalDto = personalCall.byPrimaryKeySmall(globalInfo.getTheClientDto().getIDPersonal());
 			if (null == personalDto) {
 				return getUnauthorized();
 			}
@@ -325,7 +433,7 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 			Timestamp timestamp = getTimestamp(entry);
 
 			return bucheZeitPersonalID(personalDto.getIId(), timestamp,
-					taetigkeitIId, null, Globals.getTheClientDto());
+					taetigkeitIId, null, globalInfo.getTheClientDto());
 		} catch (NamingException e) {
 			return getUnavailable(e);
 		}

@@ -23,6 +23,10 @@ public class JudgeCall extends BaseCall<TheJudgeFac> implements IJudgeCall {
 		return getFac().hatRecht(rechtCnr, theClientDto) ;
 	}
 	
+	public boolean hatRecht(String rechtCnr) throws NamingException {
+		return hatRechtImpl(rechtCnr, globalInfo.getTheClientDto()) ;
+	}
+	
 	@Override
 	public boolean hasPersZeiteingabeNurBuchen() throws NamingException {
 		return hatRechtImpl(RechteFac.RECHT_PERS_ZEITEINGABE_NUR_BUCHEN, globalInfo.getTheClientDto()) ;

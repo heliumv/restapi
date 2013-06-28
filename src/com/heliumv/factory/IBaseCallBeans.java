@@ -15,6 +15,7 @@ public interface IBaseCallBeans {
 	static final String LogonFacBean           = "LogonFacBean" ;
 	static final String MandantFacBean         = "MandantFacBean" ;
 	static final String ParameterFacBean       = "ParameterFacBean" ;
+	static final String ProjektFacBean         = "ProjektFacBean" ;
 	static final String PersonalFacBean        = "PersonalFacBean" ;
 	static final String StuecklisteFacBean     = "StuecklisteFacBean" ;
 	static final String SystemFacBean          = "SystemFacBean" ;

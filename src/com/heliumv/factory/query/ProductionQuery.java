@@ -12,31 +12,26 @@ import com.heliumv.api.production.ProductionEntry;
 import com.heliumv.api.production.ProductionEntryTransformer;
 import com.heliumv.factory.Globals;
 import com.heliumv.factory.IParameterCall;
-import com.heliumv.factory.impl.FastLaneReaderCall;
 import com.heliumv.tools.StringHelper;
 import com.lp.server.util.fastlanereader.service.query.FilterKriterium;
 import com.lp.server.util.fastlanereader.service.query.QueryParameters;
-import com.lp.server.util.fastlanereader.service.query.QueryResult;
 
-public class ProductionQuery extends FastLaneReaderCall {
+public class ProductionQuery extends BaseQuery<ProductionEntry> {
 	@Autowired
 	private IParameterCall parameterCall ;
-
-	private ProductionEntryTransformer entryTransformer = new ProductionEntryTransformer() ;
 	
 	public ProductionQuery() {
-		super(UUID.randomUUID().toString(), QueryParameters.UC_ID_LOS) ;
+		super(QueryParameters.UC_ID_LOS) ;
+		setTransformer(new ProductionEntryTransformer()) ;
 	}
 	
 	
 	public ProductionQuery(IParameterCall parameterCall) throws NamingException {
 		super(UUID.randomUUID().toString(), QueryParameters.UC_ID_LOS) ;
+		setTransformer(new ProductionEntryTransformer()) ;
 		this.parameterCall = parameterCall ;
 	}
 	
-	public List<ProductionEntry> getResultList(QueryResult result) {
-		return entryTransformer.transform(result.getRowData()) ;
-	}
 			
 	@Override
 	protected List<FilterKriterium> getRequiredFilters() {

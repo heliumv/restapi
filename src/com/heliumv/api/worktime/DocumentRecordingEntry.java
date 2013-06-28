@@ -1,19 +1,12 @@
 package com.heliumv.api.worktime;
 
 
-public class DocumentRecordingEntry {
-	private String  userId ;
+public class DocumentRecordingEntry extends TimeRecordingEntry {
 	private Integer workItemId ;
 	private String  remark ;
 	private String  extendedRemark ;
 	private Integer forUserId ;
 	
-	public String getUserId() {
-		return userId;
-	}
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
 	
 	public Integer getForUserId() {
 		return forUserId;

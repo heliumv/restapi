@@ -2,7 +2,6 @@ package com.heliumv.factory.query;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import javax.naming.NamingException;
 
@@ -12,25 +11,23 @@ import com.heliumv.api.project.ProjectEntry;
 import com.heliumv.api.project.ProjectEntryTransformer;
 import com.heliumv.factory.Globals;
 import com.heliumv.factory.IParameterCall;
-import com.heliumv.factory.impl.FastLaneReaderCall;
 import com.heliumv.tools.StringHelper;
 import com.lp.server.projekt.service.ProjektFac;
 import com.lp.server.util.fastlanereader.service.query.FilterKriterium;
 import com.lp.server.util.fastlanereader.service.query.QueryParameters;
-import com.lp.server.util.fastlanereader.service.query.QueryResult;
 
-public class ProjectQuery extends FastLaneReaderCall {
+public class ProjectQuery extends BaseQuery<ProjectEntry> {
 	@Autowired
 	private IParameterCall parameterCall ;
-
-	private ProjectEntryTransformer entryTransformer = new ProjectEntryTransformer() ;
 	
 	public ProjectQuery() {
-		super(UUID.randomUUID().toString(), QueryParameters.UC_ID_PROJEKT) ;
+		super(QueryParameters.UC_ID_PROJEKT) ;
+		setTransformer(new ProjectEntryTransformer()) ;
 	}
 
 	public ProjectQuery(IParameterCall parameterCall) throws NamingException {		
-		super(UUID.randomUUID().toString(), QueryParameters.UC_ID_PROJEKT) ;
+		super(QueryParameters.UC_ID_PROJEKT) ;
+		setTransformer(new ProjectEntryTransformer()) ;
 		this.parameterCall = parameterCall ;
 	}
 	
@@ -39,13 +36,6 @@ public class ProjectQuery extends FastLaneReaderCall {
 		this.parameterCall = parameterCall ;
 	}
 
-//	private IParameterCall getParameterCall() {
-//		return parameterCall ;
-//	}	
-
-	public List<ProjectEntry> getResultList(QueryResult result) {
-		return entryTransformer.transform(result.getRowData()) ;
-	}
 	
 	protected List<FilterKriterium> getRequiredFilters() {
 		List<FilterKriterium> filters = new ArrayList<FilterKriterium>() ;

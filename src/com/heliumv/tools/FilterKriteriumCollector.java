@@ -22,6 +22,11 @@ public class FilterKriteriumCollector {
 		return filters.add(criterium) ;
 	}
 	
+	public boolean addAll(List<FilterKriterium> criterias) {
+		if(criterias == null) return false ;
+		return filters.addAll(criterias) ;
+	}
+	
 	public List<FilterKriterium> getFilters() {
 		return filters ;
 	}
