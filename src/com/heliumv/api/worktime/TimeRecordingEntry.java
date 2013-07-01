@@ -11,6 +11,16 @@ public class TimeRecordingEntry {
 	private int hour ;
 	private int minute ;
 	private int second ;
+	private Integer forStaffId ;
+	
+	
+	public Integer getForStaffId() {
+		return forStaffId;
+	}
+
+	public void setForStaffId(Integer forStaffId) {
+		this.forStaffId = forStaffId;
+	}
 	
 	public String getUserId() {
 		return userId;

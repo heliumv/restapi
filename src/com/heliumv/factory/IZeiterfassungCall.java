@@ -17,27 +17,39 @@ import com.lp.server.system.service.TheClientDto;
 import com.lp.util.EJBExceptionLP;
 
 public interface IZeiterfassungCall {
-	@HvModul(name=LocaleFac.BELEGART_ZEITERFASSUNG)
+	@HvModul(modul=LocaleFac.BELEGART_ZEITERFASSUNG)
+	@HvJudge(recht=RechteFac.RECHT_PERS_ZEITERFASSUNG_R)	
 	TaetigkeitDto taetigkeitFindByCNr(String cnr)  throws NamingException;
 	
-	TaetigkeitDto taetigkeitFindByCNrSmall(String cnr) ;	
+	@HvModul(modul=LocaleFac.BELEGART_ZEITERFASSUNG)
+	@HvJudge(recht=RechteFac.RECHT_PERS_ZEITERFASSUNG_R)	
+	TaetigkeitDto taetigkeitFindByCNrSmall(String cnr) throws NamingException ;	
 	
-	@HvModul(name=LocaleFac.BELEGART_ZEITERFASSUNG)
+	@HvModul(modul=LocaleFac.BELEGART_ZEITERFASSUNG)
+	@HvJudge(recht=RechteFac.RECHT_PERS_ZEITEREFASSUNG_CUD) 
 	Integer createZeitdaten(ZeitdatenDto zeitdatenDto,
 			boolean bBucheAutoPausen, boolean bBucheMitternachtssprung,
-			boolean bZeitverteilen, TheClientDto theClientDto)
+			boolean bZeitverteilen)
 			throws EJBExceptionLP, NamingException, RemoteException ;
 
+	@HvModul(modul=LocaleFac.BELEGART_AUFTRAG)
+	Integer createAuftragZeitdaten(ZeitdatenDto zeitdatenDto,
+			boolean bBucheAutoPausen, boolean bBucheMitternachtssprung,
+			boolean bZeitverteilen)
+			throws EJBExceptionLP, NamingException, RemoteException ;
+	
 	List<SpecialActivity> getAllSprSondertaetigkeitenNurBDEBuchbar(String language) throws NamingException, RemoteException ; 
 	
 	List<SpecialActivity> getAllSprSondertaetigkeiten(String language) throws NamingException, RemoteException ;
 	
-	@HvModul(name=LocaleFac.BELEGART_ZEITERFASSUNG)
+	@HvModul(modul=LocaleFac.BELEGART_ZEITERFASSUNG)
 	List<DocumentType> getBebuchbareBelegarten(TheClientDto theClientDto) throws NamingException ;
 
-	@HvJudge(name=RechteFac.RECHT_PERS_ZEITEREFASSUNG_CUD) 
+	@HvModul(modul=LocaleFac.BELEGART_ZEITERFASSUNG)
+	@HvJudge(recht=RechteFac.RECHT_PERS_ZEITEREFASSUNG_CUD) 
 	void removeZeitdaten(ZeitdatenDto zeitdatenDto) throws NamingException, RemoteException, EJBExceptionLP ;
 	
-	@HvJudge(name=RechteFac.RECHT_PERS_ZEITERFASSUNG_R)	
+	@HvModul(modul=LocaleFac.BELEGART_ZEITERFASSUNG)
+	@HvJudge(recht=RechteFac.RECHT_PERS_ZEITERFASSUNG_R)	
 	ZeitdatenDto zeitdatenFindByPrimaryKey(Integer id) throws NamingException, RemoteException ;
 }

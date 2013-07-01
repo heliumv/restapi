@@ -15,5 +15,5 @@ public @interface HvJudge {
 	/**
 	 * Der Modulname aus RechteFac.RECHT_PERS_ZEITERFASSUNG_R
 	 */
-	String name() ;
+	String recht() ;
 }

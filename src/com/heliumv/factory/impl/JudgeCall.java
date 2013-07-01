@@ -70,4 +70,15 @@ public class JudgeCall extends BaseCall<TheJudgeFac> implements IJudgeCall {
 	public boolean hasPersSichtbarkeitAlle(TheClientDto theClientDto) throws NamingException {
 		return hatRechtImpl(RechteFac.RECHT_PERS_SICHTBARKEIT_ALLE, theClientDto);
 	}
+
+	@Override
+	public boolean hasPersDarfKommtGehtAendern() throws NamingException {
+		return hatRechtImpl(RechteFac.RECHT_PERS_DARF_KOMMT_GEHT_AENDERN, globalInfo.getTheClientDto());
+	}
+
+	@Override
+	public boolean hasPersDarfKommtGehtAendern(TheClientDto theClientDto)
+			throws NamingException {
+		return hatRechtImpl(RechteFac.RECHT_PERS_DARF_KOMMT_GEHT_AENDERN, theClientDto) ;
+	}	
 }

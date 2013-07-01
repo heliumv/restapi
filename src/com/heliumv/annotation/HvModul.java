@@ -14,5 +14,5 @@ public @interface HvModul {
 	/**
 	 * Der Modulname aus LocaleFac.BELEGART_*
 	 */
-	String name() ;
+	String modul() ;
 }

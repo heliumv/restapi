@@ -14,8 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.heliumv.factory.Globals;
 import com.heliumv.factory.IClientCall;
 import com.heliumv.factory.IGlobalInfo;
-import com.heliumv.factory.IServerCall;
-import com.heliumv.factory.impl.ServerCall;
+// import com.heliumv.factory.IServerCall;
 import com.lp.server.system.service.TheClientDto;
 import com.lp.util.EJBExceptionLP;
 
@@ -23,8 +22,8 @@ public class BaseApi {
 	@Context
 	private HttpServletResponse response ;
 	
-	@Autowired
-	private IServerCall serverCall ;
+//	@Autowired
+//	private IServerCall serverCall ;
 
 	@Autowired
 	private IClientCall clientCall ;
@@ -35,7 +34,6 @@ public class BaseApi {
 	private ResponseBuilder getResponseBuilder() {
 		return new ResponseBuilderImpl() ;
 	}
-	
 	
 	public TheClientDto connectClient(String userId) {
 		globalInfo.setTheClientDto(null) ;
@@ -171,23 +169,5 @@ public class BaseApi {
 	
 	protected HttpServletResponse getServletResponse() {
 		return response ;
-	}
-
-
-	protected IServerCall getServer() {
-		if(serverCall == null) {
-			serverCall = new ServerCall() ; 
-		}
-		return serverCall ;
-	}
-	
-	@Autowired(required=false)
-	protected void setServer(IServerCall newServer) {
-		serverCall = newServer ;
-	}
-	
-	@Autowired(required=false)
-	protected void setClient(IClientCall newClient) {
-		clientCall = newClient ;
-	}
+	}	
 }

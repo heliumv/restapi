@@ -21,5 +21,6 @@
 	<classpathentry kind="lib" path="C:/aspectj1.7/lib/aspectjtools.jar"/>
 	<classpathentry kind="lib" path="C:/aspectj1.7/lib/aspectjweaver.jar"/>
 	<classpathentry kind="lib" path="C:/aspectj1.7/lib/org.aspectj.matcher.jar"/>
+	<classpathentry kind="lib" path="lib/spring-test-3.0.7.RELEASE.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

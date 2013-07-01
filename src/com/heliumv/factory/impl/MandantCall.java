@@ -67,6 +67,10 @@ public class MandantCall extends BaseCall<MandantFac> implements IMandantCall {
 		}
 	}
 
+	public boolean hasNamedModul(String moduleName) throws NamingException {
+		return hasModul(moduleName, globals.getTheClientDto().getMandant()) ;		
+	}
+	
 	public boolean hasModulAngebot(String mandantCnr) throws NamingException {
 		return hasModul(LocaleFac.BELEGART_ANGEBOT, mandantCnr) ;
 	}

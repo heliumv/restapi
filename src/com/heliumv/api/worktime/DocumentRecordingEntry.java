@@ -5,16 +5,6 @@ public class DocumentRecordingEntry extends TimeRecordingEntry {
 	private Integer workItemId ;
 	private String  remark ;
 	private String  extendedRemark ;
-	private Integer forUserId ;
-	
-	
-	public Integer getForUserId() {
-		return forUserId;
-	}
-
-	public void setForUserId(Integer forUserId) {
-		this.forUserId = forUserId;
-	}
 
 	public Integer getWorkItemId() {
 		return workItemId;

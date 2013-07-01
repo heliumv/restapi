@@ -28,6 +28,18 @@ public interface IMandantCall {
 	boolean hasModulLos() throws NamingException ;
 	boolean hasModulLos(String mandantCnr) throws NamingException ;
 	
+	/**
+	 * Existiert ein Modul fuer den Mandanten?</br>
+	 * <p><b>Bitte diese Funktion nur benutzen wenn es unbedingt notwendig ist. Besser ist es,
+	 * die speziellen Methoden wie hasModulProjekt()...hasModulAngebot()... zu benutzen</b></p>
+	 * 
+	 * @param moduleName ist der betreffende Modulname aus LocaleFac.*
+	 * 
+	 * @return true wenn der angemeldete Client Zugriff auf das Modul hat
+	 * @throws NamingException
+	 */
+	boolean hasNamedModul(String moduleName) throws NamingException ;
+	
 	boolean hasFunctionProjektZeiterfassung() throws NamingException ;
 	boolean hasFunctionProjektZeiterfassung(String mandantCnr) throws NamingException ;
 

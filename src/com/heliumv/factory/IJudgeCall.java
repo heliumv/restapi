@@ -17,6 +17,9 @@ public interface IJudgeCall {
 	boolean hasPersZeiteingabeNurBuchen() throws NamingException ;
 	boolean hasPersZeiteingabeNurBuchen(TheClientDto theClientDto) throws NamingException ;
 
+	boolean hasPersDarfKommtGehtAendern() throws NamingException ;
+	boolean hasPersDarfKommtGehtAendern(TheClientDto theClientDto) throws NamingException ;
+	
 	boolean hasFertDarfLosErledigen() throws NamingException ;
 	boolean hasFertDarfLosErledigen(TheClientDto theClientDto) throws NamingException ;
 

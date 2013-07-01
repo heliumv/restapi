@@ -42,7 +42,6 @@ import com.lp.server.personal.service.ZeitdatenDto;
 import com.lp.server.personal.service.ZeiterfassungFac;
 import com.lp.server.projekt.service.ProjektDto;
 import com.lp.server.system.service.LocaleFac;
-import com.lp.server.system.service.TheClientDto;
 import com.lp.server.util.fastlanereader.service.query.FilterBlock;
 import com.lp.server.util.fastlanereader.service.query.QueryParameters;
 import com.lp.server.util.fastlanereader.service.query.QueryResult;
@@ -93,15 +92,15 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 			@PathParam("year") Integer year,
 			@PathParam("month") Integer month,
 			@PathParam("day") Integer day,
-			@QueryParam("forUserId") Integer forUserId,
+			@QueryParam("forStaffId") Integer forStaffId,
 			@QueryParam("limit") Integer limit) {
 		List<ZeitdatenEntry> entries = new ArrayList<ZeitdatenEntry>();
 		if(connectClient(userId) == null) return entries ;
 
 		Integer personalId = globalInfo.getTheClientDto().getIDPersonal() ;
 		try {
-			if(isValidPersonalId(forUserId)) {
-				personalId = forUserId ;
+			if(isValidPersonalId(forStaffId)) {
+				personalId = forStaffId ;
 			}
 			FilterKriteriumCollector collector = new FilterKriteriumCollector() ;
 			collector.add(zeitdatenQuery.getFilterForPersonalId(personalId)) ;
@@ -126,12 +125,12 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 	public void removeWorktime(
 			@PathParam("userId") String userId,
 			@PathParam("worktimeId") Integer worktimeId,
-			@QueryParam("forUserId") Integer forUserId) {
+			@QueryParam("forStaffId") Integer forStaffId) {
 		if(connectClient(userId) == null) return ;
 		Integer personalId = globalInfo.getTheClientDto().getIDPersonal() ;
 		try {
-			if(isValidPersonalId(forUserId)) {
-				personalId = forUserId ;				
+			if(isValidPersonalId(forStaffId)) {
+				personalId = forStaffId ;				
 			}
 			ZeitdatenDto zDto = zeiterfassungCall.zeitdatenFindByPrimaryKey(worktimeId) ;
 			if(zDto == null) {
@@ -195,8 +194,8 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 
 		try {
 			if(!mandantCall.hasModulAuftrag()) return getUnauthorized() ;
-			if(!isValidPersonalId(entry.getForUserId())) {
-				entry.setForUserId(globalInfo.getTheClientDto().getIDPersonal()) ;
+			if(!isValidPersonalId(entry.getForStaffId())) {
+				entry.setForStaffId(globalInfo.getTheClientDto().getIDPersonal()) ;
 			}
 			if(!isValidOrderId(entry.getOrderId())) {
 				return getBadRequest("orderId",  entry.getOrderId().toString()) ;				
@@ -206,10 +205,10 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 			}
 
 			ZeitdatenDto zDto = createDefaultZeitdatenDto(entry) ;
-			zDto.setCBelegartnr(LocaleFac.BELEGART_AUFTRAG) ;
+//			zDto.setCBelegartnr(LocaleFac.BELEGART_AUFTRAG) ;
 			zDto.setIBelegartid(entry.getOrderId()) ;
 			zDto.setIBelegartpositionid(entry.getOrderPositionId()) ;
-			zeiterfassungCall.createZeitdaten(zDto, true, true, true, globalInfo.getTheClientDto()) ;
+			zeiterfassungCall.createAuftragZeitdaten(zDto, true, true, true) ;
 		} catch(NamingException e) {
 			return getUnavailable(e) ;
 		} catch(RemoteException e) {
@@ -228,8 +227,8 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 		if(connectClient(entry.getUserId()) == null) return getUnauthorized() ;
 		try {
 			if(!mandantCall.hasModulLos()) return getUnauthorized() ;
-			if(!isValidPersonalId(entry.getForUserId())) {
-				entry.setForUserId(globalInfo.getTheClientDto().getIDPersonal()) ;
+			if(!isValidPersonalId(entry.getForStaffId())) {
+				entry.setForStaffId(globalInfo.getTheClientDto().getIDPersonal()) ;
 			}
 
 			if(!isValidProductionId(entry.getProductionId())) {
@@ -239,7 +238,7 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 			ZeitdatenDto zDto = createDefaultZeitdatenDto(entry) ;
 			zDto.setCBelegartnr(LocaleFac.BELEGART_LOS) ;
 			zDto.setIBelegartid(entry.getProductionId()) ;
-			zeiterfassungCall.createZeitdaten(zDto, true, true, true, globalInfo.getTheClientDto()) ;
+			zeiterfassungCall.createZeitdaten(zDto, true, true, true) ;
 		} catch(NamingException e) {
 			return getUnavailable(e) ;
 		} catch(RemoteException e) {
@@ -256,9 +255,9 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 	public Response bookProject(ProjectRecordingEntry entry) {
 		if(connectClient(entry.getUserId()) == null) return getUnauthorized() ;
 		try {
-			if(!mandantCall.hasModulProjekt()) return getUnauthorized() ;
-			if(!isValidPersonalId(entry.getForUserId())) {
-				entry.setForUserId(globalInfo.getTheClientDto().getIDPersonal()) ;
+//			if(!mandantCall.hasModulProjekt()) return getUnauthorized() ;
+			if(!isValidPersonalId(entry.getForStaffId())) {
+				entry.setForStaffId(globalInfo.getTheClientDto().getIDPersonal()) ;
 			}
 
 			if(!isValidProjectId(entry.getProjectId())) {
@@ -270,7 +269,7 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 			zDto.setCBelegartnr(LocaleFac.BELEGART_PROJEKT) ;
 			zDto.setIBelegartid(entry.getProjectId()) ;
 			zDto.setArtikelIId(entry.getWorkItemId()) ;
-			zeiterfassungCall.createZeitdaten(zDto, true, true, true, globalInfo.getTheClientDto()) ;
+			zeiterfassungCall.createZeitdaten(zDto, true, true, true) ;
 		} catch(NamingException e) {
 			return getUnavailable(e) ;
 		} catch(RemoteException e) {
@@ -283,7 +282,7 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 	
 	private ZeitdatenDto createDefaultZeitdatenDto(DocumentRecordingEntry entry) {
 		ZeitdatenDto zDto = new ZeitdatenDto() ;
-		zDto.setPersonalIId(entry.getForUserId()) ;
+		zDto.setPersonalIId(entry.getForStaffId()) ;
 		zDto.setArtikelIId(entry.getWorkItemId()) ;
 		zDto.setCBemerkungZuBelegart(entry.getRemark()) ;
 		zDto.setXKommentar(entry.getExtendedRemark()) ;
@@ -305,12 +304,16 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 		return losDto.getMandantCNr().equals(globalInfo.getMandant()) ;
 	}
 	
-	private boolean isValidPersonalId(Integer forUserId) throws NamingException {
-		if(forUserId == null) return false ;
+	private boolean isValidPersonalId(Integer forStaffId) throws NamingException {
+		if(forStaffId == null) return false ;
 		
-		if(judgeCall.hasPersSichtbarkeitAlle()) return true ;
+		if(judgeCall.hasPersSichtbarkeitAlle()) {
+			PersonalDto forPers = personalCall.byPrimaryKeySmall(forStaffId) ;
+			return forPers != null ;
+		}
+		
 		if(judgeCall.hasPersSichtbarkeitAbteilung()) {
-			PersonalDto forPers = personalCall.byPrimaryKeySmall(forUserId) ;
+			PersonalDto forPers = personalCall.byPrimaryKeySmall(forStaffId) ;
 			if(forPers == null) return false ;
 			PersonalDto mePers = personalCall.byPrimaryKeySmall(globalInfo.getTheClientDto().getIDPersonal()) ;
 			if(mePers.getKostenstelleIIdAbteilung() == null) return false ;
@@ -433,7 +436,7 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 			Timestamp timestamp = getTimestamp(entry);
 
 			return bucheZeitPersonalID(personalDto.getIId(), timestamp,
-					taetigkeitIId, null, globalInfo.getTheClientDto());
+					taetigkeitIId, null);
 		} catch (NamingException e) {
 			return getUnavailable(e);
 		}
@@ -465,7 +468,7 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 	}
 	
 	private Response bucheZeitPersonalID(Integer personalIId, Timestamp timestamp, 
-			Integer taetigkeitIId, String station, TheClientDto theClientDto) {
+			Integer taetigkeitIId, String station) {
 		ZeitdatenDto zd = new ZeitdatenDto();
 		zd.setPersonalIId(personalIId) ;
 		zd.setTZeit(timestamp);
@@ -476,7 +479,7 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 		}
 		
 		try {
-			zeiterfassungCall.createZeitdaten(zd, true, true, false, theClientDto) ;
+			zeiterfassungCall.createZeitdaten(zd, true, true, false) ;
 			return getNoContent() ;
 		} catch(EJBExceptionLP e) {
 			return getInternalServerError(e) ;

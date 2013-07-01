@@ -1,13 +1,17 @@
 package com.heliumv.factory.impl;
 
 import java.rmi.RemoteException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.naming.NamingException;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +21,7 @@ import com.heliumv.api.worktime.DocumentType;
 import com.heliumv.api.worktime.SpecialActivity;
 import com.heliumv.factory.BaseCall;
 import com.heliumv.factory.IGlobalInfo;
+import com.heliumv.factory.IJudgeCall;
 import com.heliumv.factory.IZeiterfassungCall;
 import com.lp.server.benutzer.service.RechteFac;
 import com.lp.server.personal.service.TaetigkeitDto;
@@ -32,26 +37,93 @@ public class ZeiterfassungCall extends BaseCall<ZeiterfassungFac> implements IZe
 	@Autowired
 	private IGlobalInfo globalInfo ;
 	
+	@Autowired
+	private IJudgeCall judgeCall ;
+	
+	private Map<String, Integer> cachedTaetigkeitIds = new HashMap<String, Integer>() ;
+	
 	public ZeiterfassungCall()  {
 		super(ZeiterfassungFacBean) ;
 	}
 	
-	@HvModul(name=LocaleFac.BELEGART_ZEITERFASSUNG)
+	
+	@HvModul(modul=LocaleFac.BELEGART_ZEITERFASSUNG)
+	@HvJudge(recht=RechteFac.RECHT_PERS_ZEITERFASSUNG_R)
 	public TaetigkeitDto taetigkeitFindByCNr(String cNr) throws NamingException {
 		return getFac().taetigkeitFindByCNr(cNr, globalInfo.getTheClientDto()) ;
 	}
 
-	public TaetigkeitDto taetigkeitFindByCNrSmall(String cnr) {
-		return null ;
-//	 	return getFac().taetigkeitFindByCNrSmallOhneExc(cnr) ;
+	@HvModul(modul=LocaleFac.BELEGART_ZEITERFASSUNG)
+	@HvJudge(recht=RechteFac.RECHT_PERS_ZEITERFASSUNG_R)	
+	public TaetigkeitDto taetigkeitFindByCNrSmall(String cnr) throws NamingException {
+	 	return getFac().taetigkeitFindByCNrSmallOhneExc(cnr) ;
 	}
 	
-	@HvModul(name=LocaleFac.BELEGART_ZEITERFASSUNG)
+	private Timestamp updateTimeWithNow(Timestamp theirsTs) {
+		if(theirsTs == null) return null ;
+		
+		Calendar theirs = Calendar.getInstance() ;
+		theirs.setTimeInMillis(theirsTs.getTime()) ;
+		
+		Calendar mine = Calendar.getInstance() ;
+		theirs.set(Calendar.HOUR, mine.get(Calendar.HOUR)) ;
+		theirs.set(Calendar.MINUTE, mine.get(Calendar.MINUTE)) ;
+		theirs.set(Calendar.SECOND, 0) ;
+		
+		return new Timestamp(theirs.getTimeInMillis()) ;		
+	}
+	
+	private Integer getCachedTaetigkeitId(String taetigkeitCnr) throws NamingException {
+		Integer foundId = cachedTaetigkeitIds.get(taetigkeitCnr) ;
+		if(foundId == null) {
+			TaetigkeitDto tDto = taetigkeitFindByCNrSmall(ZeiterfassungFac.TAETIGKEIT_KOMMT) ;
+			if(tDto != null) {
+				foundId = tDto.getIId() ;
+				cachedTaetigkeitIds.put(taetigkeitCnr, foundId) ;
+			}
+		}
+		return foundId ;
+	}
+	
+
+	private void modifyKommtGehtToNow(ZeitdatenDto zDto) throws RemoteException, NamingException, EJBExceptionLP {
+		Integer taetigkeitId = zDto.getTaetigkeitIId() ;
+		if(taetigkeitId.equals(getCachedTaetigkeitId(ZeiterfassungFac.TAETIGKEIT_KOMMT)) ||
+		   taetigkeitId.equals(getCachedTaetigkeitId(ZeiterfassungFac.TAETIGKEIT_GEHT))  ||
+		   taetigkeitId.equals(getCachedTaetigkeitId(ZeiterfassungFac.TAETIGKEIT_UNTER))) {
+
+			Calendar c = Calendar.getInstance();
+			c.setTimeInMillis(System.currentTimeMillis());
+			c.set(Calendar.MILLISECOND, 0);
+			c.set(Calendar.SECOND, 0);
+			zDto.setTZeit(new Timestamp(c.getTimeInMillis())) ;
+		}
+	}
+	
+	@HvModul(modul=LocaleFac.BELEGART_ZEITERFASSUNG)
+	@HvJudge(recht=RechteFac.RECHT_PERS_ZEITEREFASSUNG_CUD) 
 	public Integer createZeitdaten(ZeitdatenDto zeitdatenDto,
 			boolean bBucheAutoPausen, boolean bBucheMitternachtssprung,
-			boolean bZeitverteilen, TheClientDto theClientDto)
+			boolean bZeitverteilen)
 			throws EJBExceptionLP, NamingException, RemoteException {
-		return getFac().createZeitdaten(zeitdatenDto, bBucheAutoPausen, bBucheMitternachtssprung, bZeitverteilen, theClientDto) ;
+		if(judgeCall.hasPersZeiteingabeNurBuchen()) {
+			zeitdatenDto.setTZeit(updateTimeWithNow(zeitdatenDto.getTZeit())) ;
+		}
+		if(!judgeCall.hasPersDarfKommtGehtAendern()) {
+			modifyKommtGehtToNow(zeitdatenDto) ;
+		}
+		return getFac().createZeitdaten(zeitdatenDto, bBucheAutoPausen,
+				bBucheMitternachtssprung, bZeitverteilen, globalInfo.getTheClientDto()) ;
+	}
+
+	@HvModul(modul=LocaleFac.BELEGART_AUFTRAG) 
+	@HvJudge(recht=RechteFac.RECHT_PERS_ZEITEREFASSUNG_CUD) 
+	public Integer createAuftragZeitdaten(ZeitdatenDto zeitdatenDto,
+			boolean bBucheAutoPausen, boolean bBucheMitternachtssprung,
+			boolean bZeitverteilen)
+			throws EJBExceptionLP, NamingException, RemoteException {
+		zeitdatenDto.setCBelegartnr(LocaleFac.BELEGART_AUFTRAG) ;
+		return createZeitdaten(zeitdatenDto, bBucheAutoPausen, bBucheMitternachtssprung, bZeitverteilen) ;
 	}
 	
 	public List<SpecialActivity> getAllSprSondertaetigkeitenNurBDEBuchbar(String language) throws NamingException, RemoteException {
@@ -65,19 +137,21 @@ public class ZeiterfassungCall extends BaseCall<ZeiterfassungFac> implements IZe
 	}
 	
 	
-	@HvModul(name=LocaleFac.BELEGART_ZEITERFASSUNG)
+	@HvModul(modul=LocaleFac.BELEGART_ZEITERFASSUNG)
 	public List<DocumentType> getBebuchbareBelegarten(TheClientDto theClientDto) throws NamingException {
 		Map<String, String> m = getFac().getBebuchbareBelegarten(theClientDto) ;
 		return convertFromBelegarten(m) ;
 	}
 
-	@HvJudge(name=RechteFac.RECHT_PERS_ZEITERFASSUNG_R) 
+	@HvModul(modul=LocaleFac.BELEGART_ZEITERFASSUNG)
+	@HvJudge(recht=RechteFac.RECHT_PERS_ZEITERFASSUNG_R)
 	public ZeitdatenDto zeitdatenFindByPrimaryKey(Integer id) throws NamingException, RemoteException {
 //		return getFac().zeitdatenFindByPrimaryKeyOhneExc(id) ;
 		return getFac().zeitdatenFindByPrimaryKey(id, globalInfo.getTheClientDto()) ;
 	}
 	
-	@HvJudge(name=RechteFac.RECHT_PERS_ZEITEREFASSUNG_CUD) 
+	@HvModul(modul=LocaleFac.BELEGART_ZEITERFASSUNG)
+	@HvJudge(recht=RechteFac.RECHT_PERS_ZEITEREFASSUNG_CUD) 
 	public void removeZeitdaten(ZeitdatenDto zeitdatenDto) throws NamingException, RemoteException, EJBExceptionLP {
 		getFac().removeZeitdaten(zeitdatenDto) ;
 	}
