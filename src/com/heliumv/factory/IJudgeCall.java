@@ -29,4 +29,22 @@ public interface IJudgeCall {
 	 * @throws NamingException
 	 */
 	boolean hasFertLosCUD() throws NamingException ;
+	boolean hasFertLosCUD(TheClientDto theClientDto) throws NamingException ;
+
+	/**
+	 * Darf für ein Los Sollmaterial erzeugt/geändert/gelöscht werden?
+	 * @return
+	 * @throws NamingException
+	 */
+	boolean hasFertDarfSollmaterialCUD() throws NamingException ;
+	boolean hasFertDarfSollmaterialCUD(TheClientDto theClientDto) throws NamingException ;
+
+	/**
+	 * Darf Istmaterial nachträglich gebucht werden?
+	 * 
+	 * @return
+	 * @throws NamingException
+	 */
+	boolean hasFertDarfIstmaterialManuellNachbuchen() throws NamingException ;
+	boolean hasFertDarfIstmaterialManuellNachbuchen(TheClientDto theClientDto) throws NamingException ;
 }

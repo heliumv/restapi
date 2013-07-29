@@ -51,6 +51,35 @@ public class JudgeCall extends BaseCall<TheJudgeFac> implements IJudgeCall {
 		return hatRechtImpl(RechteFac.RECHT_FERT_LOS_CUD, globalInfo.getTheClientDto()) ;
 	}
 	
+	
+	@Override
+	public boolean hasFertLosCUD(TheClientDto theClientDto) throws NamingException {
+		return hatRechtImpl(RechteFac.RECHT_FERT_LOS_CUD, theClientDto) ;
+	}
+
+	@Override
+	public boolean hasFertDarfSollmaterialCUD() throws NamingException {
+		return hatRechtImpl(RechteFac.RECHT_FERT_DARF_SOLLMATERIAL_CUD, globalInfo.getTheClientDto()) ;
+	}
+
+	@Override
+	public boolean hasFertDarfSollmaterialCUD(TheClientDto theClientDto)
+			throws NamingException {
+		return hatRechtImpl(RechteFac.RECHT_FERT_DARF_SOLLMATERIAL_CUD, theClientDto) ;
+	}
+
+	@Override
+	public boolean hasFertDarfIstmaterialManuellNachbuchen()
+			throws NamingException {
+		return hatRechtImpl(RechteFac.RECHT_FERT_LOS_DARF_ISTMATERIAL_MANUELL_NACHBUCHEN, globalInfo.getTheClientDto()) ;
+	}
+
+	@Override
+	public boolean hasFertDarfIstmaterialManuellNachbuchen(
+			TheClientDto theClientDto) throws NamingException {
+		return hatRechtImpl(RechteFac.RECHT_FERT_LOS_DARF_ISTMATERIAL_MANUELL_NACHBUCHEN, theClientDto) ;
+	}
+
 	@Override
 	public boolean hasPersSichtbarkeitAbteilung() throws NamingException {
 		return hatRechtImpl(RechteFac.RECHT_PERS_SICHTBARKEIT_ABTEILUNG, globalInfo.getTheClientDto());

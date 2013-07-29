@@ -20,10 +20,11 @@ import org.springframework.stereotype.Service;
 import com.heliumv.api.BaseApi;
 import com.heliumv.factory.IArtikelCall;
 import com.heliumv.factory.IClientCall;
-import com.heliumv.factory.IFertigungCall;
+import com.heliumv.factory.IFertigungCallJudge;
 import com.heliumv.factory.IGlobalInfo;
 import com.heliumv.factory.IJudgeCall;
 import com.heliumv.factory.ILagerCall;
+import com.heliumv.factory.IMandantCall;
 import com.heliumv.factory.IParameterCall;
 import com.heliumv.factory.IStuecklisteCall;
 import com.heliumv.factory.query.ProductionQuery;
@@ -62,14 +63,15 @@ public class ProductionApi extends BaseApi implements IProductionApi {
 	@Autowired
 	private IParameterCall parameterCall ;
 	@Autowired
-	private IFertigungCall fertigungCall ;
+	private IFertigungCallJudge fertigungCall ;	
 	@Autowired
 	private ILagerCall lagerCall ;
-	
 	@Autowired
 	private IStuecklisteCall stuecklisteCall ;
 	@Autowired
 	private IJudgeCall judgeCall ;
+	@Autowired
+	private IMandantCall mandantCall ;
 	
 	@GET
 	@Path("/{userid}")
@@ -87,12 +89,16 @@ public class ProductionApi extends BaseApi implements IProductionApi {
 
 		if(connectClient(userId) == null)  return productions ;
 
-		FilterKriteriumCollector collector = new FilterKriteriumCollector() ;
-		collector.add(buildFilterCnr(filterCnr)) ;
-//		collector.add(buildFilterCompanyName(filterCompany)) ;
-		FilterBlock filterCrits = new FilterBlock(collector.asArray(), "AND")  ;
-
 		try {
+			FilterKriteriumCollector collector = new FilterKriteriumCollector() ;
+			collector.add(buildFilterCnr(filterCnr)) ;
+			FilterBlock filterCrits = new FilterBlock(collector.asArray(), "AND")  ;
+
+			if(!mandantCall.hasModulLos()) {
+				respondNotFound() ;
+				return productions ;
+			}
+
 			ProductionQuery query = new ProductionQuery(parameterCall) ;			
 			QueryParameters params = query.getDefaultQueryParameters(filterCrits) ;
 			params.setLimit(limit) ;
@@ -102,39 +108,41 @@ public class ProductionApi extends BaseApi implements IProductionApi {
 			productions = query.getResultList(result) ;
 		} catch(NamingException e) {
 			e.printStackTrace() ;
+			respondUnavailable(e) ;
 		}
+		
 		return productions ;
 	}
 	
 	
-	@POST
-	@Path("/{productionId}")
-//	@Produces({"application/json", "application/xml"})	
-	public void theFunction(
-			@PathParam("productionId") Integer losId,
-			@QueryParam("userId") String userId,
-			@QueryParam("amount") BigDecimal menge) {
-		try {
-			if(connectClient(userId) == null) return ; 
-			
-			LosDto losDto = fertigungCall.losFindByPrimaryKeyOhneExc(losId) ;
-			if(losDto == null) {
-				respondNotFound("productionId", losId.toString()) ;
-				return ;
-			}
-			
-			processMaterialBuchung(losDto, menge) ;
-			processAblieferung(losDto, menge) ;
-		} catch(NamingException e) {
-			e.printStackTrace() ;
-			respondUnavailable(e) ;			
-		} catch(RemoteException e) {
-			e.printStackTrace() ;
-			respondUnavailable(e) ;
-		} catch(EJBExceptionLP e) {
-			respondBadRequest(e) ;
-		}
-	}
+//	@POST
+//	@Path("/{productionId}")
+////	@Produces({"application/json", "application/xml"})	
+//	public void theFunction(
+//			@PathParam("productionId") Integer losId,
+//			@QueryParam("userId") String userId,
+//			@QueryParam("amount") BigDecimal menge) {
+//		try {
+//			if(connectClient(userId) == null) return ; 
+//			
+//			LosDto losDto = fertigungCall.losFindByPrimaryKeyOhneExc(losId) ;
+//			if(losDto == null) {
+//				respondNotFound("productionId", losId.toString()) ;
+//				return ;
+//			}
+//			
+//			processMaterialBuchung(losDto, menge) ;
+//			processAblieferung(losDto, menge) ;
+//		} catch(NamingException e) {
+//			e.printStackTrace() ;
+//			respondUnavailable(e) ;			
+//		} catch(RemoteException e) {
+//			e.printStackTrace() ;
+//			respondUnavailable(e) ;
+//		} catch(EJBExceptionLP e) {
+//			respondBadRequest(e) ;
+//		}
+//	}
 
 	@POST
 	@Path("/materialwithdrawal/")
@@ -166,7 +174,13 @@ public class ProductionApi extends BaseApi implements IProductionApi {
 			}
 			
 			if(connectClient(userId) == null) return ;
-			if(!judgeCall.hasFertLosCUD()) {
+//			if(!judgeCall.hasFertLosCUD()) {
+			if(!mandantCall.hasModulLos()) {
+				respondNotFound() ;
+				return ;
+			}
+			
+			if(!fertigungCall.darfGebeMaterialNachtraeglichAus()) {
 				respondUnauthorized() ;
 				return ;
 			}
