@@ -14,7 +14,6 @@ import com.lp.server.fertigung.service.LosablieferungDto;
 import com.lp.server.fertigung.service.LosistmaterialDto;
 import com.lp.server.fertigung.service.LoslagerentnahmeDto;
 import com.lp.server.fertigung.service.LossollmaterialDto;
-import com.lp.server.system.service.TheClientDto;
 import com.lp.util.EJBExceptionLP;
 
 public interface IFertigungCall {
