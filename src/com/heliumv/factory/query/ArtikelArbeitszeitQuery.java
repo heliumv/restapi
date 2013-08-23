@@ -8,7 +8,7 @@ import javax.naming.NamingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.heliumv.api.worktime.ItemEntry;
+import com.heliumv.api.item.ItemEntry;
 import com.heliumv.api.worktime.ItemEntryTransformer;
 import com.heliumv.factory.Globals;
 import com.heliumv.factory.IMandantCall;

@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.ws.rs.core.Response;
 
+import com.heliumv.api.item.ItemEntry;
+
 
 public interface IWorktimeApi {
 	Response bookComing(TimeRecordingEntry entry) ;

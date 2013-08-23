@@ -78,8 +78,19 @@ public class MandantCall extends BaseCall<MandantFac> implements IMandantCall {
 	@Override
 	public boolean hasModulAngebot() throws NamingException {
 		return hasModulAngebot(globals.getTheClientDto().getMandant());
-	}
+	}	
 	
+	@Override
+	public boolean hasModulArtikel() throws NamingException {
+		return hasModulArtikel(globals.getTheClientDto().getMandant());
+	}
+
+	@Override
+	public boolean hasModulArtikel(String mandantCnr) throws NamingException {
+		return hasModul(LocaleFac.BELEGART_ARTIKEL, mandantCnr) ;
+	}
+
+	@Override
 	public boolean hasModulAuftrag(String mandantCnr) throws NamingException {
 		return hasModul(LocaleFac.BELEGART_AUFTRAG, mandantCnr) ;
 	}

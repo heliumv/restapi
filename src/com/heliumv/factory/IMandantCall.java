@@ -19,6 +19,9 @@ public interface IMandantCall {
 	boolean hasModulAngebot() throws NamingException ;
 	boolean hasModulAngebot(String mandantCnr) throws NamingException ;
 
+	boolean hasModulArtikel() throws NamingException ;
+	boolean hasModulArtikel(String mandantCnr) throws NamingException ;
+	
 	boolean hasModulAuftrag() throws NamingException ;
 	boolean hasModulAuftrag(String mandantCnr) throws NamingException ;
 	

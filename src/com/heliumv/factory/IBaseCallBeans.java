@@ -11,6 +11,7 @@ public interface IBaseCallBeans {
 	static final String AuftragpositionFacBean = "AuftragpositionFacBean" ;
 	static final String FastLaneReaderBean     = "FastLaneReaderBean" ;
 	static final String FertigungFacBean       = "FertigungFacBean" ;
+	static final String InventurFacBean        = "InventurFacBean" ;
 	static final String LagerFacBean           = "LagerFacBean" ;
 	static final String LogonFacBean           = "LogonFacBean" ;
 	static final String MandantFacBean         = "MandantFacBean" ;

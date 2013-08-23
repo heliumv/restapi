@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.heliumv.api.BaseApi;
+import com.heliumv.api.item.ItemEntry;
 import com.heliumv.factory.IAuftragCall;
 import com.heliumv.factory.IAuftragpositionCall;
 import com.heliumv.factory.IFertigungCall;

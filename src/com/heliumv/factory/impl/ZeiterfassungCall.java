@@ -11,7 +11,6 @@ import java.util.Map.Entry;
 
 import javax.naming.NamingException;
 
-import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
