@@ -2,10 +2,13 @@ package com.heliumv.factory;
 
 import java.math.BigDecimal;
 import java.rmi.RemoteException;
+import java.util.List;
 
 import javax.naming.NamingException;
 
+import com.heliumv.factory.legacy.AllLagerEntry;
 import com.lp.server.artikel.service.LagerDto;
+import com.lp.util.EJBExceptionLP;
 
 public interface ILagerCall {
 	BigDecimal getGemittelterGestehungspreisEinesLagers(
@@ -19,4 +22,11 @@ public interface ILagerCall {
 
 	boolean hatRolleBerechtigungAufLager(Integer lagerIId)
 			throws NamingException;
+	
+	List<AllLagerEntry> getAllLager() throws NamingException, RemoteException, EJBExceptionLP ; 
+
+	BigDecimal getLagerstandsVeraenderungOhneInventurbuchungen(
+			Integer artikelIId, Integer lagerIId, java.sql.Timestamp tVon,
+			java.sql.Timestamp tBis) throws NamingException, RemoteException ; 
+
 }

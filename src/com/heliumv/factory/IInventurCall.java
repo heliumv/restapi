@@ -29,4 +29,10 @@ public interface IInventurCall {
 	InventurDto[] inventurFindOffene() throws NamingException, EJBExceptionLP ;
 	
 	InventurDto inventurFindByPrimaryKey(Integer inventurId) throws NamingException, RemoteException ;
+	
+	InventurlisteDto[] inventurlisteFindByInventurIIdLagerIIdArtikelIId(
+			Integer inventurIId, Integer lagerIId, Integer artikelIId) throws NamingException, RemoteException, EJBExceptionLP ;
+
+	Integer updateInventurliste(InventurlisteDto inventurlisteDto,
+			boolean bPruefeAufZuGrosseMenge) throws NamingException, RemoteException, EJBExceptionLP ;	
 }

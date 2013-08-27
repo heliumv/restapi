@@ -59,4 +59,19 @@ public class InventurCall extends BaseCall<InventurFac> implements IInventurCall
 	public InventurDto inventurFindByPrimaryKey(Integer inventurId) throws NamingException, RemoteException {
 		return getFac().findByPrimaryKeyOhneExc(inventurId);
 	}
+
+	@Override
+	public InventurlisteDto[] inventurlisteFindByInventurIIdLagerIIdArtikelIId(
+			Integer inventurIId, Integer lagerIId, Integer artikelIId) throws NamingException, RemoteException,
+			EJBExceptionLP {
+		return getFac().inventurlisteFindByInventurIIdLagerIIdArtikelIId(
+				inventurIId, lagerIId, artikelIId, globalInfo.getTheClientDto());
+	}
+
+	@Override
+	public Integer updateInventurliste(InventurlisteDto inventurlisteDto,
+			boolean bPruefeAufZuGrosseMenge) throws NamingException,
+			RemoteException, EJBExceptionLP {
+		return getFac().updateInventurliste(inventurlisteDto, bPruefeAufZuGrosseMenge, globalInfo.getTheClientDto()) ;
+	}
 }

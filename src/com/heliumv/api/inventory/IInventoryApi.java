@@ -17,5 +17,13 @@ public interface IInventoryApi {
 	 * @param amount die Menge des Artikels
 	 */
 	void createInventoryEntry(
-			String userId, Integer inventoryId, Integer itemId,BigDecimal amount) ;
+			String userId, Integer inventoryId, Integer itemId, BigDecimal amount, Boolean largeDifference) ;
+	
+	void updateInventoryEntry(
+			String userId, Integer inventoryId, Integer itemId, BigDecimal amount,
+			Boolean changeAmountTo) ;
+	
+	void createInventoryDataEntry(
+			String userId, Integer inventoryId, 
+			InventoryDataEntry inventoryEntry, Boolean largeDifference) ;	
 }

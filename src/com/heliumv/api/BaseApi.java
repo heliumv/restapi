@@ -31,6 +31,8 @@ public class BaseApi {
 	@Autowired
 	private IGlobalInfo globalInfo ;
 	
+	public final static int  UNPROCESSABLE_ENTITY  = 422 ;  /* RFC 4918 */
+	
 	private ResponseBuilder getResponseBuilder() {
 		return new ResponseBuilderImpl() ;
 	}
@@ -161,6 +163,13 @@ public class BaseApi {
 	
 	public void respondNotFound() {
 		getServletResponse().setStatus(Response.Status.NOT_FOUND.getStatusCode()) ;		
+	}
+	
+	public void respondUnprocessableEntity(String key, String value) {
+		getServletResponse().setHeader("x-hv-error-code", "6") ;
+		getServletResponse().setHeader("x-hv-error-key", key) ;
+		getServletResponse().setHeader("x-hv-error-value", value) ;
+		getServletResponse().setStatus(UNPROCESSABLE_ENTITY) ;
 	}
 	
 	public void setHttpServletResponse(HttpServletResponse theResponse) {
