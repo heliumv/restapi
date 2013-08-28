@@ -218,6 +218,9 @@ public class InventoryApi extends BaseApi implements IInventoryApi {
 	private boolean isDifferenceToLarge(BigDecimal baseAmount, BigDecimal newAmount) {
 		BigDecimal percentAllowed = new BigDecimal(10) ;
 		BigDecimal amplitude = baseAmount.movePointLeft(2).multiply(percentAllowed) ;
+		if(amplitude.compareTo(BigDecimal.ONE) <= 0) {
+			amplitude = BigDecimal.ONE ;
+		}
 		return baseAmount.subtract(newAmount).abs().compareTo(amplitude) > 0 ;
 	}
 	

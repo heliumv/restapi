@@ -462,12 +462,12 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 		return new Timestamp(c.getTimeInMillis()) ;		
 	}
 	
-	private Timestamp getTimestamp(int year, int month, int day, int hour, int minute, int second) {
-		Calendar c = Calendar.getInstance();
-		c.set(year, month - 1, day, hour, minute, second);
-		return new Timestamp(c.getTimeInMillis()) ;
-	}
-	
+//	private Timestamp getTimestamp(int year, int month, int day, int hour, int minute, int second) {
+//		Calendar c = Calendar.getInstance();
+//		c.set(year, month - 1, day, hour, minute, second);
+//		return new Timestamp(c.getTimeInMillis()) ;
+//	}
+
 	private Response bucheZeitPersonalID(Integer personalIId, Timestamp timestamp, 
 			Integer taetigkeitIId, String station) {
 		ZeitdatenDto zd = new ZeitdatenDto();

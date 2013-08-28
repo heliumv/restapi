@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import javax.naming.NamingException;
 
@@ -19,7 +18,6 @@ import com.heliumv.factory.ILagerCall;
 import com.heliumv.factory.legacy.AllLagerEntry;
 import com.lp.server.artikel.service.LagerDto;
 import com.lp.server.artikel.service.LagerFac;
-import com.lp.server.artikel.service.LagerplatzDto;
 import com.lp.util.EJBExceptionLP;
 
 public class LagerCall extends BaseCall<LagerFac> implements ILagerCall {
