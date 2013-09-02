@@ -34,7 +34,7 @@ public class ProjectApi extends BaseApi implements IProjectApi {
 
 	@GET
 	@Path("/{userid}")
-	@Produces({"application/json", "application/xml"})	
+	@Produces({FORMAT_JSON, FORMAT_XML})
 	public List<ProjectEntry> getProjects(
 			@PathParam("userid") String userId,
 			@QueryParam("limit") Integer limit, 

@@ -43,7 +43,7 @@ public class OrderApi extends BaseApi implements IOrderApi  {
 	
 	@GET
 	@Path("/{userid}")
-	@Produces({"application/json", "application/xml"})
+	@Produces({FORMAT_JSON, FORMAT_XML})
 	public List<OrderEntry> getOrders(
 			@PathParam("userid") String userId,
 			@QueryParam("limit") Integer limit,
@@ -88,7 +88,7 @@ public class OrderApi extends BaseApi implements IOrderApi  {
 	
 	@GET
 	@Path("/position/{orderid}/{userid}")
-	@Produces({"application/json", "application/xml"})
+	@Produces({FORMAT_JSON, FORMAT_XML})
 	public List<OrderpositionEntry> getPositions(
 			@PathParam("orderid") Integer orderId,
 			@PathParam("userid") String userId,

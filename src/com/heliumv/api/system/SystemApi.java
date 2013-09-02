@@ -22,7 +22,7 @@ public class SystemApi extends BaseApi implements ISystemApi {
 	
 	@GET
 	@Path("/ping")
-	@Produces({"application/json", "application/xml"})
+	@Produces({FORMAT_JSON, FORMAT_XML})
 	@Override
 	public PingResult ping() {
 		PingResult result = new PingResult() ;

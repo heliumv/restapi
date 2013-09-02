@@ -31,7 +31,7 @@ public class StaffApi extends BaseApi {
 	
 	@GET
 	@Path("/{userid}")
-	@Produces({"application/json", "application/xml"})
+	@Produces({FORMAT_JSON, FORMAT_XML})
 	public List<StaffEntry> getStaff(
 			@PathParam("userid") String userId,
 			@QueryParam("limit") Integer limit,

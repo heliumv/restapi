@@ -50,7 +50,7 @@ public class InventoryApi extends BaseApi implements IInventoryApi {
 	@Override
 	@GET
 	@Path("/{userid}")
-	@Produces({"application/json", "application/xml"})
+	@Produces({FORMAT_JSON, FORMAT_XML})
 	public List<InventoryEntry> getOpenInventories(
 			@PathParam("userid") String userId) {
 		List<InventoryEntry> entries = new ArrayList<InventoryEntry>() ;

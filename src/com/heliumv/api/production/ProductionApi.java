@@ -75,7 +75,7 @@ public class ProductionApi extends BaseApi implements IProductionApi {
 	
 	@GET
 	@Path("/{userid}")
-	@Produces({"application/json", "application/xml"})
+	@Produces({FORMAT_JSON, FORMAT_XML})
 	public List<ProductionEntry> getProductions(
 			@PathParam("userid") String userId,
 			@QueryParam("limit") Integer limit,

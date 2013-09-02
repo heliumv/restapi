@@ -87,7 +87,7 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 	
 	@GET
 	@Path("{userId}/{year}/{month}/{day}")
-	@Produces({"application/json", "application/xml"})	
+	@Produces({FORMAT_JSON, FORMAT_XML})
 	public List<ZeitdatenEntry> getWorktimeEntries(
 			@PathParam("userId") String userId,
 			@PathParam("year") Integer year,
@@ -343,7 +343,7 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 	
 	@GET
 	@Path("/activities/{userid}")
-	@Produces({"application/json", "application/xml"})
+	@Produces({FORMAT_JSON, FORMAT_XML})
 	@Override
 	public List<ItemEntry> getActivities(
 			@PathParam("userid") String userId,
@@ -375,7 +375,7 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 	
 	@GET
 	@Path("/specialactivities/{userid}")
-	@Produces({"application/json", "application/xml"})
+	@Produces({FORMAT_JSON, FORMAT_XML})
 	public List<SpecialActivity> getSpecialActivities(
 			@PathParam("userid") String userId) {
 		List<SpecialActivity> activities = new ArrayList<SpecialActivity>() ;
@@ -401,7 +401,7 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 	
 	@GET
 	@Path("/documenttypes/{userid}")
-	@Produces({"application/json", "application/xml"})
+	@Produces({FORMAT_JSON, FORMAT_XML})
 	public List<DocumentType> getDocumentTypes(
 			@PathParam("userid") String userId) {
 		List<DocumentType> documentTypes = new ArrayList<DocumentType>() ;

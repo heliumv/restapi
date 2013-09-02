@@ -15,5 +15,5 @@ public interface IItemApi {
 	 * @param itemCnr
 	 * @return
 	 */
-	List<StockAmountEntry> getStockAmount(String userId, String itemCnr) ;	
+	List<StockAmountEntry> getStockAmount(String userId, String itemCnr, Boolean returnItemInfo) ;	
 }

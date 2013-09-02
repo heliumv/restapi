@@ -8,11 +8,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class StockAmountEntry {
 	private BigDecimal amount ;
 	private StockEntry stock ;
-
+	private ItemEntry  item ;
+	
 	public StockAmountEntry() {
 	}
 	
-	public StockAmountEntry(StockEntry stock, BigDecimal amount) {
+	public StockAmountEntry(ItemEntry item, StockEntry stock, BigDecimal amount) {
+		this.item = item ;
 		this.stock = stock ;
 		this.amount = amount ;
 	}
@@ -28,5 +30,13 @@ public class StockAmountEntry {
 	}
 	public void setStock(StockEntry stock) {
 		this.stock = stock;
+	}
+
+	public ItemEntry getItem() {
+		return item;
+	}
+
+	public void setItem(ItemEntry item) {
+		this.item = item;
 	}
 }

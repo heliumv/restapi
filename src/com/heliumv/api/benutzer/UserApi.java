@@ -45,7 +45,7 @@ public class UserApi extends BaseApi implements IUserApi {
 	@POST
 	@Path("/logon/")
 	@Consumes({"application/json", "application/xml"})
-	@Produces({"application/json", "application/xml"})
+	@Produces({FORMAT_JSON, FORMAT_XML})
 	public LoggedOnEntry logon(LogonEntry logonEntry) {
 		if(logonEntry == null) {
 			respondBadRequest("logonEntry", "null") ;

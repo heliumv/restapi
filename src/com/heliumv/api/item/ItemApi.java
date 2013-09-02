@@ -36,13 +36,13 @@ public class ItemApi extends BaseApi implements IItemApi {
 	@Override
 	@GET
 	@Path("/{userid}")
-	@Produces({"application/json", "application/xml"})
+	@Produces({FORMAT_JSON, FORMAT_XML})
 	public ItemEntry findItemByCnr(
 			@PathParam("userid") String userId,
-			@QueryParam("cnr") String cnr) {
+			@QueryParam("itemCnr") String cnr) {
 
 		if(StringHelper.isEmpty(cnr)) {
-			respondBadRequest("cnr", cnr) ;
+			respondBadRequest("itemCnr", cnr) ;
 			return null ;
 		}
 
@@ -69,17 +69,20 @@ public class ItemApi extends BaseApi implements IItemApi {
 	@Override
 	@GET
 	@Path("/{userid}/stocks")
-	@Produces({"application/json", "application/xml"})
+//	@Produces({"application/json;charset=UTF-8", "application/xml;charset=UTF-8"}*/)
+	@Produces({FORMAT_JSON, FORMAT_XML})
 	public List<StockAmountEntry> getStockAmount(
 			@PathParam("userid") String userId, 
-			@QueryParam("itemCnr") String itemCnr) {
+			@QueryParam("itemCnr") String itemCnr,
+			@QueryParam("returnItemInfo") Boolean returnItemInfo) {
 		List<StockAmountEntry> stockEntries = new ArrayList<StockAmountEntry>() ;
  		if(StringHelper.isEmpty(itemCnr)) {
 			respondBadRequest("itemCnr", "null/empty") ;
 			return stockEntries ;
 		}
 		if(connectClient(userId) == null) return stockEntries ;
-
+		if(returnItemInfo == null) returnItemInfo = false ;
+		
 		try {
 			ArtikelDto itemDto = artikelCall.artikelFindByCNrOhneExc(itemCnr) ;
 			if(itemDto == null) {
@@ -88,6 +91,7 @@ public class ItemApi extends BaseApi implements IItemApi {
 			}
 
 			StockEntryMapper stockMapper = new StockEntryMapper() ;
+			ItemEntryMapper itemMapper = new ItemEntryMapper() ;
 			List<AllLagerEntry> stocks = lagerCall.getAllLager() ;
 			for (AllLagerEntry allLagerEntry : stocks) {
 				if(lagerCall.hatRolleBerechtigungAufLager(allLagerEntry.getStockId())) {
@@ -95,6 +99,7 @@ public class ItemApi extends BaseApi implements IItemApi {
 					BigDecimal amount = lagerCall.getLagerstandOhneExc(itemDto.getIId(), lagerDto.getIId()) ;
 					if(amount.signum() == 1) {
 						StockAmountEntry stockAmountEntry = new StockAmountEntry(
+								returnItemInfo ? itemMapper.mapEntry(itemDto) : null,
 								stockMapper.mapEntry(lagerDto), amount) ;
 						stockEntries.add(stockAmountEntry) ;
 					}

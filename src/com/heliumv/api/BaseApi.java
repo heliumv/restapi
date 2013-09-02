@@ -33,6 +33,11 @@ public class BaseApi {
 	
 	public final static int  UNPROCESSABLE_ENTITY  = 422 ;  /* RFC 4918 */
 	
+	public final static String FORMAT_JSON = "application/json;charset=UTF-8" ;
+	public final static String FORMAT_XML = "application/xml;charset=UTF-8" ;
+	
+	public final static String[] FORMAT_JSON_XML = {FORMAT_JSON, FORMAT_XML} ;
+	
 	private ResponseBuilder getResponseBuilder() {
 		return new ResponseBuilderImpl() ;
 	}
