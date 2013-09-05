@@ -26,15 +26,38 @@
 			<bean class="org.apache.cxf.feature.LoggingFeature" />
 		</jaxws:features>
 	</jaxws:endpoint>
-
-	<jaxrs:server id="restContainer" address="/rest">
+   
+<!--
+  -->
+    <bean id="jacksonJsonProvider" class="com.heliumv.tools.HeliumJsonProvider" />
+  
+<!--  
+    <bean id="simpleConverter" class="org.codehaus.jettison.mapped.SimpleConverter"/>
+	<bean id="jsonProvider" class="org.apache.cxf.jaxrs.provider.json.JSONProvider">
+		<property name="typeConverter" ref="simpleConverter"/>
+	    <property name="dropRootElement" value="true" />
+        <property name="supportUnwrapped" value="true" />
+	</bean>
+ -->
+ 	
+ 	<jaxrs:server id="restContainer" address="/rest">
 		<jaxrs:providers>
-    		<bean class="org.apache.cxf.jaxrs.provider.json.JSONProvider">
+<!--
+ -->
+			<ref bean="jacksonJsonProvider" />
+   			<bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider">
+   			</bean> 
+ 
+ <!--
+	   		<bean class="org.apache.cxf.jaxrs.provider.json.JSONProvider">
 	    	    <property name="dropRootElement" value="true" />
         		<property name="supportUnwrapped" value="true" />
     		</bean>
-		</jaxrs:providers>
-		
+ 
+			<ref bean="jsonProvider"/> 
+ -->
+ 		</jaxrs:providers>
+
 <!--
    		<jaxrs:extensionMappings> 
       		<entry key="xml" value="application/xml" /> 
@@ -43,6 +66,7 @@
  -->
  		
 		<jaxrs:serviceBeans>
+			<ref bean="hvCustomer" />
 			<ref bean="hvInventory" />
 			<ref bean="hvItem" />
 			<ref bean="hvUser" />
@@ -59,6 +83,15 @@
 	<context:component-scan base-package="com.heliumv.*" />
 	<aop:aspectj-autoproxy/>
 	
+	<!-- Workaround for JSON serializing the String "-16" to the number -16 -->
+<!--
+	<bean id="simpleConverter" class="org.codehaus.jettison.mapped.SimpleConverter"/>
+
+	<bean id="jsonProvider" class="org.apache.cxf.jaxrs.provider.json.JSONProvider">
+    	<property name="typeConverter" ref="simpleConverter"/>
+	</bean>
+ -->
+ 
 	<bean id="globalInfo" class="com.heliumv.factory.GlobalInfo" />
 	<bean id="artikelCall" class="com.heliumv.factory.impl.ArtikelCall" lazy-init="true"/>
 	<bean id="auftragCall" class="com.heliumv.factory.impl.AuftragCall" lazy-init="true"/>
@@ -67,6 +100,8 @@
 	<bean id="fertigungCall" class="com.heliumv.factory.impl.FertigungCallJudge" lazy-init="true"/>
 	<bean id="inventurCall" class="com.heliumv.factory.impl.InventurCall" lazy-init="true"/>
 	<bean id="judgeCall" class="com.heliumv.factory.impl.JudgeCall" lazy-init="true"/>
+	<bean id="kundeCall" class="com.heliumv.factory.impl.KundeCall" lazy-init="true" />
+	<bean id="kundeReportCall" class="com.heliumv.factory.impl.KundeReportCall" lazy-init="true" />
 	<bean id="lagerCall" class="com.heliumv.factory.impl.LagerCall" lazy-init="true"/>
 	<bean id="logonCall" class="com.heliumv.factory.impl.LogonCall" lazy-init="true"/>
 	<bean id="mandantCall" class="com.heliumv.factory.impl.MandantCall" lazy-init="true"/>
@@ -81,11 +116,13 @@
 	<bean id="workItemQuery" class="com.heliumv.factory.query.ArtikelArbeitszeitQuery" lazy-init="true"/>
 	<bean id="orderQuery" class="com.heliumv.factory.query.AuftragQuery" lazy-init="true"/>
 	<bean id="orderPositionQuery" class="com.heliumv.factory.query.AuftragpositionQuery" lazy-init="true"/>
+	<bean id="customerQuery" class="com.heliumv.factory.query.CustomerQuery" lazy-init="true" />
 	<bean id="productionQuery" class="com.heliumv.factory.query.ProductionQuery" lazy-init="true"/>
 	<bean id="projectQuery" class="com.heliumv.factory.query.ProjectQuery" lazy-init="true"/>
 	<bean id="staffQuery" class="com.heliumv.factory.query.StaffQuery" lazy-init="true"/>
 	<bean id="zeitdatenQuery" class="com.heliumv.factory.query.ZeitdatenQuery" lazy-init="true"/>
-	
+
+ 	<bean id="hvCustomer" class="com.heliumv.api.customer.CustomerApi" lazy-init="true" />
  	<bean id="hvInventory" class="com.heliumv.api.inventory.InventoryApi" lazy-init="true" />
  	<bean id="hvItem" class="com.heliumv.api.item.ItemApi" lazy-init="true" />
  	<bean id="hvUser" class="com.heliumv.api.benutzer.UserApi" lazy-init="true" />
