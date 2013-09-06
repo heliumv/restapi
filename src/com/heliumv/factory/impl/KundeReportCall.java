@@ -22,17 +22,13 @@ public class KundeReportCall extends BaseCall<KundeReportFac> implements IKundeR
 	
 	@Override
 	public void printKundenpreisliste(KundenpreislisteParams params) throws NamingException, RemoteException {
-		getFac().printKundenpreisliste(params.getKundeId(), params.getArtikelgruppeId(),
+//		getFac().printKundenpreisliste(params.getKundeId(), params.getArtikelgruppeId(),
+//				params.getArtikelklasseId(), params.isMitInaktiven(), params.getItemCnrVon(),
+//				params.getItemCnrBis(), params.isMitVersteckten(), params.getGueltigkeitsDatum(),
+//				params.isNurSonderkonditionen(), params.isMitMandantensprache(), globalInfo.getTheClientDto()) ;
+		getFac().printKundenpreislisteRaw(params.getKundeId(), params.getArtikelgruppeId(),
 				params.getArtikelklasseId(), params.isMitInaktiven(), params.getItemCnrVon(),
 				params.getItemCnrBis(), params.isMitVersteckten(), params.getGueltigkeitsDatum(),
 				params.isNurSonderkonditionen(), params.isMitMandantensprache(), globalInfo.getTheClientDto()) ;
 	}
-	
-//	void printKundenpreisliste(Integer kundeId, Integer artikelgruppeId, Integer artikelklasseId, 
-//			String itemCnrVon, String itemCnrBis, boolean mitVersteckten, Date gueltigkeitsDatum,
-//			boolean nurSonderkonditionen, boolean mitMandantensprache) throws NamingException, RemoteException {
-//		getFac().printKundenpreisliste(kundeId, artikelgruppeId,
-//				artikelklasseId, true, itemCnrVon, itemCnrBis, mitVersteckten, 
-//				gueltigkeitsDatum, nurSonderkonditionen, mitMandantensprache, globalInfo.getTheClientDto()) ;
-//	}	
 }
