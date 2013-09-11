@@ -14,6 +14,9 @@ public class CustomerEntry extends BaseEntryId {
 	private String phone ;
 	private String city ;
 	private Boolean deliveryAllowed ;
+	private String classification ;
+	private String addressType ;
+	private String representativeSign ;
 	
 	public String getName1() {
 		return name1;
@@ -63,5 +66,22 @@ public class CustomerEntry extends BaseEntryId {
 	public void setDeliveryAllowed(Boolean deliveryAllowed) {
 		this.deliveryAllowed = deliveryAllowed;
 	}
-	
+	public String getClassification() {
+		return classification;
+	}
+	public void setClassification(String classification) {
+		this.classification = classification;
+	}
+	public String getAddressType() {
+		return addressType;
+	}
+	public void setAddressType(String addressType) {
+		this.addressType = addressType;
+	}
+	public String getRepresentativeSign() {
+		return representativeSign;
+	}
+	public void setRepresentativeSign(String representativeSign) {
+		this.representativeSign = representativeSign;
+	}	
 }

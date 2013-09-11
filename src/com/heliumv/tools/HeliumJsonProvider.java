@@ -10,7 +10,7 @@ public class HeliumJsonProvider extends JacksonJaxbJsonProvider {
 	public HeliumJsonProvider() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(org.codehaus.jackson.map.DeserializationConfig.Feature.UNWRAP_ROOT_VALUE, true);
-        mapper.configure(org.codehaus.jackson.map.SerializationConfig.Feature.WRAP_ROOT_VALUE, false);
+        mapper.configure(org.codehaus.jackson.map.SerializationConfig.Feature.WRAP_ROOT_VALUE, true);
 
         SimpleModule testModule = new SimpleModule("MyModule", new Version(1, 0, 0, null))  ;
         testModule.addSerializer(String.class, new HvStringSerializer()) ;

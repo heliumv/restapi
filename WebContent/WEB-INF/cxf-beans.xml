@@ -28,8 +28,8 @@
 	</jaxws:endpoint>
    
 <!--
-  -->
     <bean id="jacksonJsonProvider" class="com.heliumv.tools.HeliumJsonProvider" />
+  -->
   
 <!--  
     <bean id="simpleConverter" class="org.codehaus.jettison.mapped.SimpleConverter"/>
@@ -43,20 +43,22 @@
  	<jaxrs:server id="restContainer" address="/rest">
 		<jaxrs:providers>
 <!--
- -->
 			<ref bean="jacksonJsonProvider" />
    			<bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider">
    			</bean> 
+ -->
  
  <!--
+ -->
 	   		<bean class="org.apache.cxf.jaxrs.provider.json.JSONProvider">
 	    	    <property name="dropRootElement" value="true" />
         		<property name="supportUnwrapped" value="true" />
     		</bean>
  
+<!--
 			<ref bean="jsonProvider"/> 
  -->
- 		</jaxrs:providers>
+  		</jaxrs:providers>
 
 <!--
    		<jaxrs:extensionMappings> 

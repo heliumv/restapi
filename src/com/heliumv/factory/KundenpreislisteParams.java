@@ -14,7 +14,8 @@ public class KundenpreislisteParams {
 	private boolean nurSonderkonditionen ;
 	private boolean mitMandantensprache ;
 	private boolean mitInaktiven ;
-
+	private boolean nurWebshop ;
+	
 	public KundenpreislisteParams() {
 		setDefaults() ;
 	}
@@ -90,5 +91,13 @@ public class KundenpreislisteParams {
 	}
 	public void setMitInaktiven(boolean mitInaktiven) {
 		this.mitInaktiven = mitInaktiven;
+	}
+
+	public boolean isNurWebshop() {
+		return nurWebshop;
+	}
+
+	public void setNurWebshop(boolean nurWebshop) {
+		this.nurWebshop = nurWebshop;
 	}	
 }

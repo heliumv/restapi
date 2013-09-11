@@ -12,6 +12,7 @@ import com.heliumv.api.order.OrderEntry;
 import com.heliumv.api.order.OrderEntryTransformer;
 import com.heliumv.factory.Globals;
 import com.heliumv.factory.IParameterCall;
+import com.heliumv.tools.FilterHelper;
 import com.heliumv.tools.StringHelper;
 import com.lp.server.auftrag.service.AuftragFac;
 import com.lp.server.auftrag.service.AuftragServiceFac;
@@ -89,19 +90,7 @@ public class AuftragQuery extends BaseQuery<OrderEntry> {
 	
 	
 	public FilterKriterium getFilterWithHidden(Boolean withHidden) {
-		if(null == withHidden) {
-			withHidden = false ;
-		}
-		
-		if(!withHidden) {
-			FilterKriterium fkVersteckt = new FilterKriterium(
-				AuftragFac.FLR_AUFTRAG_B_VERSTECKT, true, "(1)",
-				FilterKriterium.OPERATOR_NOT_IN, false);
-
-			return fkVersteckt;
-		}
-		
-		return null ;
+		return FilterHelper.createWithHidden(withHidden, AuftragFac.FLR_AUFTRAG_B_VERSTECKT) ;
 	}
 	
 	

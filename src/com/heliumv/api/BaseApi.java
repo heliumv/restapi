@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.heliumv.factory.Globals;
 import com.heliumv.factory.IClientCall;
 import com.heliumv.factory.IGlobalInfo;
-// import com.heliumv.factory.IServerCall;
+import com.heliumv.tools.StringHelper;
 import com.lp.server.system.service.TheClientDto;
 import com.lp.util.EJBExceptionLP;
 
@@ -46,8 +46,8 @@ public class BaseApi {
 		globalInfo.setTheClientDto(null) ;
 		Globals.setTheClientDto(null) ;
 		
-		if(null == userId || 0 == userId.trim().length()) {
-			respondBadRequest("userid", "{empty}") ;
+		if(StringHelper.isEmpty(userId)) {
+			respondBadRequestValueMissing("userid") ;
 			return null ;
 		}
 
@@ -156,6 +156,13 @@ public class BaseApi {
 		getServletResponse().setHeader("x-hv-error-code", "3") ;
 		getServletResponse().setHeader("x-hv-error-key", key) ;
 		getServletResponse().setHeader("x-hv-error-value", value) ;
+		getServletResponse().setStatus(Response.Status.BAD_REQUEST.getStatusCode()) ;		
+	}
+	
+	public void respondBadRequestValueMissing(String key) {
+		getServletResponse().setHeader("x-hv-error-code", "3") ;
+		getServletResponse().setHeader("x-hv-error-key", key) ;
+		getServletResponse().setHeader("x-hv-error-value", "{empty}") ;
 		getServletResponse().setStatus(Response.Status.BAD_REQUEST.getStatusCode()) ;		
 	}
 	

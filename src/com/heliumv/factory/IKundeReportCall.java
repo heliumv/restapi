@@ -4,6 +4,8 @@ import java.rmi.RemoteException;
 
 import javax.naming.NamingException;
 
+import com.lp.server.partner.service.CustomerPricelistReportDto;
+
 public interface IKundeReportCall {
-	void printKundenpreisliste(KundenpreislisteParams params) throws NamingException, RemoteException ;
+	public CustomerPricelistReportDto getKundenpreisliste(KundenpreislisteParams params) throws NamingException, RemoteException ;
 }

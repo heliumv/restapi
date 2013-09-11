@@ -10,6 +10,7 @@ import com.heliumv.factory.BaseCall;
 import com.heliumv.factory.IGlobalInfo;
 import com.heliumv.factory.IKundeReportCall;
 import com.heliumv.factory.KundenpreislisteParams;
+import com.lp.server.partner.service.CustomerPricelistReportDto;
 import com.lp.server.partner.service.KundeReportFac;
 
 public class KundeReportCall extends BaseCall<KundeReportFac> implements IKundeReportCall {
@@ -21,12 +22,12 @@ public class KundeReportCall extends BaseCall<KundeReportFac> implements IKundeR
 	}
 	
 	@Override
-	public void printKundenpreisliste(KundenpreislisteParams params) throws NamingException, RemoteException {
+	public CustomerPricelistReportDto getKundenpreisliste(KundenpreislisteParams params) throws NamingException, RemoteException {
 //		getFac().printKundenpreisliste(params.getKundeId(), params.getArtikelgruppeId(),
 //				params.getArtikelklasseId(), params.isMitInaktiven(), params.getItemCnrVon(),
 //				params.getItemCnrBis(), params.isMitVersteckten(), params.getGueltigkeitsDatum(),
 //				params.isNurSonderkonditionen(), params.isMitMandantensprache(), globalInfo.getTheClientDto()) ;
-		getFac().printKundenpreislisteRaw(params.getKundeId(), params.getArtikelgruppeId(),
+		return getFac().printKundenpreislisteRaw(params.getKundeId(), params.getArtikelgruppeId(),
 				params.getArtikelklasseId(), params.isMitInaktiven(), params.getItemCnrVon(),
 				params.getItemCnrBis(), params.isMitVersteckten(), params.getGueltigkeitsDatum(),
 				params.isNurSonderkonditionen(), params.isMitMandantensprache(), globalInfo.getTheClientDto()) ;
