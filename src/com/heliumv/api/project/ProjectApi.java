@@ -6,7 +6,6 @@ import java.util.List;
 import javax.naming.NamingException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
@@ -33,10 +32,9 @@ public class ProjectApi extends BaseApi implements IProjectApi {
 	private IParameterCall parameterCall ;
 	
 	@GET
-	@Path("/{userid}")
 	@Produces({FORMAT_JSON, FORMAT_XML})
 	public List<ProjectEntry> getProjects(
-			@PathParam("userid") String userId,
+			@QueryParam("userid") String userId,
 			@QueryParam("limit") Integer limit, 
 			@QueryParam("startIndex") Integer startIndex,
 			@QueryParam("filter_cnr") String filterCnr, 

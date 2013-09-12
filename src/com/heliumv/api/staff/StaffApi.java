@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
@@ -30,10 +29,9 @@ public class StaffApi extends BaseApi {
 	private StaffQuery staffQuery ;
 	
 	@GET
-	@Path("/{userid}")
 	@Produces({FORMAT_JSON, FORMAT_XML})
 	public List<StaffEntry> getStaff(
-			@PathParam("userid") String userId,
+			@QueryParam("userid") String userId,
 			@QueryParam("limit") Integer limit,
 			@QueryParam("startIndex") Integer startIndex) {
 		List<StaffEntry> entries = new ArrayList<StaffEntry>() ;

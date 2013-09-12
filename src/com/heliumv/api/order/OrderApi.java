@@ -42,10 +42,9 @@ public class OrderApi extends BaseApi implements IOrderApi  {
 	private AuftragpositionQuery orderPositionQuery ;
 	
 	@GET
-	@Path("/{userid}")
 	@Produces({FORMAT_JSON, FORMAT_XML})
 	public List<OrderEntry> getOrders(
-			@PathParam("userid") String userId,
+			@QueryParam("userid") String userId,
 			@QueryParam("limit") Integer limit,
 			@QueryParam("startIndex") Integer startIndex,
 			@QueryParam("filter_cnr") String filterCnr,
@@ -87,11 +86,11 @@ public class OrderApi extends BaseApi implements IOrderApi  {
 	
 	
 	@GET
-	@Path("/position/{orderid}/{userid}")
+	@Path("{orderid}/position")
 	@Produces({FORMAT_JSON, FORMAT_XML})
 	public List<OrderpositionEntry> getPositions(
 			@PathParam("orderid") Integer orderId,
-			@PathParam("userid") String userId,
+			@QueryParam("userid") String userId,
 			@QueryParam("limit") Integer limit,
 			@QueryParam("startIndex") Integer startIndex) {
 		List<OrderpositionEntry> positions = new ArrayList<OrderpositionEntry>() ;
