@@ -1,6 +1,5 @@
 package com.heliumv.api.customer;
 
-import java.util.Date;
 import java.util.List;
 
 import com.lp.server.partner.service.CustomerPricelistReportDto;

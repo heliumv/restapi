@@ -22,7 +22,6 @@ import com.heliumv.factory.IArtikelCall;
 import com.heliumv.factory.IKundeCall;
 import com.heliumv.factory.IKundeReportCall;
 import com.heliumv.factory.IParameterCall;
-import com.heliumv.factory.KundenpreislisteParams;
 import com.heliumv.factory.query.CustomerQuery;
 import com.heliumv.tools.FilterHelper;
 import com.heliumv.tools.FilterKriteriumCollector;
@@ -32,6 +31,7 @@ import com.lp.server.artikel.service.ArtklaDto;
 import com.lp.server.partner.service.CustomerPricelistReportDto;
 import com.lp.server.partner.service.KundeDto;
 import com.lp.server.partner.service.KundeFac;
+import com.lp.server.partner.service.KundenpreislisteParams;
 import com.lp.server.partner.service.PartnerFac;
 import com.lp.server.util.Facade;
 import com.lp.server.util.fastlanereader.service.query.FilterBlock;
@@ -220,6 +220,10 @@ public class CustomerApi extends BaseApi implements ICustomerApi {
 			respondUnavailable(e) ;
 		} catch(RemoteException e) {
 			respondUnavailable(e) ;
+		} catch(EJBExceptionLP e) {
+			respondBadRequest(e) ;
+		} catch(Throwable t) {
+			System.out.println("uups") ;
 		}
 		
 		return null ;		
