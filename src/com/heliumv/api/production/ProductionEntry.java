@@ -1,7 +1,5 @@
 package com.heliumv.api.production;
 
-import java.math.BigDecimal;
-
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.heliumv.api.BaseEntryId;
