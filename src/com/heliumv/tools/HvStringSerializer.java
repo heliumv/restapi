@@ -7,6 +7,11 @@ import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.SerializerProvider;
 
+/**
+ * Strings immer als Strings - also mit "value" ausgeben.</br>
+ * Default Jackson Converter macht daraus manchmal Integer/BigDecimal
+ * @author Gerold
+ */
 public class HvStringSerializer extends JsonSerializer<String> {
 	@Override
 	public void serialize(String value, JsonGenerator jgen,
@@ -17,7 +22,6 @@ public class HvStringSerializer extends JsonSerializer<String> {
 
 	@Override
 	public Class<String> handledType() {
-//		return super.handledType();
 		return String.class ;
 	}
 }

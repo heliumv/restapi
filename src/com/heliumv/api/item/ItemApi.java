@@ -8,7 +8,6 @@ import java.util.List;
 import javax.naming.NamingException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
@@ -35,10 +34,9 @@ public class ItemApi extends BaseApi implements IItemApi {
 	
 	@Override
 	@GET
-	@Path("/{userid}")
 	@Produces({FORMAT_JSON, FORMAT_XML})
 	public ItemEntry findItemByCnr(
-			@PathParam("userid") String userId,
+			@QueryParam("userid") String userId,
 			@QueryParam("itemCnr") String cnr) {
 
 		if(StringHelper.isEmpty(cnr)) {
@@ -68,11 +66,10 @@ public class ItemApi extends BaseApi implements IItemApi {
 
 	@Override
 	@GET
-	@Path("/{userid}/stocks")
-//	@Produces({"application/json;charset=UTF-8", "application/xml;charset=UTF-8"}*/)
+	@Path("/stocks")
 	@Produces({FORMAT_JSON, FORMAT_XML})
 	public List<StockAmountEntry> getStockAmount(
-			@PathParam("userid") String userId, 
+			@QueryParam("userid") String userId, 
 			@QueryParam("itemCnr") String itemCnr,
 			@QueryParam("returnItemInfo") Boolean returnItemInfo) {
 		List<StockAmountEntry> stockEntries = new ArrayList<StockAmountEntry>() ;

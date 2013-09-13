@@ -7,23 +7,39 @@ import com.heliumv.api.item.InventoryEntry;
 
 public interface IInventoryApi {
 	List<InventoryEntry> getOpenInventories(String userId) ;
-	
+
 	/**
 	 * Einen Eintrag in der Inventurliste erzeugen
 	 * 
+	 * @param inventoryId
+	 * @param itemId
+	 * @param amount
 	 * @param userId
-	 * @param inventoryId die betreffende Inventur
-	 * @param itemId der Artikel fuer den dies gilt
-	 * @param amount die Menge des Artikels
+	 * @param largeDifference
 	 */
 	void createInventoryEntry(
-			String userId, Integer inventoryId, Integer itemId, BigDecimal amount, Boolean largeDifference) ;
-	
+			Integer inventoryId,
+			Integer itemId,
+			BigDecimal amount,
+			String userId,
+			Boolean largeDifference) ;
+
 	void updateInventoryEntry(
-			String userId, Integer inventoryId, Integer itemId, BigDecimal amount,
+			Integer inventoryId,
+			Integer itemId,
+			BigDecimal amount,
+			String userId,
+			Boolean changeAmountTo) ;	
+	
+	void updateInventoryDataEntry(
+			Integer inventoryId,
+			String userId,
+			InventoryDataEntry inventoryEntry,
 			Boolean changeAmountTo) ;
 	
 	void createInventoryDataEntry(
-			String userId, Integer inventoryId, 
-			InventoryDataEntry inventoryEntry, Boolean largeDifference) ;	
+			Integer inventoryId,
+			InventoryDataEntry inventoryEntry,
+			String userId,
+			Boolean largeDifference) ;
 }

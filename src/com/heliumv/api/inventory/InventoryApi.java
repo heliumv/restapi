@@ -49,10 +49,9 @@ public class InventoryApi extends BaseApi implements IInventoryApi {
 	
 	@Override
 	@GET
-	@Path("/{userid}")
 	@Produces({FORMAT_JSON, FORMAT_XML})
 	public List<InventoryEntry> getOpenInventories(
-			@PathParam("userid") String userId) {
+			@QueryParam("userid") String userId) {
 		List<InventoryEntry> entries = new ArrayList<InventoryEntry>() ;
 		
 		if(connectClient(userId) == null) return entries ;
@@ -67,11 +66,11 @@ public class InventoryApi extends BaseApi implements IInventoryApi {
 	}
 
 	@PUT
-	@Path("{userid}/{inventoryid}/entry")
+	@Path("/{inventoryid}/entry")
 	@Consumes({"application/json", "application/xml"})
 	public void updateInventoryDataEntry(
-		@PathParam("userid") String userId,
 		@PathParam("inventoryid") Integer inventoryId,
+		@QueryParam("userid") String userId,
 		InventoryDataEntry inventoryEntry,
 		@QueryParam("changeAmountTo") Boolean changeAmountTo		
 	) {
@@ -109,12 +108,12 @@ public class InventoryApi extends BaseApi implements IInventoryApi {
 	
 	
 	@PUT
-	@Path("{userid}/{inventoryid}/entry/{itemid}/{amount}")
+	@Path("/{inventoryid}/entry/{itemid}/{amount}")
 	public void updateInventoryEntry(
-			@PathParam("userid") String userId,
 			@PathParam("inventoryid") Integer inventoryId,
 			@PathParam("itemid") Integer itemId,
 			@PathParam("amount") BigDecimal amount,
+			@QueryParam("userid") String userId,
 			@QueryParam("changeAmountTo") Boolean changeAmountTo) {		
 		if(connectClient(userId) == null) return ;
 		
@@ -134,12 +133,12 @@ public class InventoryApi extends BaseApi implements IInventoryApi {
 
 	
 	@POST
-	@Path("{userid}/{inventoryid}/entry")
+	@Path("/{inventoryid}/entry")
 	@Consumes({"application/json", "application/xml"})
 	public void createInventoryDataEntry(
-		@PathParam("userid") String userId,
 		@PathParam("inventoryid") Integer inventoryId,
 		InventoryDataEntry inventoryEntry,
+		@QueryParam("userid") String userId,
 		@QueryParam("largeDifference") Boolean largeDifference
 	) {
 		if(StringHelper.isEmpty(inventoryEntry.getItemCnr())) {
@@ -182,12 +181,12 @@ public class InventoryApi extends BaseApi implements IInventoryApi {
 	}
 	
 	@POST
-	@Path("{userid}/{inventoryid}/entry/{itemid}/{amount}")
+	@Path("/{inventoryid}/entry/{itemid}/{amount}")
 	public void createInventoryEntry(
-			@PathParam("userid") String userId,
 			@PathParam("inventoryid") Integer inventoryId,
 			@PathParam("itemid") Integer itemId,
 			@PathParam("amount") BigDecimal amount,
+			@QueryParam("userid") String userId,
 			@QueryParam("largeDifference") Boolean largeDifference) {
 		if(connectClient(userId) == null) return ;
 		

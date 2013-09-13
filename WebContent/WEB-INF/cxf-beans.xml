@@ -18,6 +18,7 @@
  	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
  	
  	 	
+<!--
 	<jaxws:endpoint xmlns:tns="http://hello.heliumv.com/"
 		id="deepthought" implementor="com.heliumv.hello.DeepThought"
 		wsdlLocation="wsdl/deepthought.wsdl" endpointName="tns:DeepThoughtPort"
@@ -26,10 +27,11 @@
 			<bean class="org.apache.cxf.feature.LoggingFeature" />
 		</jaxws:features>
 	</jaxws:endpoint>
-   
+ -->
+    
 <!--
-    <bean id="jacksonJsonProvider" class="com.heliumv.tools.HeliumJsonProvider" />
   -->
+    <bean id="jacksonJsonProvider" class="com.heliumv.tools.HeliumJsonProvider" />
   
 <!--  
     <bean id="simpleConverter" class="org.codehaus.jettison.mapped.SimpleConverter"/>
@@ -43,17 +45,17 @@
  	<jaxrs:server id="restContainer" address="/rest">
 		<jaxrs:providers>
 <!--
+ -->
 			<ref bean="jacksonJsonProvider" />
    			<bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider">
    			</bean> 
- -->
  
  <!--
- -->
 	   		<bean class="org.apache.cxf.jaxrs.provider.json.JSONProvider">
 	    	    <property name="dropRootElement" value="true" />
         		<property name="supportUnwrapped" value="true" />
     		</bean>
+ -->
  
 <!--
 			<ref bean="jsonProvider"/> 
