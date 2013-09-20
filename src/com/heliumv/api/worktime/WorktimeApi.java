@@ -48,6 +48,22 @@ import com.lp.server.util.fastlanereader.service.query.QueryParameters;
 import com.lp.server.util.fastlanereader.service.query.QueryResult;
 import com.lp.util.EJBExceptionLP;
 
+/**
+ * Funktionalität rund um die Zeit(daten)erfassung</br>
+ *
+ * Generell gilt, dass nur am HELIUM V angemeldete REST-API Benutzer diese Funktionen durchführen können.
+ * Weiters werden die Rechte des Benutzers berücksichtigt. Er kann - wenn er darf - im Namen einer 
+ * anderen Person/Mitarbeiter die Buchungen durchführen.
+ *
+ * <p>Der Benutzer der API ist dafür verantwortlich, dass chronologisch richtige
+ * Zeitbuchungen entstehen, da der HELIUM V Server zum gegebenen Zeitpunkt (noch)
+ * nicht in Zukunft schauen kann.</p>
+ * 
+ * <p>Weiterführende Dokumentation kann im 
+ * <a href="http://www.heliumv.com/documentation?token=Zeiterfassung">HELIUM V Benutzerhandbuch</a> nachgelesen werden.
+ * 
+ * @author Gerold
+ */
 @Service("hvWorktime")
 @Path("/api/v1/worktime/")
 public class WorktimeApi extends BaseApi implements IWorktimeApi {
@@ -86,10 +102,10 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 	private ZeitdatenQuery zeitdatenQuery ;
 	
 	@GET
-	@Path("{userId}/{year}/{month}/{day}")
+	@Path("/{year}/{month}/{day}")
 	@Produces({FORMAT_JSON, FORMAT_XML})
 	public List<ZeitdatenEntry> getWorktimeEntries(
-			@PathParam("userId") String userId,
+			@QueryParam("userId") String userId,
 			@PathParam("year") Integer year,
 			@PathParam("month") Integer month,
 			@PathParam("day") Integer day,
@@ -122,9 +138,9 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 	}
 	
 	@DELETE
-	@Path("{userId}/{worktimeId}")	
+	@Path("/{worktimeId}")	
 	public void removeWorktime(
-			@PathParam("userId") String userId,
+			@QueryParam("userId") String userId,
 			@PathParam("worktimeId") Integer worktimeId,
 			@QueryParam("forStaffId") Integer forStaffId) {
 		if(connectClient(userId) == null) return ;
@@ -158,19 +174,18 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 	}
 
 	
-	@POST
-	@Path("/coming/{userid}/{year}/{month}/{day}/{hour}/{minute}/{second}")
-	public Response bookComing(
-			@PathParam("userId") String userId,
-			@PathParam("year") Integer year,
-			@PathParam("month") Integer month,
-			@PathParam("day") Integer day,
-			@PathParam("hour") Integer hour,
-			@PathParam("minute") Integer minute,
-			@PathParam("second") Integer second) {
-		return bookComing(convertFrom(userId, year, month, day, hour, minute, second)) ;
-	}
-
+//	@POST
+//	@Path("/coming/{userid}/{year}/{month}/{day}/{hour}/{minute}/{second}")
+//	public Response bookComing(
+//			@PathParam("userId") String userId,
+//			@PathParam("year") Integer year,
+//			@PathParam("month") Integer month,
+//			@PathParam("day") Integer day,
+//			@PathParam("hour") Integer hour,
+//			@PathParam("minute") Integer minute,
+//			@PathParam("second") Integer second) {
+//		return bookComing(convertFrom(userId, year, month, day, hour, minute, second)) ;
+//	}
 	
 	@POST
 	@Path("/going/")
@@ -185,6 +200,13 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 	@Consumes({"application/json", "application/xml"})
 	public Response bookPausing(TimeRecordingEntry entry) {
 		return bookTimeEntryImpl(entry, ZeiterfassungFac.TAETIGKEIT_UNTER) ;
+	}
+
+	@POST
+	@Path("/stopping/")
+	@Consumes({"application/json", "application/xml"})
+	public Response bookStopping(TimeRecordingEntry entry) {
+		return bookTimeEntryImpl(entry, ZeiterfassungFac.TAETIGKEIT_ENDE) ;
 	}
 	
 	@POST
@@ -342,11 +364,11 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 	}
 	
 	@GET
-	@Path("/activities/{userid}")
+	@Path("/activities/")
 	@Produces({FORMAT_JSON, FORMAT_XML})
 	@Override
 	public List<ItemEntry> getActivities(
-			@PathParam("userid") String userId,
+			@QueryParam("userid") String userId,
 			@QueryParam("limit") Integer limit,
 			@QueryParam("startIndex") Integer startIndex, 
 			@QueryParam("filter_cnr") String filterCnr) {
@@ -374,10 +396,10 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 	}	
 	
 	@GET
-	@Path("/specialactivities/{userid}")
+	@Path("/specialactivities/")
 	@Produces({FORMAT_JSON, FORMAT_XML})
 	public List<SpecialActivity> getSpecialActivities(
-			@PathParam("userid") String userId) {
+			@QueryParam("userid") String userId) {
 		List<SpecialActivity> activities = new ArrayList<SpecialActivity>() ;
 		
 		try {			
@@ -400,10 +422,10 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 
 	
 	@GET
-	@Path("/documenttypes/{userid}")
+	@Path("/documenttypes/")
 	@Produces({FORMAT_JSON, FORMAT_XML})
 	public List<DocumentType> getDocumentTypes(
-			@PathParam("userid") String userId) {
+			@QueryParam("userid") String userId) {
 		List<DocumentType> documentTypes = new ArrayList<DocumentType>() ;
 		
 		try {
@@ -443,17 +465,17 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 		}
 	}
 		
-	private TimeRecordingEntry convertFrom(String userId, int year, int month, int day, int hour, int minute, int second) {
-		TimeRecordingEntry entry = new TimeRecordingEntry() ;
-		entry.setUserId(userId) ;
-		entry.setYear(year) ;
-		entry.setMonth(month) ;
-		entry.setDay(day) ;
-		entry.setHour(hour) ;
-		entry.setMinute(minute) ;
-		entry.setSecond(second) ;
-		return entry ;
-	}
+//	private TimeRecordingEntry convertFrom(String userId, int year, int month, int day, int hour, int minute, int second) {
+//		TimeRecordingEntry entry = new TimeRecordingEntry() ;
+//		entry.setUserId(userId) ;
+//		entry.setYear(year) ;
+//		entry.setMonth(month) ;
+//		entry.setDay(day) ;
+//		entry.setHour(hour) ;
+//		entry.setMinute(minute) ;
+//		entry.setSecond(second) ;
+//		return entry ;
+//	}
 	
 	private Timestamp getTimestamp(TimeRecordingEntry entry) {
 		Calendar c = Calendar.getInstance();

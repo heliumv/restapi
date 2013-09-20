@@ -29,7 +29,7 @@ public class KundeReportCall extends BaseCall<KundeReportFac> implements IKundeR
 //				params.isNurSonderkonditionen(), params.isMitMandantensprache(), globalInfo.getTheClientDto()) ;
 		return getFac().printKundenpreislisteRaw(params.getKundeId(), params.getArtikelgruppeId(),
 				params.getArtikelklasseId(), params.isMitInaktiven(), params.getItemCnrVon(),
-				params.getItemCnrBis(), params.isMitVersteckten(), params.getGueltigkeitsDatum(),
+				params.getItemCnrBis(), params.isMitVersteckten(), null /* params.getGueltigkeitsDatum() */,
 				params.isNurSonderkonditionen(), params.isMitMandantensprache(), params.isNurWebshop(), globalInfo.getTheClientDto()) ;
 	}
 }
