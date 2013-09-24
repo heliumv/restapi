@@ -115,7 +115,10 @@
 			<include name="**/*.java"/>
 			<classpath refid="enunciate.classpath"/>
 			<!--	<export artifactId="war.file" destination="${tomcat.home}/webapps/myapp.war"/>  -->
-			<export artifactId="war.file" destination="${dir.deploy}/restapi-doc.war"/>
+<!--
+			<export artifactId="war.file" destination="${dir.deploy}/restapi-doc.war"/> 
+ -->
+			<export artifactId="docs" destination="${dir.deploy}/restapi-doc.zip"/>			
 			<javacArgument argument="-g"/>
 		</enunciate>
 	</target>

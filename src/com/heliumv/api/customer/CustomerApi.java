@@ -1,6 +1,7 @@
 package com.heliumv.api.customer;
 
 import java.rmi.RemoteException;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -232,7 +233,7 @@ public class CustomerApi extends BaseApi implements ICustomerApi {
 		
 		try {
 			Calendar c = DatatypeConverter.parseDateTime(filterValidityDate) ;
-//			params.setGueltigkeitsDatum(new Date(c.getTimeInMillis())) ;
+			params.setGueltigkeitsDatum(new Date(c.getTimeInMillis())) ;
 			return true ;
 		} catch(IllegalArgumentException e) {
 			System.out.println("illegalargument" + e.getMessage()) ;

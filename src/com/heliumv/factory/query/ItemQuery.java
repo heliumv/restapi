@@ -11,13 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.heliumv.api.item.ItemEntry;
 import com.heliumv.api.item.ItemEntryTransformer;
-import com.heliumv.factory.Globals;
 import com.heliumv.factory.IGlobalInfo;
 import com.heliumv.factory.IMandantCall;
 import com.heliumv.factory.IParameterCall;
 import com.heliumv.factory.ISystemCall;
 import com.heliumv.tools.StringHelper;
-import com.lp.client.frame.delegate.DelegateFactory;
 import com.lp.server.artikel.service.ArtikelFac;
 import com.lp.server.util.fastlanereader.service.query.FilterKriterium;
 import com.lp.server.util.fastlanereader.service.query.QueryParameters;
