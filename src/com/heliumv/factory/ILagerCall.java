@@ -11,6 +11,16 @@ import com.lp.server.artikel.service.LagerDto;
 import com.lp.util.EJBExceptionLP;
 
 public interface ILagerCall {
+	/**
+	 * Sucht im Lager nach der Seriennummer. Zuerst im Zugang, dann im Abgang
+	 * 
+	 * @param serialnumber ist die gesuchte Eineindeutige Seriennummer
+	 * @return null wenn es die seriennummer nicht gibt, ansonsten die Artikel-IId
+	 * @throws NamingException
+	 * @throws RemoteException
+	 */
+	Integer artikelIdFindBySeriennummerOhneExc(String serialnumber) throws NamingException, RemoteException ;	
+
 	BigDecimal getGemittelterGestehungspreisEinesLagers(
 			Integer itemId, Integer lagerId) throws NamingException, RemoteException;
 

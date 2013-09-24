@@ -16,6 +16,7 @@ import com.lp.server.util.fastlanereader.service.query.FilterKriterium;
 import com.lp.server.util.fastlanereader.service.query.QueryParameters;
 import com.lp.server.util.fastlanereader.service.query.QueryResult;
 import com.lp.server.util.fastlanereader.service.query.SortierKriterium;
+import com.lp.server.util.fastlanereader.service.query.TableInfo;
 import com.lp.util.EJBExceptionLP;
 
 public abstract class FastLaneReaderCall extends BaseCall<FastLaneReader> implements IFastLaneReaderCall {
@@ -68,6 +69,12 @@ public abstract class FastLaneReaderCall extends BaseCall<FastLaneReader> implem
 				getUsecaseId(), sortCrits, filterCrits, 0, listOfExtraData) ;
 
 		return params ;		
+	}
+	
+	
+	public void getTableInfo() throws NamingException, RemoteException {
+		TableInfo info = getFac().getTableInfo(uuid, usecaseId, Globals.getTheClientDto()) ;
+		System.out.println("" + info.getDataBaseColumnNames()) ;
 	}
 	
 	private void installRequiredFilters(QueryParameters queryParams) {

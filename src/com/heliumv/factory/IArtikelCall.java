@@ -16,6 +16,8 @@ public interface IArtikelCall {
 	 */
 	ArtikelDto artikelFindByCNrOhneExc(String cNr) throws NamingException, RemoteException ;
 	
+	ArtikelDto artikelFindByPrimaryKeySmallOhneExc(Integer itemId) throws NamingException, RemoteException  ;
+	
 	ArtgruDto artikelgruppeFindByPrimaryKeyOhneExc(Integer artikelgruppeId) throws NamingException, RemoteException ;
 	
 	ArtgruDto artikelgruppeFindByCnrOhneExc(String artikelgruppeCnr) throws NamingException, RemoteException ;	

@@ -1,5 +1,8 @@
 package com.heliumv.api.item;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.heliumv.api.BaseEntryId;
@@ -16,9 +19,17 @@ public class ItemEntry extends BaseEntryId {
 	private String description2 ;
 	private String name ;
 	private String shortName ;
+	private BigDecimal stockAmount ;
+	private BigDecimal costs ;
+	private String billOfMaterialType ;
+	private Boolean available ;
+	private List<String> comments ;
+	private Boolean hidden ;
+	private String unitCnr ;
+	private String typeCnr ;
 	
 	/**
-	 * Die Kennung des Artikels
+	 * Die Kennung des Artikels (Artikelnummer)
 	 * @return
 	 */
 	public String getCnr() {
@@ -70,5 +81,96 @@ public class ItemEntry extends BaseEntryId {
 	}
 	public void setShortName(String shortName) {
 		this.shortName = shortName;
+	}
+	
+	/**
+	 * Der Lagerstand
+	 * @return
+	 */
+	public BigDecimal getStockAmount() {
+		return stockAmount;
+	}
+	public void setStockAmount(BigDecimal stockAmount) {
+		this.stockAmount = stockAmount;
+	}
+	
+	/**
+	 * Der Gestehungspreis
+	 * @return
+	 */
+	public BigDecimal getCosts() {
+		return costs;
+	}
+	public void setCosts(BigDecimal costs) {
+		this.costs = costs;
+	}
+	
+	/**
+	 * Die Stücklistenart
+	 * @return
+	 */
+	public String getBillOfMaterialType() {
+		return billOfMaterialType;
+	}
+	public void setBillOfMaterialType(String billOfMaterialType) {
+		this.billOfMaterialType = billOfMaterialType;
+	}
+
+	/**
+	 * Ist der Artikel verfügbar bzw. gesperrt?
+	 * @return
+	 */
+	public Boolean isAvailable() {
+		return available;
+	}
+	public void setAvailable(Boolean available) {
+		this.available = available;
+	}
+	
+	/**
+	 * Die Liste aller Artikelkommentare im Format "text/html"
+	 * @return null, oder eine Liste der für den Artikel vorhandenen Artikelkommentar im Format "text/html"
+	 */
+	public List<String> getComments() {
+		return comments;
+	}
+	
+	public void setComments(List<String> comments) {
+		this.comments = comments;
+	}
+	
+	/**
+	 * Ist es ein versteckter Artikel?
+	 * 
+	 * @return true wenn es ein versteckter Artikel ist
+	 */
+	public Boolean isHidden() {
+		return hidden;
+	}
+	public void setHidden(Boolean hidden) {
+		this.hidden = hidden;
+	}
+	
+	/**
+	 * Die Einheit des Artikels
+	 * @return
+	 */
+	public String getUnitCnr() {
+		return unitCnr;
+	}
+	
+	public void setUnitCnr(String unitCnr) {
+		this.unitCnr = unitCnr;
+	}
+	
+	/**
+	 * Die Artikelart
+	 * @return
+	 */
+	public String getTypeCnr() {
+		return typeCnr;
+	}
+	public void setTypeCnr(String typeCnr) {
+		this.typeCnr = typeCnr;
 	}	
 }

@@ -35,6 +35,10 @@ public class ArtikelCall extends BaseCall<ArtikelFac> implements IArtikelCall {
 		return getFac().artikelFindByCNrOhneExc(cNr, globalInfo.getTheClientDto());
 	}
 	
+	public ArtikelDto artikelFindByPrimaryKeySmallOhneExc(Integer itemId) throws NamingException, RemoteException {
+		return getFac().artikelFindByPrimaryKeySmallOhneExc(itemId, globalInfo.getTheClientDto()) ;
+	}
+	
 	@Override
 	public ArtgruDto artikelgruppeFindByPrimaryKeyOhneExc(Integer artikelgruppeId) throws NamingException, RemoteException {
 		try {

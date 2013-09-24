@@ -28,6 +28,15 @@ public class LagerCall extends BaseCall<LagerFac> implements ILagerCall {
 		super(LagerFacBean) ;
 	}
 	
+	public Integer artikelIdFindBySeriennummerOhneExc(String serialnumber) throws NamingException, RemoteException {
+		Integer itemId = getFac().getArtikelIIdUeberSeriennummer(serialnumber, globalInfo.getTheClientDto()) ;
+		if(itemId == null) {
+			itemId = getFac().getArtikelIIdUeberSeriennummerAbgang(serialnumber, globalInfo.getTheClientDto()) ;
+		}
+
+		return itemId ;
+	}
+
 	@Override
 	public BigDecimal  getGemittelterGestehungspreisEinesLagers(
 			Integer itemId, Integer lagerId) throws NamingException, RemoteException {

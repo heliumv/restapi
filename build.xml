@@ -11,101 +11,88 @@
 	<property environment="env"/>
 	<property file="build.properties.local"/>
 	<property file="build.properties"/>
-	
+
 	<import file="${file.build.commons}"/>
-	
+
 	<!-- the server libs for all configurations -->
 	<path id="id.cxflibs">
 		<fileset dir="${dir.cxflib}">
 			<include name="**/*.jar" />
 		</fileset>
 
-		<fileset dir="${dir.tomcatlib}">
-			<include name="**/annotations-*.jar" />
+		<fileset dir="${dir.aspectjlib}">
 			<include name="**/aspect*.jar" />
 		</fileset>
-	</path>
-	
-  <!-- Lib-Pfad als Referenz -->
-  <path id="id.lib.path">
-    <fileset dir="${dir.lib}">
-      <include name="**/*.jar"/>
-    </fileset>
-  </path>
-
-	<path id="enunciate.classpath"> 
-		<fileset dir="${enunciate.home}/lib"> 
-			<include name="*.jar"/> 
-		</fileset> 
-		<!--include (optional) spring module--> 
-		<fileset dir="${enunciate.home}/lib/modules/spring">
-			<include name="*.jar"/> 
-		</fileset> 
-		<fileset dir="${java.home}"> 
-			<include name="lib/tools.jar"/>
-		</fileset> 
 		
+		<fileset dir="${dir.tomcatlib}">			
+			<include name="**/annotations-*.jar" />
+		</fileset>
+	</path>
+
+	<!-- Lib-Pfad als Referenz -->
+	<path id="id.lib.path">
+		<fileset dir="${dir.lib}">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+
+	<path id="enunciate.classpath">
+		<fileset dir="${enunciate.home}/lib">
+			<include name="*.jar"/>
+		</fileset>
+		<!--include (optional) spring module-->
+		<fileset dir="${enunciate.home}/lib/modules/spring">
+			<include name="*.jar"/>
+		</fileset>
+		<fileset dir="${java.home}">
+			<include name="lib/tools.jar"/>
+		</fileset>
+
 		<fileset dir="${dir.cxflib}">
 			<include name="**/*.jar" />
 		</fileset>
 
-		<fileset dir="${dir.tomcatlib}">
-			<include name="**/annotations-*.jar" />
+		<fileset dir="${dir.aspectjlib}">
 			<include name="**/aspect*.jar" />
-		</fileset>		
-
-<!--
-		<fileset dir="${dir.server.classes}">
-			<include name="**/service/*.class" />
 		</fileset>
- -->
+		
+		<fileset dir="${dir.tomcatlib}">			
+			<include name="**/annotations-*.jar" />
+		</fileset>
+
 		<fileset dir="${dir.client}/deploy/">
 			<include name="**/lpclientpc.jar" />
 		</fileset>
-	</path> 
-		
-	<taskdef name="enunciate" classname="org.codehaus.enunciate.main.EnunciateTask"> 
-		<classpath refid="enunciate.classpath"/> 
-	</taskdef> 
-		
-	
-<target name="clean"
-  description="Alle Build-Verzeichnisse (classes) loeschen.">
-  <delete dir="${dir.classes}"/>
-  <delete dir="${dir.logs}"/>
-  <delete dir="${dir.doc}"/>
-  <delete dir="${dir.deploy}"/>
-	<delete dir="${dir.temp}"/>
-</target>
+	</path>
+
+	<taskdef name="enunciate" classname="org.codehaus.enunciate.main.EnunciateTask">
+		<classpath refid="enunciate.classpath"/>
+	</taskdef>
 
 
-<target name="init"  description="Ausgabe-Verzeichnisse erstellen">
-  <mkdir dir="${dir.log}"/>
-	<echo file="${file.changes.shown}" message=" " />
- 	<mkdir dir="${dir.classes}"/> 
- 	<mkdir dir="${dir.doc}"/>
- 	<mkdir dir="${dir.deploy}"/>
-	<mkdir dir="${dir.temp}"/>
-</target>
+	<target name="clean" description="Alle Build-Verzeichnisse (classes) loeschen.">
+		<delete dir="${dir.classes}"/>
+		<delete dir="${dir.logs}"/>
+		<delete dir="${dir.doc}"/>
+		<delete dir="${dir.deploy}"/>
+		<delete dir="${dir.temp}"/>
+	</target>
 
-<target  name="compile" depends="clean, init"
-  description="compile the restapi.">
-  <echo message="compile the restapi."/>
 
-  <!-- Ausgeben aller Libs zur Kontrolle -->
- <!-- AD
-    <pathconvert property="manifest.classpath"
-      dirsep="/"
-      pathsep="    "
-      refid="id.lib.path">
-      <map from="${basedir}" to="."/>
-    </pathconvert>
+	<target name="init"  description="Ausgabe-Verzeichnisse erstellen">
+		<mkdir dir="${dir.log}"/>
+		<echo file="${file.changes.shown}" message=" " />
+		<mkdir dir="${dir.classes}"/>
+		<mkdir dir="${dir.doc}"/>
+		<mkdir dir="${dir.deploy}"/>
+		<mkdir dir="${dir.temp}"/>
+	</target>
 
-    <echo message="Server: manifest.classpath: ${manifest.classpath}"/>
- AD -->
-	<echo>JAVA_HOME: ${env.JAVA_HOME}</echo>
+	<target  name="compile" depends="init" description="compile the restapi.">
+		<echo message="compile the restapi."/>
+		<echo>JAVA_HOME: ${env.JAVA_HOME}</echo>
 
-  <javac
+		<javac
     destdir="${dir.classes}"
     includes="**/*.java"
     debug="true"
@@ -116,129 +103,108 @@
     memorymaximumsize="256M"
     fork="true">
 
-    <src path="${dir.src}"/>
-    <classpath refid="id.lib.path"/>
-  	<classpath refid="id.cxflibs"/>
-    <classpath location="${dir.server.classes}"/>
-  </javac>
-</target>
+			<src path="${dir.src}"/>
+			<classpath refid="id.lib.path"/>
+			<classpath refid="id.cxflibs"/>
+			<classpath location="${dir.server.classes}"/>
+		</javac>
+	</target>
 
-<!-- <target name="webdoc" depends="compile" > -->
-<target name="webdoc" >
-	<enunciate basedir="${dir.src}"> 
-		<include name="**/*.java"/> 
-		<classpath refid="enunciate.classpath"/> 
-		<!--	<export artifactId="war.file" destination="${tomcat.home}/webapps/myapp.war"/>  -->
-		<export artifactId="war.file" destination="enunciate.war"/> 
-		<javacArgument argument="-g"/>
-	</enunciate> 
-</target>
-	
-<!-- jar-file erzeugen -->
-<target name="pack" depends="compile" unless="is.setup" >
-    <basename property="name.dir.lib" file="${dir.lib}"/>
+	<target name="webdoc" depends="compile" >
+		<enunciate basedir="${dir.src}">
+			<include name="**/*.java"/>
+			<classpath refid="enunciate.classpath"/>
+			<!--	<export artifactId="war.file" destination="${tomcat.home}/webapps/myapp.war"/>  -->
+			<export artifactId="war.file" destination="${dir.deploy}/restapi-doc.war"/>
+			<javacArgument argument="-g"/>
+		</enunciate>
+	</target>
 
-<!-- AD
-    <pathconvert property="manifest.classpath"
-      dirsep="/"
-      pathsep=" "
-      refid="id.lib.path">
-      <map from="${basedir}" to="."/>
-    </pathconvert>
-AD -->
-  	
-  	<pathconvert property="manifest.classpath" pathsep=" " >
-  		<mapper>
-  			<chainedmapper>
-  				<flattenmapper />
-  				<globmapper from="*" to="lib/*" />
-  			</chainedmapper>
-  		</mapper>
-  		<path>
-  			<fileset dir="${basedir}">
-  				<include name="**/*.jar" />
-  			</fileset>
-  		</path>
-  	</pathconvert>
-<!-- AD --> 		
-  	
-    <echo message="AD manifest.classpath: ${manifest.classpath}"/>
-    <jar destfile="${dir.deploy}/${file.application.basename}.jar">
-      <fileset dir="${dir.classes}"/>
-      <fileset dir="${dir.server.classes}">
-        <include name="**/lp/util/**"/>
-        <include name="**/lp/server/util/**"/>
-        <include name="**/service/**"/>
-      	<include name="**/ejb/*PK.*"/>
-        <include name="**/fastlanereader/generated/service/**"/>
-        <!-- ###ToDo: hier sollte vielleicht nicht alles rein! klaeren! -->
-      </fileset>
+	<target name="deploy" depends="clean,compile">
+		<war destfile="${dir.deploy}/restapi.war" webxml="WebContent/WEB-INF/web.xml">
+			<classes dir="${dir.classes}">
+				<include name="**/*.class" />
+			</classes>
+			<webinf dir="WebContent/WEB-INF">
+				<include name="**/*.xml" />
+			</webinf>
 
-      <manifest>
-        <attribute name="Built-By" value="${user.name}"/>
-        <attribute name="Main-Class" value="${class.main.class}"/>
-        <attribute name="Class-Path" value="${manifest.classpath}"/>
-      </manifest>
-    </jar>
+			<lib dir="${dir.cxflib}">
+			</lib>
+<!--			
+			<lib dir="${dir.aspectjlib}">
+				<include name="**/aspect*.jar" />
+			</lib>
+			<lib dir="${dir.client}/deploy/">
+				<include name="**/lpclientpc.jar" />
+			</lib>
+  -->				
+		</war>
+	</target>
 
-    <!-- libs kopieren, damit das jar mit dem angegebenen classpath -->
-    <!-- auch aufrufbar bleibt. -->
- <!-- AD
+	<!-- jar-file erzeugen -->
+	<target name="pack" depends="compile" unless="is.setup" >
+		<basename property="name.dir.lib" file="${dir.lib}"/>
+
+		<pathconvert property="manifest.classpath" pathsep=" " >
+			<mapper>
+				<chainedmapper>
+					<flattenmapper />
+					<globmapper from="*" to="lib/*" />
+				</chainedmapper>
+			</mapper>
+			<path>
+				<fileset dir="${basedir}">
+					<include name="**/*.jar" />
+				</fileset>
+			</path>
+		</pathconvert>
+		<!-- AD -->
+
+		<echo message="AD manifest.classpath: ${manifest.classpath}"/>
+		<jar destfile="${dir.deploy}/${file.application.basename}.jar">
+			<fileset dir="${dir.classes}"/>
+			<fileset dir="${dir.server.classes}">
+				<include name="**/lp/util/**"/>
+				<include name="**/lp/server/util/**"/>
+				<include name="**/service/**"/>
+				<include name="**/ejb/*PK.*"/>
+				<include name="**/fastlanereader/generated/service/**"/>
+				<!-- ###ToDo: hier sollte vielleicht nicht alles rein! klaeren! -->
+			</fileset>
+
+			<manifest>
+				<attribute name="Built-By" value="${user.name}"/>
+				<attribute name="Main-Class" value="${class.main.class}"/>
+				<attribute name="Class-Path" value="${manifest.classpath}"/>
+			</manifest>
+		</jar>
+
+		<!-- libs kopieren, damit das jar mit dem angegebenen classpath -->
+		<!-- auch aufrufbar bleibt. -->
+		<!-- AD
   	<copy todir="${dir.deploy}">
       <fileset dir=".">
         <include name="${dir.lib}/**"/>
       </fileset>
     </copy>
 -->
-  	<copy todir="${dir.deploy}/lib">
-      	<flattenmapper />
-  		<fileset dir=".">
-	        <include name="${dir.lib}/**"/>
-  			<exclude name="${dir.lib}/linux/**"/>
-  			<exclude name="${dir.lib}/mac/**"/>
-  			<exclude name="${dir.lib}/windows/**"/>
-      	</fileset>
-    </copy>
-  	<copy todir="${dir.deploy}">
-  		<fileset dir=".">
-  			<include name="${dir.lib}/linux/**"/>
-  			<include name="${dir.lib}/mac/**"/>
-  			<include name="${dir.lib}/windows/**"/>
-      	</fileset>
-    </copy>
-  	
-<!-- AD -->
+		<copy todir="${dir.deploy}/lib">
+			<flattenmapper />
+			<fileset dir=".">
+				<include name="${dir.lib}/**"/>
+				<exclude name="${dir.lib}/linux/**"/>
+				<exclude name="${dir.lib}/mac/**"/>
+				<exclude name="${dir.lib}/windows/**"/>
+			</fileset>
+		</copy>
+		<copy todir="${dir.deploy}">
+			<fileset dir=".">
+				<include name="${dir.lib}/linux/**"/>
+				<include name="${dir.lib}/mac/**"/>
+				<include name="${dir.lib}/windows/**"/>
+			</fileset>
+		</copy>
 
-  </target>
-  	
-
-<!-- Alles "Liefern", was fuer einen erfolgreichen Client Start gebraucht -->
-<!-- wird. -->
-<!-- ===================================================================== -->
-<target name="deploy" depends="pack" description="deploy client - runtime (and installer)">
-	<fail unless="deploydir" message="deploydir not set. cannot proceed."/>
-
-	<available property="is.available.dir.deploy" file="${dir.deploy}" type="dir"/>
-	<fail unless="is.available.dir.deploy">
-		Der Client konnte nicht deployt werden, da das Verzeichnis
-		${dir.deploy} nicht vorhanden ist.
-	</fail>
-	
-	<var name="dir.deploy.client" value="${deploydir}/client"/>
-	<mkdir dir="${dir.deploy.client}"/>
-	
-	<!-- delete old deliver-dir -->
-	<delete dir="${dir.deploy.client}"/>
-	<mkdir dir="${dir.deploy.client}"/>
-	
-	<echo message="deploying client - runtime"/>
-	<copy todir="${dir.deploy.client}">
-		<fileset dir=".">
-			<include name="${dir.deploy}/**/*"/>
-			<include name="build.xml"/>
-			<include name="build.properties"/>
-		</fileset>
-	</copy>
-</target>
-
+	</target>
 </project>
