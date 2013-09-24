@@ -17,7 +17,7 @@ public class TimeRecordingEntry {
 	private int minute ;
 	private int second ;
 	private Integer forStaffId ;
-	
+	private String where ;
 	
 	/**
 	 * Die (optionale) PersonalId für die die Buchung gilt
@@ -106,5 +106,17 @@ public class TimeRecordingEntry {
 	}
 	public void setSecond(int second) {
 		this.second = second;
+	}
+
+	/**
+	 * Die (optionale) Quelle der Buchung
+	 * @return
+	 */
+	public String getWhere() {
+		return where;
+	}
+
+	public void setWhere(String where) {
+		this.where = where;
 	}
 }

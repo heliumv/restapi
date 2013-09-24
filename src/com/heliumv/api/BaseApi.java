@@ -3,6 +3,7 @@ package com.heliumv.api;
 import java.rmi.RemoteException;
 
 import javax.naming.NamingException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
@@ -22,6 +23,9 @@ public class BaseApi {
 	@Context
 	private HttpServletResponse response ;
 	
+	@Context
+	private HttpServletRequest request ;
+	
 //	@Autowired
 //	private IServerCall serverCall ;
 
@@ -37,6 +41,18 @@ public class BaseApi {
 	public final static String FORMAT_XML = "application/xml;charset=UTF-8" ;
 	
 	public final static String[] FORMAT_JSON_XML = {FORMAT_JSON, FORMAT_XML} ;
+	
+
+	public class Param {
+		public final static String USERID = "userid" ;
+		public final static String LIMIT = "limit" ;
+		public final static String STARTINDEX = "startIndex" ;	
+	}
+	
+	public class Filter {
+		private final static String BASE = "filter_" ;
+ 		public final static String HIDDEN = BASE + "withHidden" ;
+	}
 	
 	private ResponseBuilder getResponseBuilder() {
 		return new ResponseBuilderImpl() ;
@@ -191,4 +207,8 @@ public class BaseApi {
 	protected HttpServletResponse getServletResponse() {
 		return response ;
 	}	
+	
+	protected HttpServletRequest getServletRequest() {
+		return request ;
+	}
 }
