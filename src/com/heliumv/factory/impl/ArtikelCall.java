@@ -1,6 +1,7 @@
 package com.heliumv.factory.impl;
 
 import java.rmi.RemoteException;
+import java.util.List;
 
 import javax.naming.NamingException;
 
@@ -51,7 +52,7 @@ public class ArtikelCall extends BaseCall<ArtikelFac> implements IArtikelCall {
 	@Override
 	public ArtgruDto artikelgruppeFindByCnrOhneExc(String artikelgruppeCnr) throws NamingException, RemoteException {
 		try {
-			ArtgruDto[] artikelgruppeDtos = getFac().artgruFindByMandantCNr(globalInfo.getTheClientDto()) ;
+			List<ArtgruDto> artikelgruppeDtos = getFac().artgruFindByMandantCNrSpr(globalInfo.getTheClientDto()) ;
 			for (ArtgruDto artgruDto : artikelgruppeDtos) {
 				if(artgruDto.getCNr().equals(artikelgruppeCnr)) return artgruDto ;
 			}
@@ -62,6 +63,13 @@ public class ArtikelCall extends BaseCall<ArtikelFac> implements IArtikelCall {
 		}
 	}
 	
+	
+	@Override
+	public List<ArtgruDto> artikelgruppeFindByMandantCNr() throws NamingException,
+			RemoteException {
+		return getFac().artgruFindByMandantCNrSpr(globalInfo.getTheClientDto());
+	}
+
 	@Override
 	public ArtklaDto artikelklasseFindByPrimaryKeyOhneExc(Integer artikelklasseId) throws NamingException, RemoteException {
 		try {

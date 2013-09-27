@@ -47,6 +47,9 @@ public class BaseApi {
 		public final static String USERID = "userid" ;
 		public final static String LIMIT = "limit" ;
 		public final static String STARTINDEX = "startIndex" ;	
+		
+		public final static String ITEMCNR = "itemCnr" ;
+		public final static String ITEMID  = "itemid" ;
 	}
 	
 	public class Filter {

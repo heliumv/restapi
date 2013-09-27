@@ -10,6 +10,7 @@ import java.util.Set;
 import javax.naming.NamingException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import com.heliumv.api.BaseApi;
 import com.heliumv.factory.IArtikelCall;
 import com.heliumv.factory.ILagerCall;
+import com.heliumv.factory.IPanelCall;
 import com.heliumv.factory.IParameterCall;
 import com.heliumv.factory.legacy.AllLagerEntry;
 import com.heliumv.factory.loader.IArtikelLoaderCall;
@@ -28,9 +30,12 @@ import com.heliumv.factory.query.ItemQuery;
 import com.heliumv.tools.FilterHelper;
 import com.heliumv.tools.FilterKriteriumCollector;
 import com.heliumv.tools.StringHelper;
+import com.lp.server.artikel.service.ArtgruDto;
 import com.lp.server.artikel.service.ArtikelDto;
 import com.lp.server.artikel.service.ArtikelFac;
 import com.lp.server.artikel.service.LagerDto;
+import com.lp.server.system.service.PanelFac;
+import com.lp.server.system.service.PaneldatenDto;
 import com.lp.server.util.Facade;
 import com.lp.server.util.fastlanereader.service.query.FilterBlock;
 import com.lp.server.util.fastlanereader.service.query.FilterKriterium;
@@ -57,6 +62,8 @@ public class ItemApi extends BaseApi implements IItemApi {
 
 	@Autowired
 	private IArtikelLoaderCall artikelLoaderCall ;
+	@Autowired
+	private ItemLoaderComments itemloaderComments ;
 	
 	@Autowired
 	private ILagerCall lagerCall ;
@@ -68,7 +75,13 @@ public class ItemApi extends BaseApi implements IItemApi {
 	private IParameterCall parameterCall ;
 	
 	@Autowired
-	private ItemLoaderComments itemloaderComments ;
+	private IPanelCall panelCall ;
+	
+	@Autowired
+	private ItemGroupEntryMapper itemgroupEntryMapper ;
+	
+	@Autowired
+	private ItemPropertyEntryMapper itempropertyEntryMapper ;
 	
 	@Override
 	@GET
@@ -124,7 +137,7 @@ public class ItemApi extends BaseApi implements IItemApi {
 	@Produces({FORMAT_JSON, FORMAT_XML})
 	public ItemEntry findItemByAttributes(
 			@QueryParam(Param.USERID) String userId,
-			@QueryParam("itemCnr") String cnr, 
+			@QueryParam(Param.ITEMCNR) String cnr, 
 			@QueryParam("itemSerialnumber") String serialnumber,
 			@QueryParam("addComments") Boolean addComments) {
 
@@ -168,7 +181,7 @@ public class ItemApi extends BaseApi implements IItemApi {
 	@Produces({FORMAT_JSON, FORMAT_XML})
 	public List<StockAmountEntry> getStockAmount(
 			@QueryParam(Param.USERID) String userId, 
-			@QueryParam("itemCnr") String itemCnr,
+			@QueryParam(Param.ITEMCNR) String itemCnr,
 			@QueryParam("returnItemInfo") Boolean returnItemInfo) {
 		List<StockAmountEntry> stockEntries = new ArrayList<StockAmountEntry>() ;
  		if(StringHelper.isEmpty(itemCnr)) {
@@ -211,6 +224,88 @@ public class ItemApi extends BaseApi implements IItemApi {
 	}
 
 
+	@Override
+	@GET
+	@Path("/groups")
+	@Produces({FORMAT_JSON, FORMAT_XML})
+	public List<ItemGroupEntry> getItemGroups(
+			@QueryParam(Param.USERID) String userId) {
+		List<ItemGroupEntry> itemgroups = new ArrayList<ItemGroupEntry>() ;
+		if(connectClient(userId) == null) return itemgroups ;
+		try {
+			List<ArtgruDto> dtos = artikelCall.artikelgruppeFindByMandantCNr() ; 
+			itemgroups = itemgroupEntryMapper.mapEntry(dtos) ;
+		} catch(NamingException e) {
+			respondUnavailable(e) ;
+		} catch(RemoteException e) {
+			respondUnavailable(e) ;
+		} catch(EJBExceptionLP e) {
+			respondBadRequest(e) ;
+		}
+		
+		return itemgroups ;
+	}
+
+
+	@Override
+	@GET
+	@Path("/properties")
+	@Produces({FORMAT_JSON, FORMAT_XML})
+	public List<ItemPropertyEntry> getItemProperties(
+			@QueryParam(Param.USERID) String userId,
+			@QueryParam(Param.ITEMCNR) String itemCnr) {
+		List<ItemPropertyEntry> properties = new ArrayList<ItemPropertyEntry>() ;
+
+		if(connectClient(userId) == null) return properties ;
+		try {
+			ArtikelDto itemDto = artikelCall.artikelFindByCNrOhneExc(itemCnr) ;
+			if(itemDto == null) {
+				respondNotFound(Param.ITEMCNR, itemCnr);
+				return properties ;
+			}
+
+			return getItemPropertiesFromIdImpl(itemDto.getIId()) ;
+		} catch(NamingException e) {
+			respondUnavailable(e) ;
+		} catch(RemoteException e) {
+			respondUnavailable(e) ;
+		} catch(EJBExceptionLP e) {
+			respondBadRequest(e) ;
+		}
+
+		return properties ;
+	}
+	
+	@Override
+	@GET
+	@Path("/{itemid}/properties")
+	@Produces({FORMAT_JSON, FORMAT_XML})
+	public List<ItemPropertyEntry> getItemPropertiesFromId(
+			@QueryParam(Param.USERID) String userId,
+			@PathParam(Param.ITEMID) Integer itemId) {
+		List<ItemPropertyEntry> properties = new ArrayList<ItemPropertyEntry>() ;
+
+		if(connectClient(userId) == null) return properties ;
+		try {
+			return getItemPropertiesFromIdImpl(itemId) ;
+		} catch(NamingException e) {
+			respondUnavailable(e) ;
+		} catch(RemoteException e) {
+			respondUnavailable(e) ;
+		} catch(EJBExceptionLP e) {
+			respondBadRequest(e) ;
+		}
+
+		return properties ;
+	}
+
+	private List<ItemPropertyEntry> getItemPropertiesFromIdImpl(Integer itemId) throws NamingException, RemoteException {
+		PaneldatenDto[] dtos = panelCall.paneldatenFindByPanelCNrCKey(
+				PanelFac.PANEL_ARTIKELEIGENSCHAFTEN, itemId.toString()) ;
+		List<ItemPropertyEntry> properties = itempropertyEntryMapper.mapEntry(dtos) ;
+		return properties ;	
+	}
+	
 	private ItemEntry findItemEntryBySerialnumberCnr(String serialnumber, String cnr) throws RemoteException, NamingException {
 		Integer itemId = lagerCall.artikelIdFindBySeriennummerOhneExc(serialnumber) ;
 		if(itemId == null) return null ;
@@ -230,11 +325,6 @@ public class ItemApi extends BaseApi implements IItemApi {
 			Set<IItemLoaderAttribute> attributes) throws RemoteException, NamingException {
 		ItemEntry itemEntry = artikelLoaderCall.artikelFindByCNrOhneExc(cnr, attributes) ;
 		return itemEntry ;
-//		ArtikelDto artikelDto = artikelCall.artikelFindByCNrOhneExc(cnr) ;
-//		if(artikelDto == null) return null ;
-//
-//		ItemEntryMapper mapper = new ItemEntryMapper() ;
-//		return mapper.mapEntry(artikelDto) ;
 	}
 
 	

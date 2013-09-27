@@ -2,6 +2,10 @@ package com.heliumv.api.item;
 
 import java.util.List;
 
+import javax.ws.rs.QueryParam;
+
+import com.heliumv.api.BaseApi.Param;
+
 
 public interface IItemApi {
 	/**
@@ -53,4 +57,31 @@ public interface IItemApi {
 	 * @return
 	 */
 	List<StockAmountEntry> getStockAmount(String userId, String itemCnr, Boolean returnItemInfo) ;	
+	
+	
+	/**
+	 * Eine Liste aller Artikelgruppen ermitteln.</br>
+	 *
+	 * @param userId der angemeldete HELIUM V Benutzer
+	 * @return eine (leere) Liste von Artikelgruppen
+	 */
+	List<ItemGroupEntry> getItemGroups(String userId) ;
+
+	/**
+	 * Eine Liste aller Artikeleigenschaften eines Artikels ermitteln</br>
+	 * 
+	 * @param userId userId der angemeldete HELIUM V Benutzer
+	 * @param itemCnr die gewünschte Artikelnummer
+	 * @return eine (leere) Liste von Artikeleigenschaften
+	 */
+	List<ItemPropertyEntry> getItemProperties(String userId, String itemCnr) ;
+
+
+	/**
+	 * Eine Liste aller Artikeleigenschaften eines Artikels ermitteln.
+	 * @param userId userId der angemeldete HELIUM V Benutzer
+	 * @param itemId die Id des gewünschten Artikels
+	 * @return eine (leere) Liste von Artikeleigenschaften
+	 */
+	List<ItemPropertyEntry> getItemPropertiesFromId(String userId, Integer itemId) ;	
 }

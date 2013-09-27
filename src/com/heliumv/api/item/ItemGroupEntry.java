@@ -1,7 +1,10 @@
 package com.heliumv.api.item;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import com.heliumv.api.BaseEntryId;
 
+@XmlRootElement
 public class ItemGroupEntry extends BaseEntryId {
 	private String cnr ;
 	private String description ;
