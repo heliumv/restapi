@@ -2,10 +2,6 @@ package com.heliumv.api.item;
 
 import java.util.List;
 
-import javax.ws.rs.QueryParam;
-
-import com.heliumv.api.BaseApi.Param;
-
 
 public interface IItemApi {
 	/**
@@ -15,10 +11,10 @@ public interface IItemApi {
 	 * @param userId der bei HELIUM V angemeldete API Benutzer
 	 * @param cnr (optional) die gesuchte Artikelnummer
 	 * @param serialnumber (optional) die Seriennumber des Artikels</br>
-	 * <p>Eineindeutige Artikel können über ihre Seriennummer ermittelt werden. Dabei wird
+	 * <p>Eineindeutige Artikel kÃ¶nnen Ã¼ber ihre Seriennummer ermittelt werden. Dabei wird
 	 * zuerst im aktuellen Lagerstand gesucht, danach in den Abgangsbuchungen. Ist die <code>cnr</code>
-	 * ebenfalls angegeben, muss der Artikel der über die Seriennummer ermittelt wurde mit der 
-	 * angegebenen Artikelnummer übereinstimmen.</p>
+	 * ebenfalls angegeben, muss der Artikel der Ã¼ber die Seriennummer ermittelt wurde mit der 
+	 * angegebenen Artikelnummer Ã¼bereinstimmen.</p>
 	 * @param addComments (optional) mit true die Artikelkommentar ebenfalls liefern
 	 * @return
 	 */
@@ -27,13 +23,13 @@ public interface IItemApi {
 
 	/**
 	 * Eine Liste aller Artikel ermitteln.</br>
-	 * <p>Das Ergebnis kann dabei durch Filter eingeschränkt werden</p>
+	 * <p>Das Ergebnis kann dabei durch Filter eingeschrÃ¤nkt werden</p>
 	 * 
 	 * @param userId der angemeldete HELIUM V Benutzer
-	 * @param limit die maximale Anzahl von zurückgelieferten Datensätzen
+	 * @param limit die maximale Anzahl von zurÃ¼ckgelieferten DatensÃ¤tzen
 	 * @param startIndex die Id desjenigen Satzes mit dem begonnen werden soll
-	 * @param filterCnr die (optionale) Artikelnummer nach der die Suche eingeschränkt werden soll
-	 * @param filterTextSearch der (optionale) Text der die Suche einschränkt 
+	 * @param filterCnr die (optionale) Artikelnummer nach der die Suche eingeschrÃ¤nkt werden soll
+	 * @param filterTextSearch der (optionale) Text der die Suche einschrÃ¤nkt 
 	 * @param filterDeliveryCnr die (optionale) Lieferantennr. bzw Bezeichnung
 	 * @param filterItemGroupClass die (optionale) Artikelgruppe bzw. Artikelklasse
 	 * @param filterItemReferenceNr die (optionale) Artikelreferenznummer
@@ -48,12 +44,12 @@ public interface IItemApi {
 	/**
 	 * Liefert eine Liste aller Lagerstaende dieses Artikels</br>
 	 * <p>Es werden nur Lager geliefert, die einen Lagerstand > 0 haben. Es werden nur jene
-	 * Lagerstände geliefert, für die der Benutzer das Recht hat das jeweilige Lager zu benutzen.</p>
+	 * LagerstÃ¤nde geliefert, fÃ¼r die der Benutzer das Recht hat das jeweilige Lager zu benutzen.</p>
 	 * 
 	 * @param userId der angemeldete API Benutzer
 	 * @param itemCnr die gesuchte Artikelnummer
-	 * @param returnItemInfo mit <code>true</code> werden neben den Lagerständen auch die Daten des
-	 * betreffenden Artikels zurückgeliefert.
+	 * @param returnItemInfo mit <code>true</code> werden neben den LagerstÃ¤nden auch die Daten des
+	 * betreffenden Artikels zurÃ¼ckgeliefert.
 	 * @return
 	 */
 	List<StockAmountEntry> getStockAmount(String userId, String itemCnr, Boolean returnItemInfo) ;	
@@ -71,7 +67,7 @@ public interface IItemApi {
 	 * Eine Liste aller Artikeleigenschaften eines Artikels ermitteln</br>
 	 * 
 	 * @param userId userId der angemeldete HELIUM V Benutzer
-	 * @param itemCnr die gewünschte Artikelnummer
+	 * @param itemCnr die gewÃ¼nschte Artikelnummer
 	 * @return eine (leere) Liste von Artikeleigenschaften
 	 */
 	List<ItemPropertyEntry> getItemProperties(String userId, String itemCnr) ;
@@ -80,7 +76,7 @@ public interface IItemApi {
 	/**
 	 * Eine Liste aller Artikeleigenschaften eines Artikels ermitteln.
 	 * @param userId userId der angemeldete HELIUM V Benutzer
-	 * @param itemId die Id des gewünschten Artikels
+	 * @param itemId die Id des gewÃ¼nschten Artikels
 	 * @return eine (leere) Liste von Artikeleigenschaften
 	 */
 	List<ItemPropertyEntry> getItemPropertiesFromId(String userId, Integer itemId) ;	

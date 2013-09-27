@@ -1,11 +1,12 @@
 package com.heliumv.api.order;
 
 import com.heliumv.api.BaseFLRTransformer;
+import com.lp.server.system.fastlanereader.service.TableColumnInformation;
 
 public class OrderEntryTransformer extends BaseFLRTransformer<OrderEntry> {
 
 	@Override
-	public OrderEntry transformOne(Object[] flrObject) {
+	public OrderEntry transformOne(Object[] flrObject, TableColumnInformation columnInformation) {
 		OrderEntry entry = new OrderEntry() ;
 		entry.setId((Integer) flrObject[0]) ;
 		entry.setOrderType((String) flrObject[1]) ;

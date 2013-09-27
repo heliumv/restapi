@@ -27,6 +27,8 @@ public class ItemEntry extends BaseEntryId {
 	private Boolean hidden ;
 	private String unitCnr ;
 	private String typeCnr ;
+	private String itemgroupCnr ;
+	private String itemclassCnr ;
 	
 	/**
 	 * Die Kennung des Artikels (Artikelnummer)
@@ -106,7 +108,7 @@ public class ItemEntry extends BaseEntryId {
 	}
 	
 	/**
-	 * Die Stücklistenart
+	 * Die Stï¿½cklistenart
 	 * @return
 	 */
 	public String getBillOfMaterialType() {
@@ -117,7 +119,7 @@ public class ItemEntry extends BaseEntryId {
 	}
 
 	/**
-	 * Ist der Artikel verfügbar bzw. gesperrt?
+	 * Ist der Artikel verfï¿½gbar bzw. gesperrt?
 	 * @return
 	 */
 	public Boolean isAvailable() {
@@ -129,7 +131,7 @@ public class ItemEntry extends BaseEntryId {
 	
 	/**
 	 * Die Liste aller Artikelkommentare im Format "text/html"
-	 * @return null, oder eine Liste der für den Artikel vorhandenen Artikelkommentar im Format "text/html"
+	 * @return null, oder eine Liste der fï¿½r den Artikel vorhandenen Artikelkommentar im Format "text/html"
 	 */
 	public List<String> getComments() {
 		return comments;
@@ -172,5 +174,26 @@ public class ItemEntry extends BaseEntryId {
 	}
 	public void setTypeCnr(String typeCnr) {
 		this.typeCnr = typeCnr;
+	}
+	
+	/**
+	 * Die Artikelgruppe
+	 * @return
+	 */
+	public String getItemgroupCnr() {
+		return itemgroupCnr;
+	}
+	public void setItemgroupCnr(String itemgroupCnr) {
+		this.itemgroupCnr = itemgroupCnr;
+	}
+	
+	/**
+	 * Die Artikelklasse
+	 */
+	public String getItemclassCnr() {
+		return itemclassCnr;
+	}
+	public void setItemclassCnr(String itemclassCnr) {
+		this.itemclassCnr = itemclassCnr;
 	}	
 }

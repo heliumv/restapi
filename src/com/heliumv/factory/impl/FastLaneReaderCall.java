@@ -11,6 +11,7 @@ import com.heliumv.factory.BaseCall;
 import com.heliumv.factory.Globals;
 import com.heliumv.factory.IFastLaneReaderCall;
 import com.lp.server.system.fastlanereader.service.FastLaneReader;
+import com.lp.server.system.fastlanereader.service.TableColumnInformation;
 import com.lp.server.util.fastlanereader.service.query.FilterBlock;
 import com.lp.server.util.fastlanereader.service.query.FilterKriterium;
 import com.lp.server.util.fastlanereader.service.query.QueryParameters;
@@ -23,7 +24,8 @@ public abstract class FastLaneReaderCall extends BaseCall<FastLaneReader> implem
 	
 	private String uuid ;
 	private Integer usecaseId ;
-	
+	private TableColumnInformation cachedColumnInfo ;
+
 	protected FastLaneReaderCall(Integer theUsercaseId) {
 		this(UUID.randomUUID().toString(), theUsercaseId) ;
 	}
@@ -43,6 +45,10 @@ public abstract class FastLaneReaderCall extends BaseCall<FastLaneReader> implem
 		installRequiredFilters(queryParams) ;
 		
 		try {
+			if(cachedColumnInfo == null) {
+				cachedColumnInfo = getFac().getTableColumnInfo(uuid, usecaseId, Globals.getTheClientDto()) ;
+			}
+			
 			QueryResult result = getFac().setQuery(uuid, usecaseId, queryParams, Globals.getTheClientDto()) ;
 			result.getRowCount() ;
 			
@@ -77,6 +83,11 @@ public abstract class FastLaneReaderCall extends BaseCall<FastLaneReader> implem
 		System.out.println("" + info.getDataBaseColumnNames()) ;
 	}
 	
+	public TableColumnInformation getTableColumnInfo()  {
+		return cachedColumnInfo ;
+//		return getFac().getTableColumnInfo(uuid, usecaseId, Globals.getTheClientDto()) ;
+	}
+	
 	private void installRequiredFilters(QueryParameters queryParams) {
 		List<FilterKriterium> requiredFilters = getRequiredFilters() ;
 		if(requiredFilters == null || requiredFilters.size() == 0) return ;
@@ -89,7 +100,7 @@ public abstract class FastLaneReaderCall extends BaseCall<FastLaneReader> implem
 	}
 	
 	/**
-	 * Jene Filter einh‰ngen, die automatisch (und immer!) notwendig sind damit richtige 
+	 * Jene Filter einh√§ngen, die automatisch (und immer!) notwendig sind damit richtige 
 	 * Daten geliefert werden. Beispielsweise der Mandant.
 	 * 
 	 * @return null, oder eine (auch leere) Liste von immer notwendigen Filtern

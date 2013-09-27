@@ -23,6 +23,6 @@ public abstract class BaseQuery<T> extends FastLaneReaderCall  {
 	}
 	
 	public List<T> getResultList(QueryResult result) {
-		return entryTransformer.transform(result.getRowData()) ;
+		return entryTransformer.transform(result.getRowData(), getTableColumnInfo()) ;
 	}
 }

@@ -23,6 +23,7 @@ import com.heliumv.factory.ILagerCall;
 import com.heliumv.factory.IPanelCall;
 import com.heliumv.factory.IParameterCall;
 import com.heliumv.factory.legacy.AllLagerEntry;
+import com.heliumv.factory.legacy.PaneldatenPair;
 import com.heliumv.factory.loader.IArtikelLoaderCall;
 import com.heliumv.factory.loader.IItemLoaderAttribute;
 import com.heliumv.factory.loader.ItemLoaderComments;
@@ -45,9 +46,9 @@ import com.lp.server.util.fastlanereader.service.query.QueryResult;
 import com.lp.util.EJBExceptionLP;
 
 /**
- * Funktionalität rund um die Resource <b>Artikel</b></br>
- * <p>Grundvoraussetzung für eine erfolgreiche Benutzung dieser Resource ist,
- * dass der HELIUM V Mandant das Modul "Artikel" installiert hat. Für praktisch
+ * FunktionalitÃ¤t rund um die Resource <b>Artikel</b></br>
+ * <p>Grundvoraussetzung fÃ¼r eine erfolgreiche Benutzung dieser Resource ist,
+ * dass der HELIUM V Mandant das Modul "Artikel" installiert hat. FÃ¼r praktisch
  * alle Zugriffe auf den Artikel muss der API Benutzer zumindest Leserechte auf
  * den Artikel haben.
  * </p>
@@ -300,9 +301,13 @@ public class ItemApi extends BaseApi implements IItemApi {
 	}
 
 	private List<ItemPropertyEntry> getItemPropertiesFromIdImpl(Integer itemId) throws NamingException, RemoteException {
-		PaneldatenDto[] dtos = panelCall.paneldatenFindByPanelCNrCKey(
-				PanelFac.PANEL_ARTIKELEIGENSCHAFTEN, itemId.toString()) ;
-		List<ItemPropertyEntry> properties = itempropertyEntryMapper.mapEntry(dtos) ;
+//		PaneldatenDto[] dtos = panelCall.paneldatenFindByPanelCNrCKey(
+//				PanelFac.PANEL_ARTIKELEIGENSCHAFTEN, itemId.toString()) ;
+//		List<ItemPropertyEntry> properties = itempropertyEntryMapper.mapEntry(dtos) ;
+				
+		List<PaneldatenPair> entries = panelCall.paneldatenFindByPanelCNrCKeyBeschreibung(PanelFac.PANEL_ARTIKELEIGENSCHAFTEN, itemId.toString()) ;
+		List<ItemPropertyEntry> properties = itempropertyEntryMapper.mapEntry(entries) ;
+		
 		return properties ;	
 	}
 	

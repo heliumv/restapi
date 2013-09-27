@@ -3,12 +3,13 @@ package com.heliumv.api.order;
 import java.math.BigDecimal;
 
 import com.heliumv.api.BaseFLRTransformer;
+import com.lp.server.system.fastlanereader.service.TableColumnInformation;
 
 public class OrderpositionEntryTransformer extends
 		BaseFLRTransformer<OrderpositionEntry> {
 
 	@Override
-	public OrderpositionEntry transformOne(Object[] flrObject) {
+	public OrderpositionEntry transformOne(Object[] flrObject, TableColumnInformation columnInformation) {
 		OrderpositionEntry entry = new OrderpositionEntry() ;
 		entry.setId((Integer) flrObject[0]) ;
 		entry.setPositionNr((Integer) flrObject[1]) ;
