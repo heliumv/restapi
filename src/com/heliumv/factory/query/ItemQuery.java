@@ -45,16 +45,16 @@ public class ItemQuery extends BaseQuery<ItemEntry> {
 		this.parameterCall = parameterCall ;
 	}
 
-	public List<ItemEntry> getResultList(QueryResult result) {
-		try {
-			getTableInfo() ; 
-		} catch(NamingException e) {
-
-		} catch(RemoteException e) {
-		}
-
-		return super.getResultList(result) ;
-	}
+//	public List<ItemEntry> getResultList(QueryResult result) {
+//		try {
+//			getTableInfo() ; 
+//		} catch(NamingException e) {
+//
+//		} catch(RemoteException e) {
+//		}
+//
+//		return super.getResultList(result) ;
+//	}
 	
 	@Override
 	protected List<FilterKriterium> getRequiredFilters() {

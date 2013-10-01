@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.heliumv.annotation.HvFlrMapper;
 import com.heliumv.api.BaseEntryId;
 
 @XmlRootElement
@@ -29,7 +30,8 @@ public class ItemEntry extends BaseEntryId {
 	private String typeCnr ;
 	private String itemgroupCnr ;
 	private String itemclassCnr ;
-	
+
+
 	/**
 	 * Die Kennung des Artikels (Artikelnummer)
 	 * @return
@@ -37,6 +39,7 @@ public class ItemEntry extends BaseEntryId {
 	public String getCnr() {
 		return cnr;
 	}
+	@HvFlrMapper(flrName="artikel.artikelnummerlang")
 	public void setCnr(String cnr) {
 		this.cnr = cnr;
 	}
@@ -48,6 +51,7 @@ public class ItemEntry extends BaseEntryId {
 	public String getDescription() {
 		return description;
 	}
+	@HvFlrMapper(flrName="bes.artikelbezeichnung") 
 	public void setDescription(String description) {
 		this.description = description;
 	}
@@ -59,6 +63,7 @@ public class ItemEntry extends BaseEntryId {
 	public String getDescription2() {
 		return description2;
 	}
+	@HvFlrMapper(flrName = "artikel.zusatzbez")
 	public void setDescription2(String description2) {
 		this.description2 = description2;
 	}
@@ -81,6 +86,7 @@ public class ItemEntry extends BaseEntryId {
 	public String getShortName() {
 		return shortName;
 	}
+	@HvFlrMapper(flrName = "lp.kurzbezeichnung")
 	public void setShortName(String shortName) {
 		this.shortName = shortName;
 	}
@@ -92,6 +98,7 @@ public class ItemEntry extends BaseEntryId {
 	public BigDecimal getStockAmount() {
 		return stockAmount;
 	}
+	@HvFlrMapper(flrName = "lp.lagerstand")
 	public void setStockAmount(BigDecimal stockAmount) {
 		this.stockAmount = stockAmount;
 	}
@@ -103,23 +110,25 @@ public class ItemEntry extends BaseEntryId {
 	public BigDecimal getCosts() {
 		return costs;
 	}
+	@HvFlrMapper(flrName = "lp.preis")
 	public void setCosts(BigDecimal costs) {
 		this.costs = costs;
 	}
 	
 	/**
-	 * Die St�cklistenart
+	 * Die Stücklistenart
 	 * @return
 	 */
 	public String getBillOfMaterialType() {
 		return billOfMaterialType;
 	}
+	@HvFlrMapper(flrName = "lp.stuecklistenart")
 	public void setBillOfMaterialType(String billOfMaterialType) {
 		this.billOfMaterialType = billOfMaterialType;
 	}
 
 	/**
-	 * Ist der Artikel verf�gbar bzw. gesperrt?
+	 * Ist der Artikel verfügbar bzw. gesperrt?
 	 * @return
 	 */
 	public Boolean isAvailable() {
@@ -129,9 +138,14 @@ public class ItemEntry extends BaseEntryId {
 		this.available = available;
 	}
 	
+	@HvFlrMapper(flrName="Icon")
+	public void setAvailable(Object[] iconInfo) {
+		available = iconInfo == null ;
+	}
+	
 	/**
 	 * Die Liste aller Artikelkommentare im Format "text/html"
-	 * @return null, oder eine Liste der f�r den Artikel vorhandenen Artikelkommentar im Format "text/html"
+	 * @return null, oder eine Liste der für den Artikel vorhandenen Artikelkommentar im Format "text/html"
 	 */
 	public List<String> getComments() {
 		return comments;
@@ -183,6 +197,7 @@ public class ItemEntry extends BaseEntryId {
 	public String getItemgroupCnr() {
 		return itemgroupCnr;
 	}
+	@HvFlrMapper(flrNames= {"lp.artikelgruppeInAbmessung", "lp.artikelgruppe" })
 	public void setItemgroupCnr(String itemgroupCnr) {
 		this.itemgroupCnr = itemgroupCnr;
 	}
@@ -193,6 +208,7 @@ public class ItemEntry extends BaseEntryId {
 	public String getItemclassCnr() {
 		return itemclassCnr;
 	}
+	@HvFlrMapper(flrName="lp.artikelklasse")
 	public void setItemclassCnr(String itemclassCnr) {
 		this.itemclassCnr = itemclassCnr;
 	}	

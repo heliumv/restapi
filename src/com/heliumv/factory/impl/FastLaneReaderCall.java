@@ -45,12 +45,12 @@ public abstract class FastLaneReaderCall extends BaseCall<FastLaneReader> implem
 		installRequiredFilters(queryParams) ;
 		
 		try {
+			QueryResult result = getFac().setQuery(uuid, usecaseId, queryParams, Globals.getTheClientDto()) ;
+			result.getRowCount() ;
+
 			if(cachedColumnInfo == null) {
 				cachedColumnInfo = getFac().getTableColumnInfo(uuid, usecaseId, Globals.getTheClientDto()) ;
 			}
-			
-			QueryResult result = getFac().setQuery(uuid, usecaseId, queryParams, Globals.getTheClientDto()) ;
-			result.getRowCount() ;
 			
 			return result ;
 		} catch(RemoteException e) {
