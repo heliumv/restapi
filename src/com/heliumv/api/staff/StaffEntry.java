@@ -6,16 +6,16 @@ import com.heliumv.api.BaseEntryId;
 
 @XmlRootElement
 public class StaffEntry extends BaseEntryId {
-	private Integer personalNr ;
+	private String personalNr ;
 	private String  identityCnr ;
 	private String  shortMark ;
 	private String  name ;
 	private String  firstName ;
 	
-	public Integer getPersonalNr() {
+	public String getPersonalNr() {
 		return personalNr;
 	}
-	public void setPersonalNr(Integer personalNr) {
+	public void setPersonalNr(String personalNr) {
 		this.personalNr = personalNr;
 	}
 	public String getIdentityCnr() {
