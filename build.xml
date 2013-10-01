@@ -1,11 +1,4 @@
-<!-- Build file fuer das lpclientpc - Projekt -->
-<!-- Wer Wann Was -->
-<!-- ====|==========|================================================================= -->
-<!-- HK    09.11.06   compile deprecated compile.client, rescopy depr. -> rescopy2 -->
-<!-- HK    03.11.06   lpserver compile mit 256M versehen -->
-<!-- HK    17.01.06   javadoc mit 256M versehen -->
-<!-- JO    04.08.05   cvs tags rausgenommen -->
-<!-- AD	11.02.13	git anpassung -->
+<!-- Build file fuer die Rest-API -->
 <project name="restapi" basedir="." default="compile">
 
 	<property environment="env"/>
@@ -23,8 +16,8 @@
 		<fileset dir="${dir.aspectjlib}">
 			<include name="**/aspect*.jar" />
 		</fileset>
-		
-		<fileset dir="${dir.tomcatlib}">			
+
+		<fileset dir="${dir.tomcatlib}">
 			<include name="**/annotations-*.jar" />
 		</fileset>
 	</path>
@@ -55,8 +48,8 @@
 		<fileset dir="${dir.aspectjlib}">
 			<include name="**/aspect*.jar" />
 		</fileset>
-		
-		<fileset dir="${dir.tomcatlib}">			
+
+		<fileset dir="${dir.tomcatlib}">
 			<include name="**/annotations-*.jar" />
 		</fileset>
 
@@ -85,6 +78,8 @@
 		<mkdir dir="${dir.classes}"/>
 		<mkdir dir="${dir.doc}"/>
 		<mkdir dir="${dir.deploy}"/>
+		<mkdir dir="${dir.deploy}/tomcat"/>
+		<mkdir dir="${dir.deploy}/tomcat/lib"/>
 		<mkdir dir="${dir.temp}"/>
 	</target>
 
@@ -115,10 +110,10 @@
 			<include name="**/*.java"/>
 			<classpath refid="enunciate.classpath"/>
 			<!--	<export artifactId="war.file" destination="${tomcat.home}/webapps/myapp.war"/>  -->
-<!--
+			<!--
 			<export artifactId="war.file" destination="${dir.deploy}/restapi-doc.war"/> 
  -->
-			<export artifactId="docs" destination="${dir.deploy}/restapi-doc.zip"/>			
+			<export artifactId="docs" destination="${dir.deploy}/restapi-doc.zip"/>
 			<javacArgument argument="-g"/>
 		</enunciate>
 	</target>
@@ -134,15 +129,26 @@
 
 			<lib dir="${dir.cxflib}">
 			</lib>
-<!--			
+			<!--			
 			<lib dir="${dir.aspectjlib}">
 				<include name="**/aspect*.jar" />
 			</lib>
 			<lib dir="${dir.client}/deploy/">
 				<include name="**/lpclientpc.jar" />
 			</lib>
-  -->				
+  -->
 		</war>
+		
+		<copy todir="${dir.deploy}/tomcat/lib">
+			<flattenmapper />
+			<fileset dir="lib">
+				<include name="**/jackson-all-1.9.11.jar" />
+				<include name="**/aspectjrt.jar" />
+			</fileset>
+			<fileset dir="${dir.client}/deploy/">
+				<include name="**/lpclientpc.jar" />
+			</fileset>
+		</copy>
 	</target>
 
 	<!-- jar-file erzeugen -->
