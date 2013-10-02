@@ -4,14 +4,20 @@ import java.rmi.RemoteException;
 
 import javax.naming.NamingException;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.heliumv.factory.BaseCall;
 import com.heliumv.factory.Globals;
+import com.heliumv.factory.IGlobalInfo;
 import com.heliumv.factory.IParameterCall;
 import com.lp.server.artikel.service.ArtikelFac;
 import com.lp.server.system.service.ParameterFac;
 import com.lp.server.system.service.ParametermandantDto;
 
 public class ParameterCall extends BaseCall<ParameterFac> implements IParameterCall {
+	@Autowired
+	private IGlobalInfo globalInfo ;
+	
 	public ParameterCall() {
 		super(ParameterFacBean) ;
 	}
@@ -61,5 +67,15 @@ public class ParameterCall extends BaseCall<ParameterFac> implements IParameterC
 		}
 		
 		return defaultLaenge ;
+	}
+	
+	public boolean isArtikelDirektfilterGruppeKlasseStattReferenznummer() throws NamingException, RemoteException {
+		String mandant = globalInfo.getMandant() ;
+
+		ParametermandantDto param = getFac()
+				.getMandantparameter(mandant,
+						ParameterFac.KATEGORIE_ARTIKEL,
+						ParameterFac.PARAMETER_DIREKTFILTER_GRUPPE_KLASSE_STATT_REFERENZNUMMER) ;
+		return (Boolean) param.getCWertAsObject() ;	
 	}
 }

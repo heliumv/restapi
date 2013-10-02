@@ -14,6 +14,8 @@ public class PingResult {
 	 */
 	private long serverTime ;
 
+	private long serverDuration ;
+	
 	/**
 	 * Zu diesem Zeitpunkt wurde der Aufruf vom API Server registriert (Zeitstempel des API Servers)
 	 */
@@ -75,5 +77,12 @@ public class PingResult {
 
 	public void setServerVersionNumber(String serverVersionNumber) {
 		this.serverVersionNumber = serverVersionNumber;
-	}	
+	}
+	public long getServerDuration() {
+		return serverDuration;
+	}
+	public void setServerDuration(long serverDuration) {
+		this.serverDuration = serverDuration;
+	}
+	
 }

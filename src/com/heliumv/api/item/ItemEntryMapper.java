@@ -16,6 +16,10 @@ public class ItemEntryMapper {
 			entry.setDescription(artikelSprDto.getCZbez());
 			entry.setDescription2(artikelSprDto.getCZbez2());
 		}
+		entry.setHidden(artikelDto.getBVersteckt() == null ? false : artikelDto.getBVersteckt() > 0);
+		entry.setUnitCnr(artikelDto.getEinheitCNr());
+		entry.setTypeCnr(artikelDto.getArtikelartCNr());
+		
 		return entry ;
 	}
 }

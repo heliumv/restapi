@@ -34,6 +34,7 @@ import com.heliumv.factory.IZeiterfassungCall;
 import com.heliumv.factory.query.ArtikelArbeitszeitQuery;
 import com.heliumv.factory.query.ZeitdatenQuery;
 import com.heliumv.tools.FilterKriteriumCollector;
+import com.heliumv.tools.StringHelper;
 import com.lp.server.auftrag.service.AuftragDto;
 import com.lp.server.auftrag.service.AuftragpositionDto;
 import com.lp.server.fertigung.service.LosDto;
@@ -445,8 +446,12 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 			if(connectClient(entry.getUserId()) == null) {
 				return getBadRequest("userId", entry.getUserId()) ;
 			}
+	
+			if(!isValidPersonalId(entry.getForStaffId())) {
+				entry.setForStaffId(globalInfo.getTheClientDto().getIDPersonal()) ;
+			}
 			
-			PersonalDto personalDto = personalCall.byPrimaryKeySmall(globalInfo.getTheClientDto().getIDPersonal());
+			PersonalDto personalDto = personalCall.byPrimaryKeySmall(entry.getForStaffId());
 			if (null == personalDto) {
 				return getUnauthorized();
 			}
@@ -459,7 +464,7 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 			Timestamp timestamp = getTimestamp(entry);
 
 			return bucheZeitPersonalID(personalDto.getIId(), timestamp,
-					taetigkeitIId, null);
+					taetigkeitIId, entry.getWhere());
 		} catch (NamingException e) {
 			return getUnavailable(e);
 		}
@@ -495,11 +500,10 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 		ZeitdatenDto zd = new ZeitdatenDto();
 		zd.setPersonalIId(personalIId) ;
 		zd.setTZeit(timestamp);
-		zd.setTaetigkeitIId(taetigkeitIId);
+		zd.setTaetigkeitIId(taetigkeitIId);		
+		zd.setCWowurdegebucht(StringHelper.trim(station)) ;
+		zd.setTAendern(timestamp);
 		
-		if(station != null && station.trim().length() > 0) {
-			zd.setCWowurdegebucht(station.trim()) ;
-		}
 		
 		try {
 			zeiterfassungCall.createZeitdaten(zd, true, true, false) ;

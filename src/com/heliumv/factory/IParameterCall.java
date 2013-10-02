@@ -25,5 +25,13 @@ public interface IParameterCall {
 	 * @throws RemoteException
 	 */
 	int getMaximaleLaengeArtikelnummer()  throws NamingException, RemoteException ;
-
+	
+	/**
+	 * Im Direktfilter nach Artikelgruppe/Klasse anstatt Referenznummer suchen
+	 * 
+	 * @return
+	 * @throws NamingException
+	 * @throws RemoteException
+	 */
+	boolean isArtikelDirektfilterGruppeKlasseStattReferenznummer() throws NamingException, RemoteException ;
 }

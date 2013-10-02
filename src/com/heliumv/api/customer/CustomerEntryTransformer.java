@@ -1,11 +1,12 @@
 package com.heliumv.api.customer;
 
 import com.heliumv.api.BaseFLRTransformer;
+import com.lp.server.system.fastlanereader.service.TableColumnInformation;
 
 public class CustomerEntryTransformer extends BaseFLRTransformer<CustomerEntry> {
 
 	@Override
-	public CustomerEntry transformOne(Object[] flrObject) {
+	public CustomerEntry transformOne(Object[] flrObject, TableColumnInformation columnInformation) {
 		CustomerEntry entry = new CustomerEntry() ;
 		entry.setId((Integer) flrObject[0]) ;
 		entry.setAddressType((String) flrObject[1]) ;

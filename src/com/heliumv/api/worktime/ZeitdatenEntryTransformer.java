@@ -1,12 +1,13 @@
 package com.heliumv.api.worktime;
 
 import com.heliumv.api.BaseFLRTransformer;
+import com.lp.server.system.fastlanereader.service.TableColumnInformation;
 
 public class ZeitdatenEntryTransformer extends
 		BaseFLRTransformer<ZeitdatenEntry> {
 
 	@Override
-	public ZeitdatenEntry transformOne(Object[] flrObject) {
+	public ZeitdatenEntry transformOne(Object[] flrObject, TableColumnInformation columnInformation) {
 		ZeitdatenEntry entry = new ZeitdatenEntry() ;
 		entry.setId((Integer) flrObject[0]) ;
 		entry.setActivityCnr((String) flrObject[1]) ;

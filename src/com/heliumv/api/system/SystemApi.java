@@ -27,10 +27,13 @@ public class SystemApi extends BaseApi implements ISystemApi {
 	public PingResult ping() {
 		PingResult result = new PingResult() ;
 		try {
-			result.setApiTime(System.currentTimeMillis()) ;
+			long startMs = System.currentTimeMillis() ;
+			result.setApiTime(startMs) ;
 			result.setServerBuildNumber(systemCall.getServerBuildNumber()) ;
 			result.setServerVersionNumber(systemCall.getServerVersion()) ;
 			result.setServerTime(systemCall.getServerTimestamp().getTime());
+			long stopMs = System.currentTimeMillis() ;
+			result.setServerDuration(Math.abs(stopMs - startMs));
 		} catch(RemoteException e) {
 			respondUnavailable(e) ;
 		} catch(NamingException e) {
@@ -39,4 +42,16 @@ public class SystemApi extends BaseApi implements ISystemApi {
 		
  		return result ;
 	}
+
+	@GET
+	@Path("/localping")
+	@Produces({FORMAT_JSON, FORMAT_XML})
+	@Override
+	public LocalPingResult localping() {
+		LocalPingResult result = new LocalPingResult() ;
+		result.setApiTime(System.currentTimeMillis());
+		result.setApiBuildNumber(1);
+		result.setApiVersionNumber("1.0.1") ;
+		return result ;
+	}	
 }

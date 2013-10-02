@@ -43,4 +43,13 @@ public class StringHelper {
 	public static String asSqlString(String value) {
 		return "'" + value + "'" ;
 	}
+
+	/**
+	 * Einen String trim(), null-String wird dabei ignoriert 
+	 * @param value
+	 * @return null wenn null, ansonsten value.trim()
+	 */
+	public static String trim(String value) {
+		return value != null ? value.trim() : null ;
+	}
 }

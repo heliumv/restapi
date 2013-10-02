@@ -98,6 +98,7 @@
  
 	<bean id="globalInfo" class="com.heliumv.factory.GlobalInfo" />
 	<bean id="artikelCall" class="com.heliumv.factory.impl.ArtikelCall" lazy-init="true"/>
+	<bean id="artikelkommentarCall" class="com.heliumv.factory.impl.ArtikelkommentarCall" lazy-init="true"/>
 	<bean id="auftragCall" class="com.heliumv.factory.impl.AuftragCall" lazy-init="true"/>
 	<bean id="auftragpositionCall" class="com.heliumv.factory.impl.AuftragpositionCall" lazy-init="true"/>
 	<bean id="clientCall" class="com.heliumv.factory.impl.ClientCall" lazy-init="true"/>
@@ -109,6 +110,7 @@
 	<bean id="lagerCall" class="com.heliumv.factory.impl.LagerCall" lazy-init="true"/>
 	<bean id="logonCall" class="com.heliumv.factory.impl.LogonCall" lazy-init="true"/>
 	<bean id="mandantCall" class="com.heliumv.factory.impl.MandantCall" lazy-init="true"/>
+	<bean id="panelCall" class="com.heliumv.factory.impl.PanelCall" lazy-init="true" />
 	<bean id="parameterCall" class="com.heliumv.factory.impl.ParameterCall" lazy-init="true"/>
 	<bean id="personalCall" class="com.heliumv.factory.impl.PersonalCall" lazy-init="true"/>
 	<bean id="projektCall" class="com.heliumv.factory.impl.ProjektCall" lazy-init="true"/>
@@ -117,10 +119,18 @@
 	<bean id="systemCall" class="com.heliumv.factory.impl.SystemCall" lazy-init="true"/>
 	<bean id="zeiterfassungCall" class="com.heliumv.factory.impl.ZeiterfassungCall" lazy-init="true"/>
 	
+	<bean id="artikelLoaderCall" class="com.heliumv.factory.loader.ArtikelLoaderCall" lazy-init="true" />
+	<bean id="itemloaderComments" class="com.heliumv.factory.loader.ItemLoaderComments" lazy-init="true"/>
+	
+	<bean id="itemEntryMapper" class="com.heliumv.api.item.ItemEntryMapper" lazy-init="true" />
+	<bean id="itemgroupEntryMapper" class="com.heliumv.api.item.ItemGroupEntryMapper" lazy-init="true" />
+	<bean id="itempropertyEntryMapper" class="com.heliumv.api.item.ItemPropertyEntryMapper" lazy-init="true" />
+	
 	<bean id="workItemQuery" class="com.heliumv.factory.query.ArtikelArbeitszeitQuery" lazy-init="true"/>
 	<bean id="orderQuery" class="com.heliumv.factory.query.AuftragQuery" lazy-init="true"/>
 	<bean id="orderPositionQuery" class="com.heliumv.factory.query.AuftragpositionQuery" lazy-init="true"/>
 	<bean id="customerQuery" class="com.heliumv.factory.query.CustomerQuery" lazy-init="true" />
+	<bean id="itemQuery" class="com.heliumv.factory.query.ItemQuery" lazy-init="true" />
 	<bean id="productionQuery" class="com.heliumv.factory.query.ProductionQuery" lazy-init="true"/>
 	<bean id="projectQuery" class="com.heliumv.factory.query.ProjectQuery" lazy-init="true"/>
 	<bean id="staffQuery" class="com.heliumv.factory.query.StaffQuery" lazy-init="true"/>

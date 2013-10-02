@@ -1,6 +1,7 @@
 package com.heliumv.api.customer;
 
 import java.rmi.RemoteException;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -57,18 +58,17 @@ public class CustomerApi extends BaseApi implements ICustomerApi {
 	
 	@Override
 	@GET
-//	@Path("/{userid}")
 	@Produces({FORMAT_JSON, FORMAT_XML})
 	public List<CustomerEntry> getCustomers(
-			@QueryParam("userid") String userId, 
-			@QueryParam("limit") Integer limit,
-			@QueryParam("startIndex") Integer startIndex,
+			@QueryParam(Param.USERID) String userId, 
+			@QueryParam(Param.LIMIT) Integer limit,
+			@QueryParam(Param.STARTINDEX) Integer startIndex,
 			@QueryParam("filter_company") String filterCompany,
 			@QueryParam("filter_city") String filterCity,
 			@QueryParam("filter_extendedSearch") String filterExtendedSearch,
 			@QueryParam("filter_withCustomers") Boolean filterWithCustomers,
 			@QueryParam("filter_withProspectiveCustomers") Boolean filterWithProspectiveCustomers,
-			@QueryParam("filter_withHidden") Boolean filterWithHidden) {
+			@QueryParam(Filter.HIDDEN) Boolean filterWithHidden) {
 		List<CustomerEntry> customerEntries = new ArrayList<CustomerEntry>() ;
 		
 		try {
@@ -233,7 +233,7 @@ public class CustomerApi extends BaseApi implements ICustomerApi {
 		
 		try {
 			Calendar c = DatatypeConverter.parseDateTime(filterValidityDate) ;
-//			params.setGueltigkeitsDatum(new Date(c.getTimeInMillis())) ;
+			params.setGueltigkeitsDatum(new Date(c.getTimeInMillis())) ;
 			return true ;
 		} catch(IllegalArgumentException e) {
 			System.out.println("illegalargument" + e.getMessage()) ;

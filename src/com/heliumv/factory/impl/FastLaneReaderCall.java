@@ -11,18 +11,21 @@ import com.heliumv.factory.BaseCall;
 import com.heliumv.factory.Globals;
 import com.heliumv.factory.IFastLaneReaderCall;
 import com.lp.server.system.fastlanereader.service.FastLaneReader;
+import com.lp.server.system.fastlanereader.service.TableColumnInformation;
 import com.lp.server.util.fastlanereader.service.query.FilterBlock;
 import com.lp.server.util.fastlanereader.service.query.FilterKriterium;
 import com.lp.server.util.fastlanereader.service.query.QueryParameters;
 import com.lp.server.util.fastlanereader.service.query.QueryResult;
 import com.lp.server.util.fastlanereader.service.query.SortierKriterium;
+import com.lp.server.util.fastlanereader.service.query.TableInfo;
 import com.lp.util.EJBExceptionLP;
 
 public abstract class FastLaneReaderCall extends BaseCall<FastLaneReader> implements IFastLaneReaderCall {
 	
 	private String uuid ;
 	private Integer usecaseId ;
-	
+	private TableColumnInformation cachedColumnInfo ;
+
 	protected FastLaneReaderCall(Integer theUsercaseId) {
 		this(UUID.randomUUID().toString(), theUsercaseId) ;
 	}
@@ -44,6 +47,10 @@ public abstract class FastLaneReaderCall extends BaseCall<FastLaneReader> implem
 		try {
 			QueryResult result = getFac().setQuery(uuid, usecaseId, queryParams, Globals.getTheClientDto()) ;
 			result.getRowCount() ;
+
+			if(cachedColumnInfo == null) {
+				cachedColumnInfo = getFac().getTableColumnInfo(uuid, usecaseId, Globals.getTheClientDto()) ;
+			}
 			
 			return result ;
 		} catch(RemoteException e) {
@@ -70,6 +77,17 @@ public abstract class FastLaneReaderCall extends BaseCall<FastLaneReader> implem
 		return params ;		
 	}
 	
+	
+	public void getTableInfo() throws NamingException, RemoteException {
+		TableInfo info = getFac().getTableInfo(uuid, usecaseId, Globals.getTheClientDto()) ;
+		System.out.println("" + info.getDataBaseColumnNames()) ;
+	}
+	
+	public TableColumnInformation getTableColumnInfo()  {
+		return cachedColumnInfo ;
+//		return getFac().getTableColumnInfo(uuid, usecaseId, Globals.getTheClientDto()) ;
+	}
+	
 	private void installRequiredFilters(QueryParameters queryParams) {
 		List<FilterKriterium> requiredFilters = getRequiredFilters() ;
 		if(requiredFilters == null || requiredFilters.size() == 0) return ;
@@ -82,7 +100,7 @@ public abstract class FastLaneReaderCall extends BaseCall<FastLaneReader> implem
 	}
 	
 	/**
-	 * Jene Filter einh‰ngen, die automatisch (und immer!) notwendig sind damit richtige 
+	 * Jene Filter einh√§ngen, die automatisch (und immer!) notwendig sind damit richtige 
 	 * Daten geliefert werden. Beispielsweise der Mandant.
 	 * 
 	 * @return null, oder eine (auch leere) Liste von immer notwendigen Filtern
