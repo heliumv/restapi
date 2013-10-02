@@ -2,6 +2,8 @@ package com.heliumv.factory.query;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.heliumv.annotation.HvFlrMapper;
 import com.heliumv.api.item.ItemEntry;
@@ -19,6 +21,7 @@ import com.lp.server.system.fastlanereader.service.TableColumnInformation;
 public class TableColumnInformationMapper {
 	private Object theInstance ;
 	private TableColumnInformation columnInfos ;
+	private List<Method> cachedMethods ;
 	
 	public TableColumnInformationMapper() {
 	}
@@ -36,14 +39,44 @@ public class TableColumnInformationMapper {
 		return columnInfos ;
 	}
 	
-	public void setValues(Object target, Object[] flrObject) {
-		theInstance = target ; 
+	protected List<Method> getMappingMethods(Object target) {
+		if(cachedMethods != null) return cachedMethods ;
+
+		cachedMethods = new ArrayList<Method>() ;
 		Method[] methods = target.getClass().getMethods() ;
 		
 		for (Method theMethod : methods) {
 			if(!theMethod.getName().startsWith("set")) continue ;
 			if(!theMethod.isAnnotationPresent(HvFlrMapper.class)) continue ;
-			
+		
+			cachedMethods.add(theMethod) ;
+		}
+		return cachedMethods ;
+	}
+	
+//	public void setValues(Object target, Object[] flrObject) {
+//		theInstance = target ; 
+//		Method[] methods = target.getClass().getMethods() ;
+//		
+//		for (Method theMethod : methods) {
+//			if(!theMethod.getName().startsWith("set")) continue ;
+//			if(!theMethod.isAnnotationPresent(HvFlrMapper.class)) continue ;
+//			
+//			HvFlrMapper mapper = theMethod.getAnnotation(HvFlrMapper.class) ;
+//			if(mapper.flrName().length() > 0) {
+//				setOneValue(theMethod, mapper.flrName(), flrObject);
+//			} else {
+//				for (String flrName : mapper.flrNames()) {
+//					setOneValue(theMethod, flrName, flrObject);					
+//				}
+//			}
+//		}
+//	}
+
+	public void setValues(Object target, Object[] flrObject) {
+		theInstance = target ; 
+
+		for (Method theMethod : getMappingMethods(target)) {
 			HvFlrMapper mapper = theMethod.getAnnotation(HvFlrMapper.class) ;
 			if(mapper.flrName().length() > 0) {
 				setOneValue(theMethod, mapper.flrName(), flrObject);

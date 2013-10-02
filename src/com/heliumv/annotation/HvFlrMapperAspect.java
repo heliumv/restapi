@@ -7,8 +7,6 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
-import com.lp.util.EJBExceptionLP;
-
 @Component
 @Aspect
 public class HvFlrMapperAspect {
@@ -38,13 +36,13 @@ public class HvFlrMapperAspect {
 		// System.out.println("In method signature: " +
 		// methodSig.getMethod().getAnnotations().length + "<") ;
 
-		HvJudge theModul = (HvJudge) methodSig.getMethod().getAnnotation(
-				HvJudge.class);
+		HvFlrMapper theModul = (HvFlrMapper) methodSig.getMethod().getAnnotation(
+				HvFlrMapper.class);
 		if (theModul == null)
 			return;
 
 		System.out.println("Having the HvFlrMapper Annotation with name '"
-				+ theModul.recht() + "<");
+				+ theModul.flrName() + "<");
 //		if (!judgeCall.hatRecht(theModul.recht())) {
 //			throw new EJBExceptionLP(
 //					EJBExceptionLP.FEHLER_UNZUREICHENDE_RECHTE, methodSig

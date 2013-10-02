@@ -1,6 +1,5 @@
 package com.heliumv.factory.query;
 
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -19,7 +18,6 @@ import com.heliumv.tools.StringHelper;
 import com.lp.server.artikel.service.ArtikelFac;
 import com.lp.server.util.fastlanereader.service.query.FilterKriterium;
 import com.lp.server.util.fastlanereader.service.query.QueryParameters;
-import com.lp.server.util.fastlanereader.service.query.QueryResult;
 
 public class ItemQuery extends BaseQuery<ItemEntry> {
 	@Autowired

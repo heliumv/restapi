@@ -36,7 +36,6 @@ import com.lp.server.artikel.service.ArtikelDto;
 import com.lp.server.artikel.service.ArtikelFac;
 import com.lp.server.artikel.service.LagerDto;
 import com.lp.server.system.service.PanelFac;
-import com.lp.server.system.service.PaneldatenDto;
 import com.lp.server.util.Facade;
 import com.lp.server.util.fastlanereader.service.query.FilterBlock;
 import com.lp.server.util.fastlanereader.service.query.FilterKriterium;

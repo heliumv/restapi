@@ -5,52 +5,42 @@
 	<property file="build.properties.local"/>
 	<property file="build.properties"/>
 
-	<import file="${file.build.commons}"/>
+<!--	<import file="${file.build.commons}"/> -->
 
 	<!-- the server libs for all configurations -->
 	<path id="id.cxflibs">
-		<fileset dir="${dir.cxflib}">
+		<fileset dir="libCxf">
 			<include name="**/*.jar" />
-		</fileset>
-
-		<fileset dir="${dir.aspectjlib}">
-			<include name="**/aspect*.jar" />
-		</fileset>
-
-		<fileset dir="${dir.tomcatlib}">
-			<include name="**/annotations-*.jar" />
 		</fileset>
 	</path>
 
 	<!-- Lib-Pfad als Referenz -->
 	<path id="id.lib.path">
 		<fileset dir="${dir.lib}">
-			<include name="**/*.jar"/>
+			<include name="**/aspectjweaver.jar"/>
+			<include name="**/jackson-all-1.9.11.jar" />
 		</fileset>
+		
 	</path>
 
 	<path id="enunciate.classpath">
-		<fileset dir="${enunciate.home}/lib">
+		<fileset dir="${dir.enunciate}/lib">
 			<include name="*.jar"/>
 		</fileset>
 		<!--include (optional) spring module-->
-		<fileset dir="${enunciate.home}/lib/modules/spring">
+		<fileset dir="${dir.enunciate}/lib/modules/spring">
 			<include name="*.jar"/>
 		</fileset>
 		<fileset dir="${java.home}">
 			<include name="lib/tools.jar"/>
 		</fileset>
 
-		<fileset dir="${dir.cxflib}">
+		<fileset dir="libCxf">
 			<include name="**/*.jar" />
 		</fileset>
 
-		<fileset dir="${dir.aspectjlib}">
-			<include name="**/aspect*.jar" />
-		</fileset>
-
-		<fileset dir="${dir.tomcatlib}">
-			<include name="**/annotations-*.jar" />
+		<fileset dir="lib">
+			<include name="**/aspectjweaver.jar" />
 		</fileset>
 
 		<fileset dir="${dir.client}/deploy/">
@@ -109,16 +99,17 @@
 		<enunciate basedir="${dir.src}">
 			<include name="**/*.java"/>
 			<classpath refid="enunciate.classpath"/>
-			<!--	<export artifactId="war.file" destination="${tomcat.home}/webapps/myapp.war"/>  -->
-			<!--
-			<export artifactId="war.file" destination="${dir.deploy}/restapi-doc.war"/> 
+<!--
+				<export artifactId="war.file" destination="${dir.deploy}/restapi-doc.war"/> 
  -->
-			<export artifactId="docs" destination="${dir.deploy}/restapi-doc.zip"/>
+<!--
+ -->		
+				<export artifactId="docs" destination="${dir.deploy}/restapi-doc.zip"/>
 			<javacArgument argument="-g"/>
 		</enunciate>
 	</target>
 
-	<target name="deploy" depends="clean,compile">
+	<target name="build" depends="clean,compile">
 		<war destfile="${dir.deploy}/restapi.war" webxml="WebContent/WEB-INF/web.xml">
 			<classes dir="${dir.classes}">
 				<include name="**/*.class" />
@@ -127,93 +118,55 @@
 				<include name="**/*.xml" />
 			</webinf>
 
-			<lib dir="${dir.cxflib}">
+			<lib dir="libCxf">
+				<include name="**/*.jar" />
 			</lib>
-			<!--			
-			<lib dir="${dir.aspectjlib}">
-				<include name="**/aspect*.jar" />
+
+			<lib dir="lib">
+				<include name="**/jackson-all-1.9.11.jar" />
 			</lib>
-			<lib dir="${dir.client}/deploy/">
-				<include name="**/lpclientpc.jar" />
+			
+			<lib dir="${dir.server.dir}/jboss/all/server/helium/lib/">				
+				<include name="**/jbossall-client.jar" />
+				<include name="**/ejb3-persistence.jar" />
+				<include name="**/jai_codec.jar" />
+				<include name="**/jai_core.jar" />
 			</lib>
-  -->
 		</war>
 		
 		<copy todir="${dir.deploy}/tomcat/lib">
 			<flattenmapper />
 			<fileset dir="lib">
-				<include name="**/jackson-all-1.9.11.jar" />
-				<include name="**/aspectjrt.jar" />
+				<include name="**/aspectjweaver.jar" />
 			</fileset>
+			
 			<fileset dir="${dir.client}/deploy/">
 				<include name="**/lpclientpc.jar" />
 			</fileset>
+			
+			<fileset dir="${dir.client}/lib/jasperreports">
+				<include name="**jasperreports-4.0.1.jar" />
+			</fileset>
+		</copy>
+		
+		<!-- ein kleiner check, ob alle benoetigten files vorhanden sind. -->
+		<antcall target="webdoc" />		
+	</target>
+	
+	<target name="deploy" depends="build"
+		description="Kopiert den mittels 'install' erstellten Webstart Client ins endgültige Deploy-Verzeichnis">
+		<fail unless="deploydir" message="deploydir not set. cannot proceed!"/>
+
+		<var name="dir.deploy.restapi" value="${deploydir}/restapi/deploy/"/>
+
+		<delete dir="${dir.deploy.restapi}"/>
+		<mkdir dir="${dir.deploy.restapi}"/>
+
+		<copy todir="${dir.deploy.restapi}">
+			<fileset dir="${dir.deploy}">
+				<include name="**/*"/>
+			</fileset>
 		</copy>
 	</target>
-
-	<!-- jar-file erzeugen -->
-	<target name="pack" depends="compile" unless="is.setup" >
-		<basename property="name.dir.lib" file="${dir.lib}"/>
-
-		<pathconvert property="manifest.classpath" pathsep=" " >
-			<mapper>
-				<chainedmapper>
-					<flattenmapper />
-					<globmapper from="*" to="lib/*" />
-				</chainedmapper>
-			</mapper>
-			<path>
-				<fileset dir="${basedir}">
-					<include name="**/*.jar" />
-				</fileset>
-			</path>
-		</pathconvert>
-		<!-- AD -->
-
-		<echo message="AD manifest.classpath: ${manifest.classpath}"/>
-		<jar destfile="${dir.deploy}/${file.application.basename}.jar">
-			<fileset dir="${dir.classes}"/>
-			<fileset dir="${dir.server.classes}">
-				<include name="**/lp/util/**"/>
-				<include name="**/lp/server/util/**"/>
-				<include name="**/service/**"/>
-				<include name="**/ejb/*PK.*"/>
-				<include name="**/fastlanereader/generated/service/**"/>
-				<!-- ###ToDo: hier sollte vielleicht nicht alles rein! klaeren! -->
-			</fileset>
-
-			<manifest>
-				<attribute name="Built-By" value="${user.name}"/>
-				<attribute name="Main-Class" value="${class.main.class}"/>
-				<attribute name="Class-Path" value="${manifest.classpath}"/>
-			</manifest>
-		</jar>
-
-		<!-- libs kopieren, damit das jar mit dem angegebenen classpath -->
-		<!-- auch aufrufbar bleibt. -->
-		<!-- AD
-  	<copy todir="${dir.deploy}">
-      <fileset dir=".">
-        <include name="${dir.lib}/**"/>
-      </fileset>
-    </copy>
--->
-		<copy todir="${dir.deploy}/lib">
-			<flattenmapper />
-			<fileset dir=".">
-				<include name="${dir.lib}/**"/>
-				<exclude name="${dir.lib}/linux/**"/>
-				<exclude name="${dir.lib}/mac/**"/>
-				<exclude name="${dir.lib}/windows/**"/>
-			</fileset>
-		</copy>
-		<copy todir="${dir.deploy}">
-			<fileset dir=".">
-				<include name="${dir.lib}/linux/**"/>
-				<include name="${dir.lib}/mac/**"/>
-				<include name="${dir.lib}/windows/**"/>
-			</fileset>
-		</copy>
-
-	</target>
+		
 </project>
