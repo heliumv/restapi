@@ -126,12 +126,14 @@
 				<include name="**/jackson-all-1.9.11.jar" />
 			</lib>
 			
+<!--
 			<lib dir="${dir.server.dir}/jboss/all/server/helium/lib/">				
 				<include name="**/jbossall-client.jar" />
 				<include name="**/ejb3-persistence.jar" />
 				<include name="**/jai_codec.jar" />
 				<include name="**/jai_core.jar" />
 			</lib>
+ -->			
 		</war>
 		
 		<copy todir="${dir.deploy}/tomcat/lib">
@@ -146,6 +148,13 @@
 			
 			<fileset dir="${dir.client}/lib/jasperreports">
 				<include name="**jasperreports-4.0.1.jar" />
+			</fileset>
+			
+			<fileset dir="${dir.server.dir}/jboss/all/server/helium/lib/">
+				<include name="**/jbossall-client.jar" />
+				<include name="**/ejb3-persistence.jar" />
+				<include name="**/jai_codec.jar" />
+				<include name="**/jai_core.jar" />
 			</fileset>
 		</copy>
 		
