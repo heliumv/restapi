@@ -152,7 +152,7 @@ public class ZeiterfassungCall extends BaseCall<ZeiterfassungFac> implements IZe
 	@HvModul(modul=LocaleFac.BELEGART_ZEITERFASSUNG)
 	@HvJudge(recht=RechteFac.RECHT_PERS_ZEITEREFASSUNG_CUD) 
 	public void removeZeitdaten(ZeitdatenDto zeitdatenDto) throws NamingException, RemoteException, EJBExceptionLP {
-		getFac().removeZeitdaten(zeitdatenDto) ;
+		getFac().removeZeitdaten(zeitdatenDto, globalInfo.getTheClientDto()) ;
 	}
 	
 	private List<SpecialActivity> convertFromActivities(Map<?, ?> allActivities) {
