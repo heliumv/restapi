@@ -11,27 +11,27 @@ import com.heliumv.api.project.ProjectApi;
 
 
 /**
- * Funktionalität rund um die Zeit(daten)erfassung</br>
+ * Funktionalit&auml;t rund um die Zeit(daten)erfassung</br>
  *
  * @author Gerold
  */
 public interface IWorktimeApi {
 	/**
-	 * Eine KOMMT-Buchung durchführen.</br>
+	 * Eine KOMMT-Buchung durchf&uuml;hren.</br>
 	 * @param entry ist die Standardzeitbuchung Datenstruktur <code>TimeRecordingEntry</code>
 	 * @return
 	 */
 	Response bookComing(TimeRecordingEntry entry) ;
 	
 	/**
-	 * Eine GEHT-Buchung durchführen.</br>
+	 * Eine GEHT-Buchung durchf&uuml;hren.</br>
 	 * @param entry ist die Standardzeitbuchung Datenstruktur <code>TimeRecordingEntry</code>
 	 * @return
 	 */
 	Response bookGoing(TimeRecordingEntry entry) ;
 
 	/**
-	 * Eine PAUSE (Unterbrechung)-Buchung durchführen.</br>
+	 * Eine PAUSE (Unterbrechung)-Buchung durchf&uuml;hren.</br>
 	 * <p>Eine Pause (zum Beispiel Mittagspause) wird durch <b>zwei</b> PAUSE
 	 * Buchungen erzielt.</p>
 	 * @param entry ist die Standardzeitbuchung Datenstruktur <code>TimeRecordingEntry</code>
@@ -40,7 +40,7 @@ public interface IWorktimeApi {
 	Response bookPausing(TimeRecordingEntry entry) ;
 
 	/**
-	 * Eine ENDE Buchung durchführen</br>
+	 * Eine ENDE Buchung durchf&uuml;hren</br>
 	 * <p>Eine Belegbuchung wie beispielsweise Auftrags-, Projekt oder Los-Buchung beenden</p>
 	 * @param entry
 	 * @return
@@ -52,10 +52,10 @@ public interface IWorktimeApi {
 //			Integer hour, Integer minute, Integer second) ;
 
 	/** 
-	 * Eine (Beginn) Buchung eines Los durchführen.
+	 * Eine (Beginn) Buchung eines Los durchf&uuml;hren.
 	 * 
 	 * @param entry ist die Datenstruktur zur Speicherung einer Los-Buchung</br>
-	 * <p>Die anzugebende Los-Id kann über die Resource <code>production</code> ermittelt werden @see {@link ProductionApi}
+	 * <p>Die anzugebende Los-Id kann &uuml;ber die Resource <code>production</code> ermittelt werden @see {@link ProductionApi}
 	 * {@link ProductionApi} </p>
 	 * 
 	 * @return
@@ -63,10 +63,10 @@ public interface IWorktimeApi {
 	Response bookProduction(ProductionRecordingEntry entry) ;
 
 	/** 
-	 * Eine (Beginn) Buchung eines Projekts durchführen.
+	 * Eine (Beginn) Buchung eines Projekts durchf&uuml;hren.
 	 * 
 	 * @param entry ist die Datenstruktur zur Speicherung einer Projekt-Buchung</br>
-	 * <p>Die anzugebende Project-Id kann über die Resource <code>project</code> ermittelt werden
+	 * <p>Die anzugebende Project-Id kann &uuml;ber die Resource <code>project</code> ermittelt werden
 	 * @see {@link ProjectApi} </p>
 	 * @return
 	 */
@@ -74,7 +74,7 @@ public interface IWorktimeApi {
 	
 	/**
 	 * Eine (Beginn) Buchung mit Auftragsbezug erzeugen.</br>
-	 * <p>Die anzugebende Order-Id kann über die Resource <code>order</code> ermittelt werden
+	 * <p>Die anzugebende Order-Id kann &uuml;ber die Resource <code>order</code> ermittelt werden
 	 * @see {@link OrderApi} </p>
 	 *
 	 * @param entry ist dabei die Auftragszeit Datenstruktur
@@ -83,14 +83,14 @@ public interface IWorktimeApi {
 	Response bookOrder(OrderRecordingEntry entry) ;
 
 	/**
-	 * Liefert eine Liste aller verfügbaren Tätigkeiten(Artikel) die innerhalb der Zeiterfassung 
-	 * durchgeführt werden können. </br>
+	 * Liefert eine Liste aller verf&uuml;gbaren T&auml;tigkeiten(Artikel) die innerhalb der Zeiterfassung 
+	 * durchgefï¿½hrt werden k&ouml;nnen. </br>
 	 * 
 	 * @param userId des am HELIUM V Servers angemeldeten Benutzers
-	 * @param limit (optional) die maximale Anzahl von gelieferten Einträgen. Default ist 50.
+	 * @param limit (optional) die maximale Anzahl von gelieferten Eintr&auml;gen. Default ist 50.
 	 * @param startIndex (optional) die Id (eines <code>ItemEntry</code> Eintrags, mit dem die Liste beginnen soll
-	 * @param filterCnr (optional) die Sondertätigkeiten auf diese Kennung einschränken
-	 * @return eine (leere) Liste der für den Benutzer verfügbaren Sondertätigkeiten
+	 * @param filterCnr (optional) die Sondert&auml;tigkeiten auf diese Kennung einschr&auml;nken
+	 * @return eine (leere) Liste der f&uuml;r den Benutzer verf&uuml;gbaren Sondert&auml;tigkeiten
 	 */
 	List<ItemEntry> getActivities(
 			String userId,
@@ -98,24 +98,24 @@ public interface IWorktimeApi {
 			Integer startIndex,String filterCnr);
 	
 	/**
-	 * Liefert eine Liste aller verfügbaren Belegarten die für die Zeiterfassung verwendet werden können.</br>
+	 * Liefert eine Liste aller verf&uuml;gbaren Belegarten die f&uuml;r die Zeiterfassung verwendet werden k&ouml;nnen.</br>
 	 * <p>Belegarten sind typischerweise Angebot, Auftrag, Los oder Projekt</p>
 	 * 
 	 * @param userId der am HELIUM V Server angemeldete Benutzer
-	 * @return eine (leere) Liste von verfuegbaren/bebuchbaren Belegarten
+	 * @return eine (leere) Liste von verf&uuml;gbaren/bebuchbaren Belegarten
 	 */
 	List<DocumentType> getDocumentTypes(String userId) ; 
 
 	/**
-	 * Liefert alle <code>ZeitdatenEntry</code> für den angegebenen Tag.</br>
+	 * Liefert alle <code>ZeitdatenEntry</code> f&uuml;r den angegebenen Tag.</br>
 	 * 
-	 * @param userId enthält den angemeldeten Benutzer
-	 * @param year ist das Jahr für das die Zeitdaten abgerufen werden sollen
+	 * @param userId enth&auml;lt den angemeldeten Benutzer
+	 * @param year ist das Jahr f&uuml;r das die Zeitdaten abgerufen werden sollen
 	 * @param month ist das Monat (1-12) 
 	 * @param day der Tag (1-31)
-	 * @param forStaffId ist jene Benutzer-Id für welche die Zeitdaten abgerufen werden sollen. Kann auch leer sein
-	 * @param limit Ist die maximale Anzahl an Datensätzen. Default 50.
-	 * @return eine (leere) Liste von <code>ZeitdatenEntry </code> für den gewünschten Tag
+	 * @param forStaffId ist jene Benutzer-Id f&uuml;r welche die Zeitdaten abgerufen werden sollen. Kann auch leer sein
+	 * @param limit Ist die maximale Anzahl an Datens&auml;tzen. Default 50.
+	 * @return eine (leere) Liste von <code>ZeitdatenEntry </code> f&uuml;r den gew&uuml;nschten Tag
 	 */
 	List<ZeitdatenEntry> getWorktimeEntries(
 			String userId,
@@ -126,15 +126,15 @@ public interface IWorktimeApi {
 			Integer limit) ;
 	
 	/**
-	 * Eine Zeitbuchung löschen
+	 * Eine Zeitbuchung l&ouml;schen
 	 * 
 	 * @param userId der angemeldete Benutzer
-	 * @param worktimeId die Id der zu löschenden Buchung.</br><p>Die Zeitbuchungen (und damit auch deren Id)
-	 * kann über die GET ermittelt werden.</p>
-	 * @param forStaffId ist die optionale PersonalId für die gelöscht werden soll. 
-	 * <p>Der angemeldete Benutzer kann für jene Personen für die er ausreichend Rechte hat Zeitbuchungen löschen.
+	 * @param worktimeId die Id der zu l&ouml;schenden Buchung.</br><p>Die Zeitbuchungen (und damit auch deren Id)
+	 * kann &uuml;ber die GET Methode ermittelt werden.</p>
+	 * @param forStaffId ist die optionale PersonalId f&uuml;r die gel&ouml;scht werden soll. 
+	 * <p>Der angemeldete Benutzer kann f&uuml;r jene Personen f&uuml;r die er ausreichend Rechte hat Zeitbuchungen l&ouml;schen.
 	 * </p>
-	 * <p>Wird sie nicht angegeben, so wird der Zeitbuchung mit der angemeldeten Person verknüpft.
+	 * <p>Wird sie nicht angegeben, so wird der Zeitbuchung mit der angemeldeten Person verkn&uuml;pft.
 	 */
 	void removeWorktime(
 			String userId,

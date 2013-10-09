@@ -50,17 +50,17 @@ import com.lp.server.util.fastlanereader.service.query.QueryResult;
 import com.lp.util.EJBExceptionLP;
 
 /**
- * Funktionalität rund um die Zeit(daten)erfassung</br>
+ * Funktionalit&auml;t rund um die Zeit(daten)erfassung</br>
  *
- * Generell gilt, dass nur am HELIUM V angemeldete REST-API Benutzer diese Funktionen durchführen können.
- * Weiters werden die Rechte des Benutzers berücksichtigt. Er kann - wenn er darf - im Namen einer 
- * anderen Person/Mitarbeiter die Buchungen durchführen.
+ * Generell gilt, dass nur am HELIUM V angemeldete REST-API Benutzer diese Funktionen durchf&uuml;hren k&ouml;nnen.
+ * Weiters werden die Rechte des Benutzers ber&uuml;cksichtigt. Er kann - wenn er darf - im Namen einer 
+ * anderen Person/Mitarbeiter die Buchungen durchf&uuml;hren.
  *
- * <p>Der Benutzer der API ist dafür verantwortlich, dass chronologisch richtige
+ * <p>Der Benutzer der API ist daf&uuml;r verantwortlich, dass chronologisch richtige
  * Zeitbuchungen entstehen, da der HELIUM V Server zum gegebenen Zeitpunkt (noch)
  * nicht in Zukunft schauen kann.</p>
  * 
- * <p>Weiterführende Dokumentation kann im 
+ * <p>Weiterf&uuml;hrende Dokumentation kann im 
  * <a href="http://www.heliumv.com/documentation?token=Zeiterfassung">HELIUM V Benutzerhandbuch</a> nachgelesen werden.
  * 
  * @author Gerold
