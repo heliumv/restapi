@@ -9,4 +9,5 @@ import com.lp.server.partner.service.KundeDto;
 
 public interface IKundeCall {
 	List<KundeDto> kundeFindByKbezMandantCnr(String kbez) throws RemoteException, NamingException ;
+	KundeDto kundeFindByPrimaryKeyOhneExc(Integer customerId) throws RemoteException, NamingException ;
 }

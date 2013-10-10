@@ -138,7 +138,7 @@ public class ZeiterfassungCall extends BaseCall<ZeiterfassungFac> implements IZe
 	
 	@HvModul(modul=LocaleFac.BELEGART_ZEITERFASSUNG)
 	public List<DocumentType> getBebuchbareBelegarten(TheClientDto theClientDto) throws NamingException {
-		Map<String, String> m = getFac().getBebuchbareBelegarten(theClientDto) ;
+		Map<String, String> m = (Map<String,String>) getFac().getBebuchbareBelegarten(theClientDto) ;
 		return convertFromBelegarten(m) ;
 	}
 

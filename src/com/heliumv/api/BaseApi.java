@@ -43,13 +43,15 @@ public class BaseApi {
 	public final static String[] FORMAT_JSON_XML = {FORMAT_JSON, FORMAT_XML} ;
 	
 
-	public class Param {
+	public static class Param {
 		public final static String USERID = "userid" ;
 		public final static String LIMIT = "limit" ;
 		public final static String STARTINDEX = "startIndex" ;	
 		
 		public final static String ITEMCNR = "itemCnr" ;
 		public final static String ITEMID  = "itemid" ;
+		
+		public final static String CUSTOMERID = "customerid" ;
 	}
 	
 	public class Filter {

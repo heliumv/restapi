@@ -22,17 +22,21 @@ import com.heliumv.factory.IArtikelCall;
 import com.heliumv.factory.IKundeCall;
 import com.heliumv.factory.IKundeReportCall;
 import com.heliumv.factory.IParameterCall;
+import com.heliumv.factory.IPersonalCall;
+import com.heliumv.factory.IVkPreisfindungCall;
 import com.heliumv.factory.query.CustomerQuery;
 import com.heliumv.tools.FilterHelper;
 import com.heliumv.tools.FilterKriteriumCollector;
 import com.heliumv.tools.StringHelper;
 import com.lp.server.artikel.service.ArtgruDto;
 import com.lp.server.artikel.service.ArtklaDto;
+import com.lp.server.artikel.service.VkpfartikelpreislisteDto;
 import com.lp.server.partner.service.CustomerPricelistReportDto;
 import com.lp.server.partner.service.KundeDto;
 import com.lp.server.partner.service.KundeFac;
 import com.lp.server.partner.service.KundenpreislisteParams;
 import com.lp.server.partner.service.PartnerFac;
+import com.lp.server.personal.service.PersonalDto;
 import com.lp.server.util.Facade;
 import com.lp.server.util.fastlanereader.service.query.FilterBlock;
 import com.lp.server.util.fastlanereader.service.query.FilterKriterium;
@@ -46,7 +50,6 @@ import com.lp.util.EJBExceptionLP;
 public class CustomerApi extends BaseApi implements ICustomerApi {
 	@Autowired
 	private CustomerQuery customerQuery ;
-	
 	@Autowired
 	private IKundeCall kundeCall ;
 	@Autowired
@@ -55,6 +58,12 @@ public class CustomerApi extends BaseApi implements ICustomerApi {
 	private IParameterCall parameterCall ;
 	@Autowired
 	private IArtikelCall artikelCall ;
+	@Autowired
+	private IVkPreisfindungCall vkpreisfindungCall ;
+	@Autowired
+	private IPersonalCall personalCall ;
+	@Autowired
+	private CustomerEntryMapper customerEntryMapper ;
 	
 	@Override
 	@GET
@@ -102,11 +111,41 @@ public class CustomerApi extends BaseApi implements ICustomerApi {
 		return customerEntries ;
 	}
 
+	
+	@Override
+	@GET
+	@Path("/{" + Param.CUSTOMERID + "}")
+	@Produces({FORMAT_JSON, FORMAT_XML})
+	public CustomerDetailEntry getCustomer(
+			@QueryParam(Param.USERID) String userId,
+			@PathParam(Param.CUSTOMERID)  Integer customerId) {
+		try {
+			if(connectClient(userId) == null) return null ;
+			
+			KundeDto kundeDto = kundeCall.kundeFindByPrimaryKeyOhneExc(customerId) ;
+			if(kundeDto == null ) {
+				respondNotFound(Param.CUSTOMERID, customerId.toString());
+				return null ;
+			}
+			
+			PersonalDto personalDto = getPersonal(kundeDto.getPersonaliIdProvisionsempfaenger()) ;
+			VkpfartikelpreislisteDto preislisteDto = getPreisliste(kundeDto.getVkpfArtikelpreislisteIIdStdpreisliste()) ;			
+			return customerEntryMapper.mapDetailEntry(kundeDto, personalDto, preislisteDto) ;
+		} catch(NamingException e) {
+			respondUnavailable(e) ;
+		} catch(RemoteException e) {
+			respondUnavailable(e);
+		}
+
+		return null;
+	}
+
+
 	@GET
 	@Path("/pricelist")
 	@Produces({FORMAT_JSON, FORMAT_XML})
 	public CustomerPricelistReportDto getPriceListCustomerShortName(
-			@QueryParam("userid") String userId,
+			@QueryParam(Param.USERID) String userId,
 			@QueryParam("customer_shortname") String customerShortSign,
 			@QueryParam("filter_itemgroupcnr") String filterItemgroupCnr,
 			@QueryParam("filter_itemgroupid") Integer filterItemgroupId,
@@ -149,11 +188,11 @@ public class CustomerApi extends BaseApi implements ICustomerApi {
 	}
 	@Override
 	@GET
-	@Path("/{customerid}/pricelist")
+	@Path("/{" + Param.CUSTOMERID + "}/pricelist")
 	@Produces({FORMAT_JSON, FORMAT_XML})
 	public CustomerPricelistReportDto getPriceList(
-			@QueryParam("userid") String userId,
-			@PathParam("customerid") Integer customerId,
+			@QueryParam(Param.USERID) String userId,
+			@PathParam(Param.CUSTOMERID) Integer customerId,
 			@QueryParam("filter_itemgroupcnr") String filterItemgroupCnr,
 			@QueryParam("filter_itemgroupid") Integer filterItemgroupId,
 			@QueryParam("filter_itemclasscnr") String filterItemclassCnr,
@@ -358,5 +397,15 @@ public class CustomerApi extends BaseApi implements ICustomerApi {
 	private FilterKriterium buildFilterWithHidden(Boolean withHidden) {
 		return FilterHelper.createWithHidden(withHidden,
 				KundeFac.FLR_PARTNER + "." + PartnerFac.FLR_PARTNER_VERSTECKT) ;
+	}
+
+	private VkpfartikelpreislisteDto getPreisliste(Integer preislisteId) throws NamingException, RemoteException {
+		if(preislisteId == null) return null ;			
+		return vkpreisfindungCall.vkpfartikelpreislisteFindByPrimaryKey(preislisteId) ;
+	}
+	
+	private PersonalDto getPersonal(Integer personalId) throws NamingException, RemoteException {
+		if(personalId == null) return null ;
+		return personalCall.byPrimaryKeySmall(personalId) ;
 	}
 }

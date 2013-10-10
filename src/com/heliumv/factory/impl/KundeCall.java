@@ -23,5 +23,9 @@ public class KundeCall extends BaseCall<KundeFac> implements IKundeCall  {
 	
 	public List<KundeDto> kundeFindByKbezMandantCnr(String kbez) throws RemoteException, NamingException {
 		return getFac().kundeFindByKbezMandantCnr(kbez, globalInfo.getTheClientDto()) ;
-	}	
+	}
+	
+	public KundeDto kundeFindByPrimaryKeyOhneExc(Integer customerId) throws RemoteException, NamingException {
+		return getFac().kundeFindByPrimaryKeyOhneExc(customerId, globalInfo.getTheClientDto()) ;
+	}
 }
