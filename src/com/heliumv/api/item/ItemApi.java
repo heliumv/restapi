@@ -155,7 +155,11 @@ public class ItemApi extends BaseApi implements IItemApi {
 		
 		try {
 			if(!StringHelper.isEmpty(serialnumber)) {
-				findItemEntryBySerialnumberCnr(serialnumber, cnr) ;
+				ItemEntry itemEntry = findItemEntryBySerialnumberCnr(serialnumber, cnr, attributes) ;
+				if(itemEntry == null) {
+					respondNotFound() ;				
+				}
+				return itemEntry ;
 			}
 
 			ItemEntry itemEntry = findItemEntryByCnrImpl(cnr, attributes) ;
@@ -310,7 +314,7 @@ public class ItemApi extends BaseApi implements IItemApi {
 		return properties ;	
 	}
 	
-	private ItemEntry findItemEntryBySerialnumberCnr(String serialnumber, String cnr) throws RemoteException, NamingException {
+	private ItemEntry findItemEntryBySerialnumberCnr(String serialnumber, String cnr, Set<IItemLoaderAttribute> attributes) throws RemoteException, NamingException {
 		Integer itemId = lagerCall.artikelIdFindBySeriennummerOhneExc(serialnumber) ;
 		if(itemId == null) return null ;
 		
@@ -321,8 +325,9 @@ public class ItemApi extends BaseApi implements IItemApi {
 			if(!artikelDto.getCNr().equals(cnr)) return null ;
 		}
 		
-		ItemEntryMapper mapper = new ItemEntryMapper() ;
-		return mapper.mapEntry(artikelDto) ;
+		return artikelLoaderCall.artikelFindByCNrOhneExc(artikelDto.getCNr(), attributes) ;
+//		ItemEntryMapper mapper = new ItemEntryMapper() ;
+//		return mapper.mapEntry(artikelDto) ;
 	}
 	
 	private ItemEntry findItemEntryByCnrImpl(String cnr, 

@@ -7,15 +7,14 @@ public interface IItemApi {
 	/**
 	 * Einen Artikel anhand seiner Artikelnummer ermitteln</br>
 	 * 
-	 * 
-	 * @param userId der bei HELIUM V angemeldete API Benutzer
+	 * @param userId des bei HELIUM V angemeldeten API Benutzer
 	 * @param cnr (optional) die gesuchte Artikelnummer
 	 * @param serialnumber (optional) die Seriennumber des Artikels</br>
-	 * <p>Eineindeutige Artikel können über ihre Seriennummer ermittelt werden. Dabei wird
+	 * <p>Eineindeutige Artikel k&ouml;nnen &uuml;ber ihre Seriennummer ermittelt werden. Dabei wird
 	 * zuerst im aktuellen Lagerstand gesucht, danach in den Abgangsbuchungen. Ist die <code>cnr</code>
-	 * ebenfalls angegeben, muss der Artikel der über die Seriennummer ermittelt wurde mit der 
-	 * angegebenen Artikelnummer übereinstimmen.</p>
-	 * @param addComments (optional) mit true die Artikelkommentar ebenfalls liefern
+	 * ebenfalls angegeben, muss der Artikel der &uuml;ber die Seriennummer ermittelt wurde mit der 
+	 * angegebenen Artikelnummer &uuml;bereinstimmen.</p>
+	 * @param addComments (optional) mit <code>true</code> die Artikelkommentar ebenfalls liefern
 	 * @return
 	 */
 	ItemEntry findItemByAttributes(String userId, String cnr, String serialnumber, Boolean addComments) ;
@@ -42,14 +41,14 @@ public interface IItemApi {
 			Boolean filterWithHidden) ;
 	
 	/**
-	 * Liefert eine Liste aller Lagerstaende dieses Artikels</br>
+	 * Liefert eine Liste aller Lagerst&auml;nde dieses Artikels</br>
 	 * <p>Es werden nur Lager geliefert, die einen Lagerstand > 0 haben. Es werden nur jene
-	 * Lagerstände geliefert, für die der Benutzer das Recht hat das jeweilige Lager zu benutzen.</p>
+	 * Lagerst&auml;nde geliefert, f&uuml;r die der Benutzer das Recht hat das jeweilige Lager zu benutzen.</p>
 	 * 
 	 * @param userId der angemeldete API Benutzer
 	 * @param itemCnr die gesuchte Artikelnummer
-	 * @param returnItemInfo mit <code>true</code> werden neben den Lagerständen auch die Daten des
-	 * betreffenden Artikels zurückgeliefert.
+	 * @param returnItemInfo mit <code>true</code> werden neben den Lagerst&auml;nden auch die Daten des
+	 * betreffenden Artikels zur&uuml;ckgeliefert.
 	 * @return
 	 */
 	List<StockAmountEntry> getStockAmount(String userId, String itemCnr, Boolean returnItemInfo) ;	
@@ -67,7 +66,7 @@ public interface IItemApi {
 	 * Eine Liste aller Artikeleigenschaften eines Artikels ermitteln</br>
 	 * 
 	 * @param userId userId der angemeldete HELIUM V Benutzer
-	 * @param itemCnr die gewünschte Artikelnummer
+	 * @param itemCnr die gew&uuml;nschte Artikelnummer
 	 * @return eine (leere) Liste von Artikeleigenschaften
 	 */
 	List<ItemPropertyEntry> getItemProperties(String userId, String itemCnr) ;
@@ -76,7 +75,7 @@ public interface IItemApi {
 	/**
 	 * Eine Liste aller Artikeleigenschaften eines Artikels ermitteln.
 	 * @param userId userId der angemeldete HELIUM V Benutzer
-	 * @param itemId die Id des gewünschten Artikels
+	 * @param itemId die Id des gew&uuml;nschten Artikels
 	 * @return eine (leere) Liste von Artikeleigenschaften
 	 */
 	List<ItemPropertyEntry> getItemPropertiesFromId(String userId, Integer itemId) ;	
