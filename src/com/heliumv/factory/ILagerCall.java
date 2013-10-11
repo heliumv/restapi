@@ -38,5 +38,8 @@ public interface ILagerCall {
 	BigDecimal getLagerstandsVeraenderungOhneInventurbuchungen(
 			Integer artikelIId, Integer lagerIId, java.sql.Timestamp tVon,
 			java.sql.Timestamp tBis) throws NamingException, RemoteException ; 
+	
+	BigDecimal getLagerstandAllerLagerEinesMandanten(Integer itemId, Boolean mitKonsignationsLager) throws NamingException, RemoteException ;
+	BigDecimal getPaternosterLagerstand(Integer itemId) throws NamingException, RemoteException ;
 
 }

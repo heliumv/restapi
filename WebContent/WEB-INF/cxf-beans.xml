@@ -80,6 +80,7 @@
 			<ref bean="hvProduction" />
 			<ref bean="hvStaff" />
 			<ref bean="hvSystem" />
+			<ref bean="hvItemV11" />
 		</jaxrs:serviceBeans>
 	</jaxrs:server>	
 	
@@ -102,6 +103,7 @@
 	<bean id="auftragCall" class="com.heliumv.factory.impl.AuftragCall" lazy-init="true"/>
 	<bean id="auftragpositionCall" class="com.heliumv.factory.impl.AuftragpositionCall" lazy-init="true"/>
 	<bean id="clientCall" class="com.heliumv.factory.impl.ClientCall" lazy-init="true"/>
+	<bean id="fehlmengeCall" class="com.heliumv.factory.impl.FehlmengeCall" lazy-init="true" />
 	<bean id="fertigungCall" class="com.heliumv.factory.impl.FertigungCallJudge" lazy-init="true"/>
 	<bean id="inventurCall" class="com.heliumv.factory.impl.InventurCall" lazy-init="true"/>
 	<bean id="judgeCall" class="com.heliumv.factory.impl.JudgeCall" lazy-init="true"/>
@@ -114,6 +116,7 @@
 	<bean id="parameterCall" class="com.heliumv.factory.impl.ParameterCall" lazy-init="true"/>
 	<bean id="personalCall" class="com.heliumv.factory.impl.PersonalCall" lazy-init="true"/>
 	<bean id="projektCall" class="com.heliumv.factory.impl.ProjektCall" lazy-init="true"/>
+	<bean id="reservierungCall" class="com.heliumv.factory.impl.ReservierungCall" lazy-init="true"/>
 	<bean id="server" class="com.heliumv.factory.impl.ServerCall" lazy-init="true"/>
 	<bean id="stuecklisteCall" class="com.heliumv.factory.impl.StuecklisteCall" lazy-init="true"/>
 	<bean id="systemCall" class="com.heliumv.factory.impl.SystemCall" lazy-init="true"/>
@@ -122,6 +125,7 @@
 	
 	<bean id="artikelLoaderCall" class="com.heliumv.factory.loader.ArtikelLoaderCall" lazy-init="true" />
 	<bean id="itemloaderComments" class="com.heliumv.factory.loader.ItemLoaderComments" lazy-init="true"/>
+	<bean id="itemloaderStockinfoSummary" class="com.heliumv.factory.loader.ItemLoaderStockinfoSummary" lazy-init="true"/>
 	
 	<bean id="itemEntryMapper" class="com.heliumv.api.item.ItemEntryMapper" lazy-init="true" />
 	<bean id="itemgroupEntryMapper" class="com.heliumv.api.item.ItemGroupEntryMapper" lazy-init="true" />
@@ -141,6 +145,7 @@
  	<bean id="hvCustomer" class="com.heliumv.api.customer.CustomerApi" lazy-init="true" />
  	<bean id="hvInventory" class="com.heliumv.api.inventory.InventoryApi" lazy-init="true" />
  	<bean id="hvItem" class="com.heliumv.api.item.ItemApi" lazy-init="true" />
+ 	<bean id="hvItemV11" class="com.heliumv.api.item.ItemApiV11" lazy-init="true" />
  	<bean id="hvUser" class="com.heliumv.api.benutzer.UserApi" lazy-init="true" />
 	<bean id="hvWorktime" class="com.heliumv.api.worktime.WorktimeApi" lazy-init="true"/>
 	<bean id="hvOrder" class="com.heliumv.api.order.OrderApi" lazy-init="true"/>

@@ -62,6 +62,16 @@ public class LagerCall extends BaseCall<LagerFac> implements ILagerCall {
 	}
 
 	@Override
+	public BigDecimal getLagerstandAllerLagerEinesMandanten(Integer itemId, Boolean mitKonsignationsLager) throws NamingException, RemoteException {
+		return getFac().getLagerstandAllerLagerEinesMandanten(itemId, mitKonsignationsLager, globalInfo.getTheClientDto()) ;
+	}
+	
+	@Override
+	public BigDecimal getPaternosterLagerstand(Integer itemId) throws NamingException, RemoteException {
+		return getFac().getPaternosterLagerstand(itemId) ;
+	}
+	
+	@Override
 	public boolean hatRolleBerechtigungAufLager(Integer lagerIId)
 			throws NamingException {
 		return getFac().hatRolleBerechtigungAufLager(lagerIId, globalInfo.getTheClientDto()) ;

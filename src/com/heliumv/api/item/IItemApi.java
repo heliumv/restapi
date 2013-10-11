@@ -9,31 +9,33 @@ public interface IItemApi {
 	 * 
 	 * @param userId des bei HELIUM V angemeldeten API Benutzer
 	 * @param cnr (optional) die gesuchte Artikelnummer
-	 * @param serialnumber (optional) die Seriennumber des Artikels</br>
+	 * @param serialnumber (optional) die Seriennummer des Artikels</br>
 	 * <p>Eineindeutige Artikel k&ouml;nnen &uuml;ber ihre Seriennummer ermittelt werden. Dabei wird
 	 * zuerst im aktuellen Lagerstand gesucht, danach in den Abgangsbuchungen. Ist die <code>cnr</code>
 	 * ebenfalls angegeben, muss der Artikel der &uuml;ber die Seriennummer ermittelt wurde mit der 
 	 * angegebenen Artikelnummer &uuml;bereinstimmen.</p>
-	 * @param addComments (optional) mit <code>true</code> die Artikelkommentar ebenfalls liefern
-	 * @return
+	 * @param addComments (optional) mit <code>true</code> die Artikelkommentar der Art text/html ebenfalls liefern
+	 * @param addStockAmountInfos (optional) mit <code>true</code> die allgemeinen Lagerstandsinformationen liefern
+	 * @return den Artikel sofern vorhanden. Gibt es den Artikel/Seriennummer nicht wird mit 
+	 * StatusCode <code>NOT_FOUND (404)</code> geantwortet
 	 */
-	ItemEntry findItemByAttributes(String userId, String cnr, String serialnumber, Boolean addComments) ;
+	ItemEntry findItemByAttributes(String userId, String cnr, String serialnumber, Boolean addComments, Boolean addStockAmountInfos) ;
 
 
 	/**
 	 * Eine Liste aller Artikel ermitteln.</br>
-	 * <p>Das Ergebnis kann dabei durch Filter eingeschränkt werden</p>
+	 * <p>Das Ergebnis kann dabei durch Filter eingeschr&auml;nkt werden</p>
 	 * 
-	 * @param userId der angemeldete HELIUM V Benutzer
-	 * @param limit die maximale Anzahl von zurückgelieferten Datensätzen
-	 * @param startIndex die Id desjenigen Satzes mit dem begonnen werden soll
-	 * @param filterCnr die (optionale) Artikelnummer nach der die Suche eingeschränkt werden soll
-	 * @param filterTextSearch der (optionale) Text der die Suche einschränkt 
-	 * @param filterDeliveryCnr die (optionale) Lieferantennr. bzw Bezeichnung
-	 * @param filterItemGroupClass die (optionale) Artikelgruppe bzw. Artikelklasse
-	 * @param filterItemReferenceNr die (optionale) Artikelreferenznummer
+	 * @param userId des angemeldeten HELIUM V Benutzer
+	 * @param limit die maximale Anzahl von zur&uuml;ckgelieferten Datens&auml;tzen
+	 * @param startIndex die Index-Nummer desjenigen Satzes mit dem begonnen werden soll
+	 * @param filterCnr die (optionale) Artikelnummer nach der die Suche eingeschr&auml;nkt werden soll
+	 * @param filterTextSearch der (optionale) Text der die Suche einschr&auml;nkt 
+	 * @param filterDeliveryCnr auf die (optionale) Lieferantennr. bzw Bezeichnung einschr&auml;nken
+	 * @param filterItemGroupClass auf die (optionale) Artikelgruppe bzw. Artikelklasse einschr&auml;nken
+	 * @param filterItemReferenceNr auf die (optionale) Artikelreferenznummer einschr&auml;nken
 	 * @param filterWithHidden mit <code>true</code> werden auch versteckte Artikel in die Suche einbezogen
-	 * @return
+	 * @return eine (leere) Liste von <code>ItemEntry</code>
 	 */
 	List<ItemEntry> getItems(String userId, Integer limit, Integer startIndex, 
 			String filterCnr, String filterTextSearch, String filterDeliveryCnr, String filterItemGroupClass,
@@ -49,7 +51,7 @@ public interface IItemApi {
 	 * @param itemCnr die gesuchte Artikelnummer
 	 * @param returnItemInfo mit <code>true</code> werden neben den Lagerst&auml;nden auch die Daten des
 	 * betreffenden Artikels zur&uuml;ckgeliefert.
-	 * @return
+	 * @return eine (leere) Liste von Lagerst&auml;nden
 	 */
 	List<StockAmountEntry> getStockAmount(String userId, String itemCnr, Boolean returnItemInfo) ;	
 	
@@ -60,7 +62,7 @@ public interface IItemApi {
 	 * @param userId der angemeldete HELIUM V Benutzer
 	 * @return eine (leere) Liste von Artikelgruppen
 	 */
-	List<ItemGroupEntry> getItemGroups(String userId) ;
+	ItemGroupEntryList getItemGroups(String userId) ;
 
 	/**
 	 * Eine Liste aller Artikeleigenschaften eines Artikels ermitteln</br>
@@ -69,7 +71,7 @@ public interface IItemApi {
 	 * @param itemCnr die gew&uuml;nschte Artikelnummer
 	 * @return eine (leere) Liste von Artikeleigenschaften
 	 */
-	List<ItemPropertyEntry> getItemProperties(String userId, String itemCnr) ;
+	ItemPropertyEntryList getItemProperties(String userId, String itemCnr) ;
 
 
 	/**
@@ -78,5 +80,5 @@ public interface IItemApi {
 	 * @param itemId die Id des gew&uuml;nschten Artikels
 	 * @return eine (leere) Liste von Artikeleigenschaften
 	 */
-	List<ItemPropertyEntry> getItemPropertiesFromId(String userId, Integer itemId) ;	
+	ItemPropertyEntryList getItemPropertiesFromId(String userId, Integer itemId) ;	
 }

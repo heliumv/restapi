@@ -27,6 +27,7 @@ import com.heliumv.factory.legacy.PaneldatenPair;
 import com.heliumv.factory.loader.IArtikelLoaderCall;
 import com.heliumv.factory.loader.IItemLoaderAttribute;
 import com.heliumv.factory.loader.ItemLoaderComments;
+import com.heliumv.factory.loader.ItemLoaderStockinfoSummary;
 import com.heliumv.factory.query.ItemQuery;
 import com.heliumv.tools.FilterHelper;
 import com.heliumv.tools.FilterKriteriumCollector;
@@ -45,9 +46,9 @@ import com.lp.server.util.fastlanereader.service.query.QueryResult;
 import com.lp.util.EJBExceptionLP;
 
 /**
- * Funktionalität rund um die Resource <b>Artikel</b></br>
- * <p>Grundvoraussetzung für eine erfolgreiche Benutzung dieser Resource ist,
- * dass der HELIUM V Mandant das Modul "Artikel" installiert hat. Für praktisch
+ * Funktionalit&auml;t rund um die Resource <b>Artikel</b></br>
+ * <p>Grundvoraussetzung f&uuml;r eine erfolgreiche Benutzung dieser Resource ist,
+ * dass der HELIUM V Mandant das Modul "Artikel" installiert hat. F&uuml;r praktisch
  * alle Zugriffe auf den Artikel muss der API Benutzer zumindest Leserechte auf
  * den Artikel haben.
  * </p>
@@ -64,6 +65,8 @@ public class ItemApi extends BaseApi implements IItemApi {
 	private IArtikelLoaderCall artikelLoaderCall ;
 	@Autowired
 	private ItemLoaderComments itemloaderComments ;
+	@Autowired
+	private ItemLoaderStockinfoSummary itemloaderStockinfoSummary ;
 	
 	@Autowired
 	private ILagerCall lagerCall ;
@@ -139,7 +142,8 @@ public class ItemApi extends BaseApi implements IItemApi {
 			@QueryParam(Param.USERID) String userId,
 			@QueryParam(Param.ITEMCNR) String cnr, 
 			@QueryParam("itemSerialnumber") String serialnumber,
-			@QueryParam("addComments") Boolean addComments) {
+			@QueryParam("addComments") Boolean addComments, 
+			@QueryParam("addStockAmountInfos") Boolean addStockAmountInfos) {
 
 		if(StringHelper.isEmpty(cnr) && StringHelper.isEmpty(serialnumber)) {
 			respondBadRequest("itemCnr", cnr) ;
@@ -151,6 +155,9 @@ public class ItemApi extends BaseApi implements IItemApi {
 		Set<IItemLoaderAttribute> attributes = new HashSet<IItemLoaderAttribute>() ;
 		if(addComments != null && addComments) {
 			attributes.add(itemloaderComments) ;
+		}
+		if(addStockAmountInfos != null && addStockAmountInfos) {
+			attributes.add(itemloaderStockinfoSummary) ;
 		}
 		
 		try {
@@ -187,6 +194,12 @@ public class ItemApi extends BaseApi implements IItemApi {
 			@QueryParam(Param.USERID) String userId, 
 			@QueryParam(Param.ITEMCNR) String itemCnr,
 			@QueryParam("returnItemInfo") Boolean returnItemInfo) {
+		return getStockAmountImpl(userId, itemCnr, returnItemInfo);
+	}
+
+
+	protected List<StockAmountEntry> getStockAmountImpl(String userId,
+			String itemCnr, Boolean returnItemInfo) {
 		List<StockAmountEntry> stockEntries = new ArrayList<StockAmountEntry>() ;
  		if(StringHelper.isEmpty(itemCnr)) {
 			respondBadRequest("itemCnr", "null/empty") ;
@@ -232,13 +245,13 @@ public class ItemApi extends BaseApi implements IItemApi {
 	@GET
 	@Path("/groups")
 	@Produces({FORMAT_JSON, FORMAT_XML})
-	public List<ItemGroupEntry> getItemGroups(
+	public ItemGroupEntryList getItemGroups(
 			@QueryParam(Param.USERID) String userId) {
-		List<ItemGroupEntry> itemgroups = new ArrayList<ItemGroupEntry>() ;
+		ItemGroupEntryList itemgroups = new ItemGroupEntryList() ;
 		if(connectClient(userId) == null) return itemgroups ;
 		try {
-			List<ArtgruDto> dtos = artikelCall.artikelgruppeFindByMandantCNr() ; 
-			itemgroups = itemgroupEntryMapper.mapEntry(dtos) ;
+			List<ArtgruDto> dtos = artikelCall.artikelgruppeFindByMandantCNr() ; 			
+			itemgroups.setEntries(itemgroupEntryMapper.mapEntry(dtos)) ;
 		} catch(NamingException e) {
 			respondUnavailable(e) ;
 		} catch(RemoteException e) {
@@ -255,10 +268,10 @@ public class ItemApi extends BaseApi implements IItemApi {
 	@GET
 	@Path("/properties")
 	@Produces({FORMAT_JSON, FORMAT_XML})
-	public List<ItemPropertyEntry> getItemProperties(
+	public ItemPropertyEntryList getItemProperties(
 			@QueryParam(Param.USERID) String userId,
 			@QueryParam(Param.ITEMCNR) String itemCnr) {
-		List<ItemPropertyEntry> properties = new ArrayList<ItemPropertyEntry>() ;
+		ItemPropertyEntryList properties = new ItemPropertyEntryList() ;
 
 		if(connectClient(userId) == null) return properties ;
 		try {
@@ -268,7 +281,8 @@ public class ItemApi extends BaseApi implements IItemApi {
 				return properties ;
 			}
 
-			return getItemPropertiesFromIdImpl(itemDto.getIId()) ;
+			properties.setEntries(getItemPropertiesFromIdImpl(itemDto.getIId()));
+			return properties ;
 		} catch(NamingException e) {
 			respondUnavailable(e) ;
 		} catch(RemoteException e) {
@@ -282,16 +296,17 @@ public class ItemApi extends BaseApi implements IItemApi {
 	
 	@Override
 	@GET
-	@Path("/{itemid}/properties")
+	@Path("/{" + Param.ITEMID + "}/properties")
 	@Produces({FORMAT_JSON, FORMAT_XML})
-	public List<ItemPropertyEntry> getItemPropertiesFromId(
+	public ItemPropertyEntryList getItemPropertiesFromId(
 			@QueryParam(Param.USERID) String userId,
 			@PathParam(Param.ITEMID) Integer itemId) {
-		List<ItemPropertyEntry> properties = new ArrayList<ItemPropertyEntry>() ;
+		ItemPropertyEntryList properties = new ItemPropertyEntryList() ;
 
 		if(connectClient(userId) == null) return properties ;
 		try {
-			return getItemPropertiesFromIdImpl(itemId) ;
+			properties.setEntries(getItemPropertiesFromIdImpl(itemId));
+			return properties ;
 		} catch(NamingException e) {
 			respondUnavailable(e) ;
 		} catch(RemoteException e) {

@@ -30,7 +30,11 @@ public class ItemEntry extends BaseEntryId {
 	private String typeCnr ;
 	private String itemgroupCnr ;
 	private String itemclassCnr ;
-
+	private String revision ;
+	private String referenceNumber ;
+	private String index ;
+	
+	private StockAmountInfoEntry stockAmountInfo ;
 
 	/**
 	 * Die Kennung des Artikels (Artikelnummer)
@@ -92,7 +96,7 @@ public class ItemEntry extends BaseEntryId {
 	}
 	
 	/**
-	 * Der Lagerstand
+	 * Der "verf&uuml;gbare" Lagerstand
 	 * @return
 	 */
 	public BigDecimal getStockAmount() {
@@ -211,5 +215,51 @@ public class ItemEntry extends BaseEntryId {
 	@HvFlrMapper(flrName="lp.artikelklasse")
 	public void setItemclassCnr(String itemclassCnr) {
 		this.itemclassCnr = itemclassCnr;
+	}
+	
+	/**
+	 * Die Revisions"nummer"
+	 * @return
+	 */
+	public String getRevision() {
+		return revision;
+	}
+	public void setRevision(String revision) {
+		this.revision = revision;
+	}
+
+	/**
+	 * Lagerstandsinformationen
+	 * 
+	 * @return
+	 */
+	public StockAmountInfoEntry getStockAmountInfo() {
+		return stockAmountInfo;
+	}
+	public void setStockAmountInfo(StockAmountInfoEntry stockAmountInfo) {
+		this.stockAmountInfo = stockAmountInfo;
+	}
+	
+	/**
+	 * Die Referenznummer
+	 * @return
+	 */
+	public String getReferenceNumber() {
+		return referenceNumber;
+	}
+	public void setReferenceNumber(String referenceNumber) {
+		this.referenceNumber = referenceNumber;
+	}
+	
+	/**
+	 * Die Indexnummer
+	 * @return
+	 */
+	public String getIndex() {
+		return index;
+	}
+	public void setIndex(String index) {
+		this.index = index;
 	}	
+
 }

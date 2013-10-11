@@ -31,6 +31,14 @@ public class ArtikelLoaderCall implements IArtikelLoaderCall {
 		ArtikelDto artikelDto = artikelCall.artikelFindByCNrOhneExc(cnr) ;
 		if(artikelDto == null) return null ;
 
+		if(artikelDto.getArtgruIId() != null) {
+			artikelDto.setArtgruDto(
+					artikelCall.artikelgruppeFindByPrimaryKeyOhneExc(artikelDto.getArtgruIId())) ;
+		}
+		if(artikelDto.getArtklaIId() != null) {
+			artikelDto.setArtklaDto(artikelCall.artikelklasseFindByPrimaryKeyOhneExc(artikelDto.getArtklaIId()));
+		}
+		
 		ItemEntry entry = itemEntryMapper.mapEntry(artikelDto) ;
 		
 		for (IItemLoaderAttribute loaderAttribute : attributes) {
