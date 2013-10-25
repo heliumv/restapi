@@ -6,6 +6,7 @@ import java.util.Locale;
 
 import javax.naming.NamingException;
 
+import com.heliumv.annotation.HvCallrate;
 import com.heliumv.factory.BaseCall;
 import com.heliumv.factory.ILogonCall;
 import com.lp.server.benutzer.service.LogonFac;
@@ -18,6 +19,7 @@ public class LogonCall extends BaseCall<LogonFac> implements ILogonCall {
 		super(LogonFacBean) ;
 	}
 	
+	@HvCallrate(maxCalls=5, durationMs=10000)
 	public TheClientDto logon(String benutzer, char[] kennwort,
 			Locale uILocale, String sMandantI) throws NamingException, RemoteException {
 

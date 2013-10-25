@@ -30,6 +30,8 @@
   <listener>
     <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
   </listener>
+<!-- Diese Settings werden aus der context.xml befuellt ($tomcat/conf/Catalina/localhost)
+-->
   <env-entry>
     <env-entry-name>java.naming.provider.url</env-entry-name>
     <env-entry-type>java.lang.String</env-entry-type>

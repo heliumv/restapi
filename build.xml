@@ -158,6 +158,12 @@
 			</fileset>
 		</copy>
 		
+<!--		<copy file="WebContent/tomcat/conf/Catalina/localhost/restapi.xml" todir="${dir.deploy}/tomcat" verbose="true"/> -->
+		
+		<copy todir="${dir.deploy}/tomcat" includeEmptyDirs="true" verbose="true" flatten="false" overwrite="true">
+			<fileset dir="TomcatContent/tomcat"/>
+		</copy>
+			
 		<!-- ein kleiner check, ob alle benoetigten files vorhanden sind. -->
 		<antcall target="webdoc" />		
 	</target>

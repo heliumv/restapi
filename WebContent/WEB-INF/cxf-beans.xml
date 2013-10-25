@@ -97,7 +97,11 @@
 	</bean>
  -->
  
+ 	<bean id="baseCallRegistrant" class="com.heliumv.factory.BaseCallRegistrant" />
+<!--    <bean id="callTracer" class="com.heliumv.calltrace.CallTracer" /> -->
+    <bean id="callTracer" class="com.heliumv.calltrace.CallTracerDelaying" />
 	<bean id="globalInfo" class="com.heliumv.factory.GlobalInfo" />
+	
 	<bean id="artikelCall" class="com.heliumv.factory.impl.ArtikelCall" lazy-init="true"/>
 	<bean id="artikelkommentarCall" class="com.heliumv.factory.impl.ArtikelkommentarCall" lazy-init="true"/>
 	<bean id="auftragCall" class="com.heliumv.factory.impl.AuftragCall" lazy-init="true"/>

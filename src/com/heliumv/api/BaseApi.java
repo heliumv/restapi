@@ -25,9 +25,6 @@ public class BaseApi {
 	
 	@Context
 	private HttpServletRequest request ;
-	
-//	@Autowired
-//	private IServerCall serverCall ;
 
 	@Autowired
 	private IClientCall clientCall ;
@@ -63,6 +60,14 @@ public class BaseApi {
 		return new ResponseBuilderImpl() ;
 	}
 	
+	protected String getUuidForValue(String value) {
+		return value ;
+	}
+	
+	protected String getValueForUuid(String uuid) {
+		return uuid ;
+	}
+	
 	public TheClientDto connectClient(String userId) {
 		globalInfo.setTheClientDto(null) ;
 		Globals.setTheClientDto(null) ;
@@ -72,7 +77,13 @@ public class BaseApi {
 			return null ;
 		}
 
-		TheClientDto theClientDto = clientCall.theClientFindByUserLoggedIn(userId) ;
+		if(getServletRequest().getContentLength() >1000) {
+			respondBadRequestValueMissing("userid") ;
+			return null ;			
+		}
+		
+		String hvId = getValueForUuid(userId) ;
+		TheClientDto theClientDto = clientCall.theClientFindByUserLoggedIn(hvId) ;
 		if (null == theClientDto || null == theClientDto.getIDPersonal()) {
 			respondUnauthorized() ; 
 		} else {

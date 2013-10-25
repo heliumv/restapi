@@ -1,5 +1,7 @@
 package com.heliumv.annotation;
 
+import java.lang.reflect.Method;
+
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -13,7 +15,7 @@ import com.lp.util.EJBExceptionLP;
 
 @Component
 @Aspect
-public class HvJudgeAspect {
+public class HvJudgeAspect extends BaseAspect {
 
 	@Autowired
 	private IJudgeCall judgeCall ;
@@ -36,11 +38,10 @@ public class HvJudgeAspect {
 //	
 //		System.out.println("In declaring clazz " + clazz.getName() + " inspecting annotations...") ;
 		
-		MethodSignature methodSig = (MethodSignature) pjp.getSignature() ;
-//		methodSig.getMethod().getAnnotations() ;
-//		System.out.println("In method signature: " + methodSig.getMethod().getAnnotations().length + "<") ;
 
-		HvJudge theModul = (HvJudge) methodSig.getMethod().getAnnotation(HvJudge.class);
+	    MethodSignature methodSig = getMethodSignatureFrom(pjp) ;
+	    Method method = getMethodFrom(pjp) ;
+		HvJudge theModul = (HvJudge) method.getAnnotation(HvJudge.class);
 		if(theModul == null) return ;
 		
 		System.out.println("Having the HvJudge Annotation with name '" + theModul.recht() + "<") ;

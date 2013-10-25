@@ -1,5 +1,7 @@
 package com.heliumv.annotation;
 
+import java.lang.reflect.Method;
+
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -13,7 +15,7 @@ import com.lp.util.EJBExceptionLP;
 
 @Component
 @Aspect
-public class HvModulAspect {
+public class HvModulAspect extends BaseAspect {
 
 	@Autowired
 	private IMandantCall mandantCall ;
@@ -35,13 +37,14 @@ public class HvModulAspect {
 //	
 //		System.out.println("In declaring clazz " + clazz.getName() + " inspecting annotations...") ;
 		
-		MethodSignature methodSig = (MethodSignature) pjp.getSignature() ;
+	    MethodSignature methodSig = getMethodSignatureFrom(pjp) ;
+	    Method method = getMethodFrom(pjp) ;
+		HvModul theModul = (HvModul) method.getAnnotation(HvModul.class);
+		if(theModul == null) return ;
+		
 //		methodSig.getMethod().getAnnotations() ;
 //		System.out.println("In method signature: " + methodSig.getMethod().getAnnotations().length + "<") ;
 
-		HvModul theModul = (HvModul) methodSig.getMethod().getAnnotation(HvModul.class);
-		if(theModul == null) return ;
-		
 		System.out.println("Having the HvModul Annotation with name '" + theModul.modul() +
 				"<" + methodSig.getMethod().getName() + ":" + theModul.modul() + ">") ;
 		if(!mandantCall.hasNamedModul(theModul.modul())) {

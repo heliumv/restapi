@@ -6,11 +6,19 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 
 public class BaseCall<T> implements IBaseCallBeans {
+//	private static Log log = LogFactory.getLog(BaseCall.class) ;
+//	private static Logger log = LoggerFactory.getLogger(BaseCall.class) ;
+	
 	private Context context = null ;
 	private T callFac = null ;
 	private String beanName = null ;
+
+	@Autowired
+	private BaseCallRegistrant baseCallRegistrant ;
 	
   	protected BaseCall(String beanName) {
   		if(null == beanName || beanName.trim().length() == 0) throw new IllegalArgumentException("beanName == null or empty") ;
@@ -21,6 +29,14 @@ public class BaseCall<T> implements IBaseCallBeans {
 
 	private String getServerBeanName(String beanName) {
 		return "lpserver/" + beanName + "/remote" ;
+	}
+	
+	public String getBeanName() {
+		return beanName ;
+	}
+	
+	public void clear() {
+		callFac = null ;
 	}
 	
 	/*
@@ -44,6 +60,9 @@ public class BaseCall<T> implements IBaseCallBeans {
 		String namingFactory = (String) env.lookup(Context.INITIAL_CONTEXT_FACTORY) ;
 		String urlProvider = (String) env.lookup(Context.PROVIDER_URL) ;
 		
+//		log.debug("namingFactory = {" + namingFactory +"}") ;
+//		log.debug("urlProvider = {" + urlProvider + "}") ;
+		
 		Hashtable<String, String> environment = new Hashtable<String, String>();
 
 		environment.put(Context.INITIAL_CONTEXT_FACTORY, namingFactory);
@@ -54,7 +73,9 @@ public class BaseCall<T> implements IBaseCallBeans {
 	protected T getFac() throws NamingException {
 		if(callFac == null) {
 			context = getInitialContext() ;
-			callFac = (T) context.lookup(getServerBeanName(beanName)) ;			
+			callFac = (T) context.lookup(getServerBeanName(beanName)) ;
+			
+			baseCallRegistrant.register(this);
 		}
 		
 		return callFac ;
