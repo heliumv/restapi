@@ -259,7 +259,10 @@ public class CustomerApi extends BaseApi implements ICustomerApi {
 		} catch(RemoteException e) {
 			respondUnavailable(e) ;
 		} catch(EJBExceptionLP e) {
-			respondBadRequest(e) ;
+			if(e.getCode() == EJBExceptionLP.FEHLER_KUNDE_IID_IN_MANDANT_NICHT_VORHANDEN)
+				respondNotFound() ;
+			else
+				respondBadRequest(e) ;
 		} catch(Throwable t) {
 			System.out.println("uups") ;
 		}
