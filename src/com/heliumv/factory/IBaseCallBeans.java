@@ -9,6 +9,8 @@ public interface IBaseCallBeans {
 	static final String ArtikelFacBean          = "ArtikelFacBean" ;
 	static final String ArtikelkommentarFacBean = "ArtikelkommentarFacBean" ;
 	static final String AuftragFacBean          = "AuftragFacBean" ;
+	static final String AuftragFacBeanCC        = "AuftragFacBeanCC" ;
+	static final String AuftragFacBeanRest      = "AuftragFacBeanRest" ;
 	static final String AuftragpositionFacBean  = "AuftragpositionFacBean" ;
 	static final String FastLaneReaderBean      = "FastLaneReaderBean" ;
 	static final String FehlmengeFacBean        = "FehlmengeFacBean" ;
@@ -16,6 +18,7 @@ public interface IBaseCallBeans {
 	static final String InventurFacBean         = "InventurFacBean" ;
 	static final String KundeFacBean            = "KundeFacBean" ;
 	static final String KundeReportFacBean      = "KundeReportFacBean" ;
+	static final String LieferscheinFacBean     = "LieferscheinFacBean" ;
 	static final String LagerFacBean            = "LagerFacBean" ;
 	static final String LogonFacBean            = "LogonFacBean" ;
 	static final String MandantFacBean          = "MandantFacBean" ;

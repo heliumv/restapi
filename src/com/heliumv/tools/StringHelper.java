@@ -11,6 +11,16 @@ public class StringHelper {
 	public static boolean isEmpty(String value) {
 		return value == null || value.trim().length() == 0 ;
 	}
+
+	/**
+	 * Hat der String einen Inhalt (nicht null und trim() liefert Laenge > 0)
+	 * 
+	 * @param value ist der zu pruefende String
+	 * @return true wenn value einen Inhalt hat
+	 */
+	public static boolean hasContent(String value) {
+		return value != null && value.trim().length() > 0 ;
+	}
 	
 	/**
 	 * Poor Mans SQL Delimiters entfernen

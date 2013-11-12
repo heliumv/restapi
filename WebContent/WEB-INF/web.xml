@@ -42,4 +42,34 @@
     <env-entry-type>java.lang.String</env-entry-type>
     <env-entry-value>org.jnp.interfaces.NamingContextFactory</env-entry-value>
   </env-entry>
+  
+  <env-entry>
+  	<env-entry-name>heliumv.credentials.user</env-entry-name>
+    <env-entry-type>java.lang.String</env-entry-type>
+    <env-entry-value>webshop1</env-entry-value>
+  </env-entry>
+
+  <env-entry>
+  	<env-entry-name>heliumv.credentials.password</env-entry-name>
+    <env-entry-type>java.lang.String</env-entry-type>
+    <env-entry-value>webshop1</env-entry-value>
+  </env-entry>
+
+  <env-entry>
+  	<env-entry-name>heliumv.credentials.webshop</env-entry-name>
+    <env-entry-type>java.lang.String</env-entry-type>
+    <env-entry-value>mte</env-entry-value>
+  </env-entry>
+
+  <env-entry>
+  	<env-entry-name>heliumv.cc.data.storebefore</env-entry-name>
+    <env-entry-type>java.lang.Boolean</env-entry-type>
+    <env-entry-value>true</env-entry-value>
+  </env-entry>
+   
+  <env-entry>
+   	<env-entry-name>clevercure.endpoint</env-entry-name>
+    <env-entry-type>java.lang.String</env-entry-type>
+    <env-entry-value>https://demo.clevercure.com:7083/endpointHTTPS/CC?companycode=12345&amp;user=superuser&amp;password=gusenbauer</env-entry-value>
+  </env-entry>
 </web-app>
