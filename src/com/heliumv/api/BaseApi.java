@@ -188,13 +188,17 @@ public class BaseApi {
 	public void respondUnavailable(ClientProtocolException e) {
 		getServletResponse().setHeader("x-hv-error-code", HvErrorCode.CLIENTPROTOCOL_EXCEPTION.toString()) ;
 		getServletResponse().setHeader("x-hv-error-description", e.getMessage()) ;		
-		getServletResponse().setStatus(Response.Status.BAD_GATEWAY.getStatusCode()) ;			
+// TODO: Enunciate kennt "BAD_GATEWAY" nicht??
+//		getServletResponse().setStatus(Response.Status.BAD_GATEWAY.getStatusCode()) ;			
+		getServletResponse().setStatus(502) ;
 	}
 
 	public void respondUnavailable(IOException e) {
 		getServletResponse().setHeader("x-hv-error-code", HvErrorCode.IO_EXCEPTION.toString()) ;
 		getServletResponse().setHeader("x-hv-error-description", e.getMessage()) ;		
-		getServletResponse().setStatus(Response.Status.BAD_GATEWAY.getStatusCode()) ;			
+// TODO: Enunciate kennt "BAD_GATEWAY" nicht??
+//		getServletResponse().setStatus(Response.Status.BAD_GATEWAY.getStatusCode()) ;			
+		getServletResponse().setStatus(502) ;			
 	}
 	
 	public void respondBadRequest(EJBExceptionLP e) {
