@@ -12,6 +12,11 @@ public class LoggedOnEntry {
 	private String client ;
 	private String localeString ;
 	
+	/**
+	 * Der vom HELIUM V System ermittelte "token". Sp&auml;ter auch als "userId"
+	 * referenziert.
+	 * @return
+	 */
 	public String getToken() {
 		return token;
 	}
@@ -20,6 +25,11 @@ public class LoggedOnEntry {
 		this.token = token;
 	}
 
+	/**
+	 * Der Mandant in dem sich der Benutzer angemeldet hat, bzw. vom System
+	 * angemeldet wurde.
+	 * @return
+	 */
 	public String getClient() {
 		return client;
 	}
@@ -28,6 +38,10 @@ public class LoggedOnEntry {
 		this.client = client;
 	}
 
+	/**
+	 * Die Locale ("deAT", "deDE", ...) die der Anmeldung zugewiesen worden ist
+	 * @return
+	 */
 	public String getLocaleString() {
 		return localeString;
 	}

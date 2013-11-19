@@ -84,7 +84,7 @@ public interface IWorktimeApi {
 
 	/**
 	 * Liefert eine Liste aller verf&uuml;gbaren T&auml;tigkeiten(Artikel) die innerhalb der Zeiterfassung 
-	 * durchgef�hrt werden k&ouml;nnen. </br>
+	 * durchgef&uuml;hrt werden k&ouml;nnen. </br>
 	 * 
 	 * @param userId des am HELIUM V Servers angemeldeten Benutzers
 	 * @param limit (optional) die maximale Anzahl von gelieferten Eintr&auml;gen. Default ist 50.
@@ -96,6 +96,17 @@ public interface IWorktimeApi {
 			String userId,
 			Integer limit,
 			Integer startIndex,String filterCnr);
+
+	/**
+	 * Liefert eine Liste aller verf&uuml;gbaren Sondert&auml;tigkeiten die f&uuml;r die Zeiterfassung
+	 * zur Verf&uuml;gung stehen.</br>
+	 * <p>Sondert&auml;tigkeiten sind T&auml;tigkeiten wie "KOMMT", "GEHT", "ARZT", "BEH&Ouml;RDE", ...</p>
+	 * <p>Es k&ouml;nnen nur jene Sondert&auml;tigkeiten gebucht werden, die laut HELIUM V Konfiguration
+	 * f&uuml;r den Anwender beziehungsweise dessen Benutzerrolle zur Verf&uuml;gung steht.</p>
+	 * @param userId
+	 * @return
+	 */
+	public List<SpecialActivity> getSpecialActivities(String userId) ;
 	
 	/**
 	 * Liefert eine Liste aller verf&uuml;gbaren Belegarten die f&uuml;r die Zeiterfassung verwendet werden k&ouml;nnen.</br>

@@ -62,9 +62,10 @@ public class UserApi extends BaseApi implements IUserApi {
 		
 		try {
 			String mandant = logonEntry.getClient() ;
-			if(StringHelper.isEmpty(mandant)) {
-				mandant = systemCall.getHauptmandant() ;
-			}
+// SP1794: Server-Core entscheidet welcher Mandant zu verwenden ist		
+//			if(StringHelper.isEmpty(mandant)) {
+//				mandant = systemCall.getHauptmandant() ;
+//			}
 
 			Locale theLocale = null ;
 			if(StringHelper.isEmpty(logonEntry.getLocaleString())) {
@@ -93,6 +94,8 @@ public class UserApi extends BaseApi implements IUserApi {
 			// respondBadRequest(e) ;
 			// ABSICHTLICH Unauthorized um einem Angreifer keine Hinweise zu geben
 			respondUnauthorized() ;
+		} catch(Exception e) {
+			respondUnauthorized() ;
 		}
 		
 		return null ;
@@ -111,9 +114,9 @@ public class UserApi extends BaseApi implements IUserApi {
 				logonCall.logout(theClientDto) ;
 			}
 		} catch(NamingException e) {
-			return Response.status(Status.SERVICE_UNAVAILABLE.getStatusCode()).build() ;
+			respondUnavailable(e) ;
 		} catch(RemoteException e) {
-			return Response.status(Status.SERVICE_UNAVAILABLE.getStatusCode()).build() ;
+			respondUnavailable(e) ;
 		}
 
 		return Response.ok().build();

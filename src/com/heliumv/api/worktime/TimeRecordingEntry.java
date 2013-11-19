@@ -20,7 +20,7 @@ public class TimeRecordingEntry {
 	private String where ;
 	
 	/**
-	 * Die (optionale) PersonalId für die die Buchung gilt
+	 * Die (optionale) PersonalId f&uuml;r die die Buchung gilt
 	 * @return
 	 */
 	public Integer getForStaffId() {
@@ -43,7 +43,7 @@ public class TimeRecordingEntry {
 	}
 	
 	/**
-	 * Das Jahr für das die Buchung gelten soll
+	 * Das Jahr f&uuml;r das die Buchung gelten soll
 	 * @return
 	 */
 	public int getYear() {
@@ -54,7 +54,7 @@ public class TimeRecordingEntry {
 	}
 	
 	/**
-	 * Der Monat im Bereich 1 - 12 für den die Buchung gelten soll
+	 * Der Monat im Bereich 1 - 12 f&uuml;r den die Buchung gelten soll
 	 * @return
 	 */
 	public int getMonth() {
@@ -65,7 +65,7 @@ public class TimeRecordingEntry {
 	}
 	
 	/**
-	 * Der Tag im Bereich 1 - 31 für den die Buchung gelten soll.
+	 * Der Tag im Bereich 1 - 31 f&uuml;r den die Buchung gelten soll.
 	 * @return
 	 */
 	public int getDay() {
@@ -76,7 +76,7 @@ public class TimeRecordingEntry {
 	}
 	
 	/**
-	 * Die Stunde im Bereich 0 - 23 für die die Buchung bestimmt ist.
+	 * Die Stunde im Bereich 0 - 23 f&uuml;r die die Buchung bestimmt ist.
 	 * @return
 	 */
 	public int getHour() {
@@ -87,7 +87,7 @@ public class TimeRecordingEntry {
 	}
 	
 	/**
-	 * Die Minute im Bereich 0 - 59 für die die Buchung bestimmt ist.
+	 * Die Minute im Bereich 0 - 59 f&uuml;r die die Buchung bestimmt ist.
 	 * @return
 	 */
 	public int getMinute() {
@@ -98,7 +98,7 @@ public class TimeRecordingEntry {
 	}
 	
 	/**
-	 * Die (optionale) Sekunde im Bereich 0 - 59 für die die Buchung bestimmt ist.
+	 * Die (optionale) Sekunde im Bereich 0 - 59 f&uuml;r die die Buchung bestimmt ist.
 	 * @return
 	 */
 	public int getSecond() {
@@ -109,7 +109,9 @@ public class TimeRecordingEntry {
 	}
 
 	/**
-	 * Die (optionale) Quelle der Buchung
+	 * Die (optionale) Quelle der Buchung</br>
+	 * <p>Dies kann ein beliebiger Text sein, der aus Anwendersicht die Zuordnung zur 
+	 * Buchung erm&ouml;glicht.</p>
 	 * @return
 	 */
 	public String getWhere() {
