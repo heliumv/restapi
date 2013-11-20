@@ -76,6 +76,8 @@ public interface IWorktimeApi {
 	 * Eine (Beginn) Buchung mit Auftragsbezug erzeugen.</br>
 	 * <p>Die anzugebende Order-Id kann &uuml;ber die Resource <code>order</code> ermittelt werden
 	 * @see {@link OrderApi} </p>
+	 * <p>Die anzugebende Position-Id kann &&uml;ber die Resource <code>order/{orderId}/position</code>
+	 * ermittelt werden.</p>
 	 *
 	 * @param entry ist dabei die Auftragszeit Datenstruktur
 	 * @return

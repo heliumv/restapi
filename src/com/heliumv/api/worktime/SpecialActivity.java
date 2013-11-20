@@ -20,6 +20,10 @@ public class SpecialActivity {
 		activity = theActivity ;
 	}
 	
+	/**
+	 * Die id
+	 * @return
+	 */
 	public Integer getId() {
 		return id;
 	}
@@ -28,6 +32,11 @@ public class SpecialActivity {
 		this.id = id;
 	}
 	
+	/**
+	 * Die Bezeichnung der Sondertaetigkeit</br>
+	 * <p>Beispielsweise "KOMMT", "GEHT", "ARZT", "KRANK"</p>
+	 * @return
+	 */
 	public String getActivity() {
 		return activity;
 	}

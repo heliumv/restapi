@@ -124,4 +124,73 @@ public class OrderApi extends BaseApi implements IOrderApi  {
 		}
 		return positions ;
 	}
+	
+	@GET
+	@Path("position")
+	@Produces({FORMAT_JSON, FORMAT_XML})
+	public List<OrderpositionsEntry> getOrderPositions(
+			@QueryParam(Param.USERID) String userId,
+			@QueryParam(Param.LIMIT) Integer limit,
+			@QueryParam(Param.STARTINDEX) Integer startIndex,
+			@QueryParam("filter_cnr") String filterCnr,
+			@QueryParam("filter_customer") String filterCustomer, 
+			@QueryParam("filter_project") String filterProject,
+			@QueryParam("filter_withHidden") Boolean filterWithHidden) {	
+		List<OrderpositionsEntry> entries = new ArrayList<OrderpositionsEntry>() ;
+
+		try {
+			if(null == connectClient(userId)) return entries ;
+			if(!mandantCall.hasModulAuftrag()) {
+				respondNotFound() ;
+				return entries ;
+			}
+			
+			FilterKriteriumCollector collector = new FilterKriteriumCollector() ;
+			collector.add(orderQuery.getFilterCnr(StringHelper.removeXssDelimiters(filterCnr))) ;
+			collector.add(orderQuery.getFilterProject(StringHelper.removeXssDelimiters(filterProject))) ;
+			collector.add(orderQuery.getFilterCustomer(StringHelper.removeXssDelimiters(filterCustomer))) ;
+			collector.add(orderQuery.getFilterWithHidden(filterWithHidden)) ;
+			FilterBlock filterCrits = new FilterBlock(collector.asArray(), "AND")  ;
+			
+			QueryParameters params = orderQuery.getDefaultQueryParameters(filterCrits) ;
+			params.setLimit(limit) ;
+			params.setKeyOfSelectedRow(startIndex) ;
+
+			QueryResult result = orderQuery.setQuery(params) ;
+			List<OrderEntry> orders = orderQuery.getResultList(result) ;
+			
+			for (OrderEntry orderEntry : orders) {
+				collector = new FilterKriteriumCollector() ;
+				collector.add(orderPositionQuery.getOrderIdFilter(orderEntry.getId())) ;
+				
+				filterCrits = new FilterBlock(collector.asArray(), "AND")  ;
+				
+				params = orderPositionQuery.getDefaultQueryParameters(filterCrits) ;
+				params.setLimit(Integer.MAX_VALUE) ;
+				params.setKeyOfSelectedRow(0) ;
+
+				QueryResult positionResult = orderPositionQuery.setQuery(params) ;
+				List<OrderpositionEntry> posEntries = orderPositionQuery.getResultList(positionResult) ;	
+				
+				addPositionEntries(entries, orderEntry.getId(), posEntries);
+			}
+		} catch(NamingException e) {
+			respondUnavailable(e) ;
+			e.printStackTrace() ;
+		} catch(RemoteException e) {
+			respondUnavailable(e) ;
+			e.printStackTrace() ;
+		}
+		
+		return entries ;
+	}
+	
+	private void addPositionEntries(List<OrderpositionsEntry> allEntries, Integer orderId, List<OrderpositionEntry> posEntries) {
+		for (OrderpositionEntry orderpositionEntry : posEntries) {
+			OrderpositionsEntry entry = new OrderpositionsEntry(orderId, orderpositionEntry) ;
+			entry.setOrderId(orderId);
+			
+			allEntries.add(entry) ;
+		}
+	}
 }

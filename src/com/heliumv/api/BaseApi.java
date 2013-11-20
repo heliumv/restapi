@@ -150,6 +150,11 @@ public class BaseApi {
 	}
 
 	public void respondBadRequest(EJBExceptionLP e) {
+		if(e.getCode() == EJBExceptionLP.FEHLER_FALSCHER_MANDANT) {
+			respondNotFound() ;
+			return ;
+		}
+		
 		getServletResponse().setHeader("x-hv-error-code", "5") ;
 		getServletResponse().setHeader("x-hv-error-code-extended", new Integer(e.getCode()).toString()) ;
 		getServletResponse().setHeader("x-hv-error-description", e.getCause().getMessage()) ;		
