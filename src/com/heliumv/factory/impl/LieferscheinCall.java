@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.heliumv.factory.BaseCall;
 import com.heliumv.factory.IGlobalInfo;
 import com.heliumv.factory.ILieferscheinCall;
+import com.lp.server.lieferschein.service.ILieferscheinAviso;
 import com.lp.server.lieferschein.service.LieferscheinDto;
 import com.lp.server.lieferschein.service.LieferscheinFac;
 import com.lp.server.system.service.TheClientDto;
@@ -53,14 +54,15 @@ public class LieferscheinCall extends BaseCall<LieferscheinFac> implements ILief
 	}
 	
 	@Override
-	public String createLieferscheinAviso(LieferscheinDto lieferscheinDto,
+	public ILieferscheinAviso createLieferscheinAviso(LieferscheinDto lieferscheinDto,
 			TheClientDto theClientDto) throws NamingException, RemoteException {
 		return getFac().createLieferscheinAviso(lieferscheinDto, theClientDto) ;
 	}
 
 	@Override
-	public void sendLieferscheinAviso(LieferscheinDto lieferscheinDto,
+	public String getLieferscheinAvisoAsString(LieferscheinDto lieferscheinDto, ILieferscheinAviso lieferscheinAviso,
 			TheClientDto theClientDto) throws NamingException, RemoteException {
+		return getFac().LieferscheinAvisoToString(lieferscheinDto, lieferscheinAviso, theClientDto) ;
 //		return getFac().sendLieferscheinAviso(lieferscheinDto, theClientDto) ;
 	}
 }

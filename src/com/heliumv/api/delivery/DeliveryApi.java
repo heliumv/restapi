@@ -80,6 +80,7 @@ public class DeliveryApi extends BaseApi implements IDeliveryApi {
 	}
 
 	private String createDispatchNotificationImpl(LieferscheinDto deliveryDto) throws NamingException, RemoteException {
-		return lieferscheinCall.createLieferscheinAviso(deliveryDto, globalInfo.getTheClientDto()) ;
+		return null ;
+//		return lieferscheinCall.createLieferscheinAviso(deliveryDto, globalInfo.getTheClientDto()) ;
 	}
 }

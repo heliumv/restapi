@@ -1,11 +1,8 @@
 package com.heliumv.api.cc;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.rmi.RemoteException;
 
 import javax.naming.Context;
@@ -20,7 +17,6 @@ import javax.ws.rs.QueryParam;
 
 import org.apache.commons.codec.Charsets;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
@@ -252,7 +248,14 @@ public class ClevercureApi extends BaseApi implements IClevercureApi {
 	}
 
 	private String createDispatchNotificationImpl(LieferscheinDto deliveryDto) throws NamingException, RemoteException {
-		return lieferscheinCall.createLieferscheinAviso(deliveryDto, globalInfo.getTheClientDto()) ;
+// TODO: Wieder aktivieren!
+//		ILieferscheinAviso aviso = lieferscheinCall.createLieferscheinAviso(deliveryDto, globalInfo.getTheClientDto()) ;
+		String avisoContent = null ;
+//		if(aviso != null) {
+//			avisoContent = lieferscheinCall.getLieferscheinAvisoAsString(deliveryDto, aviso, globalInfo.getTheClientDto()) ;
+//		}
+		
+		return avisoContent ;
 	}
 	
 	@Override
@@ -277,7 +280,7 @@ public class ClevercureApi extends BaseApi implements IClevercureApi {
 
 			if(avisoContent == null) {
 				respondBadRequestValueMissing(BaseApi.Param.DELIVERYID) ;
-			} else {
+			} else {				
 				persistDndData(avisoContent, null);
 				StatusLine sl = postToCleverCure("dnd", avisoContent) ;
 				persistDndData(avisoContent, "" + sl.getStatusCode()) ;
@@ -311,14 +314,14 @@ public class ClevercureApi extends BaseApi implements IClevercureApi {
 		HttpClient client = new DefaultHttpClient() ;
 		HttpResponse response = client.execute(post) ;
 		StatusLine status = response.getStatusLine() ;
-		HttpEntity anEntity = response.getEntity() ;
-		InputStream s = anEntity.getContent() ;
-		BufferedReader br = new BufferedReader(new InputStreamReader(s)) ;
-		String theContent = "" ;
-		String line = ""; 
-		while((line = br.readLine()) != null) {
-			theContent += line + "\n" ;
-		}		
+//		HttpEntity anEntity = response.getEntity() ;
+//		InputStream s = anEntity.getContent() ;
+//		BufferedReader br = new BufferedReader(new InputStreamReader(s)) ;
+//		String theContent = "" ;
+//		String line = ""; 
+//		while((line = br.readLine()) != null) {
+//			theContent += line + "\n" ;
+//		}		
 		return status ;
 	}
 }
