@@ -29,8 +29,42 @@ public interface ILieferscheinCall {
 	 */
 	ILieferscheinAviso createLieferscheinAviso(
 			LieferscheinDto lieferscheinDto, TheClientDto theClientDto) throws NamingException, RemoteException ;
-	
+
+	/**
+	 * Ein Aviso zu einem String-Content transformieren
+	 *
+	 * @param lieferscheinDto
+	 * @param lieferscheinAviso
+	 * @param theClientDto
+	 * @return
+	 * @throws NamingException
+	 * @throws RemoteException
+	 */
 	String getLieferscheinAvisoAsString(
 			LieferscheinDto lieferscheinDto, ILieferscheinAviso lieferscheinAviso,
 			TheClientDto theClientDto) throws NamingException, RemoteException ;
+
+	/**
+	 * Ein Lieferscheinaviso erzeugen und als transformierten String zurueckliefern
+	 * 
+	 * @param lieferscheinDto
+	 * @param theClientDto
+	 * @return
+	 * @throws RemoteException
+	 * @throws NamingException
+	 */
+	String createLieferscheinAvisoToString(
+			LieferscheinDto lieferscheinDto, TheClientDto theClientDto) throws RemoteException, NamingException ;
+	
+	/**
+	 * Ein LieferscheinAviso erzeugen und versenden 
+	 * 
+	 * @param lieferscheinDto
+	 * @param theClientDto
+	 * @return den Aviso-Inhalt als String
+	 * @throws RemoteException
+	 * @throws NamingException
+	 */
+	String createLieferscheinAvisoPost(
+			LieferscheinDto lieferscheinDto, TheClientDto theClientDto) throws RemoteException, NamingException ;	
 }

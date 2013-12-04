@@ -3,6 +3,7 @@ package com.heliumv.api.cc;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.rmi.RemoteException;
 
 import javax.naming.Context;
@@ -74,7 +75,23 @@ public class ClevercureApi extends BaseApi implements IClevercureApi {
 
 		try {
 			if ("osd".equals(datatype)) {
-				receiveCCDataOsd(companyCode, token, ccdata);
+//				try {
+//					String oldString = "\u00DF";
+//					String newString = new String(oldString.getBytes("UTF-8"), "UTF-8");
+//					System.out.println(newString.equals(oldString));
+//				} catch(UnsupportedEncodingException e) {
+//					System.out.println("use " +  e.getMessage()) ;
+//				}
+//
+				String encoded = null ;
+				try {
+					encoded = new String(ccdata.getBytes("UTF-8"), "UTF-8") ;
+				} catch(UnsupportedEncodingException e) {					
+					System.out.println("uee " +  e.getMessage()) ;
+				}
+				
+//				receiveCCDataOsd(companyCode, token, ccdata);
+				receiveCCDataOsd(companyCode, token, encoded);
 				return;
 			}
 			
@@ -148,28 +165,31 @@ public class ClevercureApi extends BaseApi implements IClevercureApi {
 			}
 			if(result.getRc() == CreateOrderResult.ERROR_AUTHENTIFICATION) {
 				respondForbidden();
-				persistOsdData(ccdata, "error_auth");
+				persistOsdData(ccdata, "error_auth_.xml");
 				return ;
 			}
 			if(result.getRc() == CreateOrderResult.ERROR_CUSTOMER_NOT_FOUND) {
 				respondNotFound() ;
-				persistOsdData(ccdata, "error_customer");
+				persistOsdData(ccdata, "error_customer_.xml");
 				return ;
 			}
 
 			if(result.getRc() >= CreateOrderResult.ERROR_EJB_EXCEPTION) {
 				respondBadRequest(result.getRc()) ;
-				persistOsdData(ccdata, "error_ejb");
+				persistOsdData(ccdata, "error_ejb_.xml");
 				return ;
 			}
 			
-			if(result.getRc() != BaseRequestResult.OKAY) {
+			if(result.getRc() == BaseRequestResult.OKAY){
+				respondOkay() ;
+				persistOsdData(ccdata, "200_.xml");
+			} else {
 				respondExpectationFailed(result.getRc()) ;
 			}
 		} catch(EJBExceptionLP e) {
 			respondBadRequest(e) ;
 
-			persistOsdData(ccdata, "error");
+			persistOsdData(ccdata, "error_.xml");
 		}
 	}
 
@@ -204,15 +224,16 @@ public class ClevercureApi extends BaseApi implements IClevercureApi {
 	public String createDispatchNotification(
 			@QueryParam(BaseApi.Param.USERID) String userId, 
 			@QueryParam(BaseApi.Param.DELIVERYID) Integer deliveryId, 
-			@QueryParam(BaseApi.Param.DELIVERYCNR) String deliveryCnr) {
+			@QueryParam(BaseApi.Param.DELIVERYCNR) String deliveryCnr,
+			@QueryParam("post") @DefaultValue(value="false") Boolean doPost) {
 		try {
 			if(connectClient(userId) == null) return null ;
 			if(deliveryId != null) {
-				return createDispatchNotificationId(deliveryId) ;
+				return createDispatchNotificationId(deliveryId, doPost) ;
 			}
 			
 			if(!StringHelper.isEmpty(deliveryCnr)) {
-				return createDispatchNotificationCnr(deliveryCnr) ;
+				return createDispatchNotificationCnr(deliveryCnr, doPost) ;
 			}
 
 			respondBadRequestValueMissing(BaseApi.Param.DELIVERYID) ;
@@ -227,101 +248,62 @@ public class ClevercureApi extends BaseApi implements IClevercureApi {
 		return null;
 	}
 
-	private String createDispatchNotificationId(Integer deliveryId) throws NamingException, RemoteException {
+	private String createDispatchNotificationId(Integer deliveryId, Boolean doPost) throws NamingException, RemoteException {
 		LieferscheinDto lsDto = lieferscheinCall.lieferscheinFindByPrimaryKey(deliveryId) ; 
 		if(lsDto == null) {
 			respondNotFound(BaseApi.Param.DELIVERYID, deliveryId.toString());
 			return null ;				
 		}
 		
-		return createDispatchNotificationImpl(lsDto) ;
+		return createDispatchNotificationImpl(lsDto, doPost) ;
 	}
 
-	private String createDispatchNotificationCnr(String deliveryCnr) throws NamingException, RemoteException {
+	private String createDispatchNotificationCnr(String deliveryCnr, Boolean doPost) throws NamingException, RemoteException {
 		LieferscheinDto lsDto = lieferscheinCall.lieferscheinFindByCNr(deliveryCnr) ;
 		if(lsDto == null) {
 			respondNotFound(BaseApi.Param.DELIVERYCNR, deliveryCnr);
 			return null ;
 		}
 		
-		return createDispatchNotificationImpl(lsDto) ;
+		return createDispatchNotificationImpl(lsDto, doPost) ;
 	}
 
-	private String createDispatchNotificationImpl(LieferscheinDto deliveryDto) throws NamingException, RemoteException {
-// TODO: Wieder aktivieren!
-//		ILieferscheinAviso aviso = lieferscheinCall.createLieferscheinAviso(deliveryDto, globalInfo.getTheClientDto()) ;
+	private String createDispatchNotificationImpl(LieferscheinDto deliveryDto, Boolean doPost) throws NamingException, RemoteException {
 		String avisoContent = null ;
-//		if(aviso != null) {
-//			avisoContent = lieferscheinCall.getLieferscheinAvisoAsString(deliveryDto, aviso, globalInfo.getTheClientDto()) ;
-//		}
+		if(!doPost) {
+			avisoContent = lieferscheinCall.createLieferscheinAvisoToString(deliveryDto, globalInfo.getTheClientDto()) ;
+		} else {
+			avisoContent = lieferscheinCall.createLieferscheinAvisoPost(deliveryDto, globalInfo.getTheClientDto());
+			if(avisoContent != null) {
+				persistDndData(avisoContent, null) ;
+			}
+		}
 		
 		return avisoContent ;
 	}
 	
-	@Override
-	@POST
-	@Path("/aviso/transfer")
-	@Produces({FORMAT_XML})
-	public String createAndTransmitDispatchNotification(
-			@QueryParam(BaseApi.Param.USERID) String userId,
-			@QueryParam(BaseApi.Param.DELIVERYID) Integer deliveryId,
-			@QueryParam(BaseApi.Param.DELIVERYCNR) String deliveryCnr) {
-		try {
-			if(connectClient(userId) == null) return null ;
 
-			String avisoContent = null ;
-			if(deliveryId != null) {
-				avisoContent = createDispatchNotificationId(deliveryId) ;
-			}
-			
-			if((avisoContent == null) && StringHelper.hasContent(deliveryCnr)) {
-				avisoContent = createDispatchNotificationCnr(deliveryCnr) ;
-			}
-
-			if(avisoContent == null) {
-				respondBadRequestValueMissing(BaseApi.Param.DELIVERYID) ;
-			} else {				
-				persistDndData(avisoContent, null);
-				StatusLine sl = postToCleverCure("dnd", avisoContent) ;
-				persistDndData(avisoContent, "" + sl.getStatusCode()) ;
-			}
-			return avisoContent ;
-		} catch(NamingException e) {
-			respondUnavailable(e) ;
-		} catch(RemoteException e) {
-			respondUnavailable(e);
-		} catch(EJBExceptionLP e) {
-			respondBadRequest(e) ;
-		} catch(ClientProtocolException e) {
-			respondUnavailable(e);
-		} catch(IOException e) {
-			respondUnavailable(e); 
-		}
-
-		return null;
-	}	
-	
-	private StatusLine postToCleverCure(String datatype, String content) throws NamingException, ClientProtocolException, IOException {
-		Context env = (Context) new InitialContext().lookup("java:comp/env") ;
-		String ccEndpoint = (String) env.lookup("clevercure.endpoint") ;
-		String uri = ccEndpoint + "&datatype=" + datatype ;
-		
-		HttpPost post = new HttpPost(uri) ;
-		StringEntity entity = new StringEntity(content, Charsets.UTF_8) ;
-		entity.setContentType("text/xml") ;
-		post.setEntity(entity) ;
-
-		HttpClient client = new DefaultHttpClient() ;
-		HttpResponse response = client.execute(post) ;
-		StatusLine status = response.getStatusLine() ;
-//		HttpEntity anEntity = response.getEntity() ;
-//		InputStream s = anEntity.getContent() ;
-//		BufferedReader br = new BufferedReader(new InputStreamReader(s)) ;
-//		String theContent = "" ;
-//		String line = ""; 
-//		while((line = br.readLine()) != null) {
-//			theContent += line + "\n" ;
-//		}		
-		return status ;
-	}
+//	private StatusLine postToCleverCure(String datatype, String content) throws NamingException, ClientProtocolException, IOException {
+//		Context env = (Context) new InitialContext().lookup("java:comp/env") ;
+//		String ccEndpoint = (String) env.lookup("clevercure.endpoint") ;
+//		String uri = ccEndpoint + "&datatype=" + datatype ;
+//		
+//		HttpPost post = new HttpPost(uri) ;
+//		StringEntity entity = new StringEntity(content, Charsets.UTF_8) ;
+//		entity.setContentType("text/xml") ;
+//		post.setEntity(entity) ;
+//
+//		HttpClient client = new DefaultHttpClient() ;
+//		HttpResponse response = client.execute(post) ;
+//		StatusLine status = response.getStatusLine() ;
+////		HttpEntity anEntity = response.getEntity() ;
+////		InputStream s = anEntity.getContent() ;
+////		BufferedReader br = new BufferedReader(new InputStreamReader(s)) ;
+////		String theContent = "" ;
+////		String line = ""; 
+////		while((line = br.readLine()) != null) {
+////			theContent += line + "\n" ;
+////		}		
+//		return status ;
+//	}
 }

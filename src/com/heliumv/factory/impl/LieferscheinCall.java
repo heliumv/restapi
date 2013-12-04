@@ -62,7 +62,20 @@ public class LieferscheinCall extends BaseCall<LieferscheinFac> implements ILief
 	@Override
 	public String getLieferscheinAvisoAsString(LieferscheinDto lieferscheinDto, ILieferscheinAviso lieferscheinAviso,
 			TheClientDto theClientDto) throws NamingException, RemoteException {
-		return getFac().LieferscheinAvisoToString(lieferscheinDto, lieferscheinAviso, theClientDto) ;
+		return getFac().lieferscheinAvisoToString(lieferscheinDto, lieferscheinAviso, theClientDto) ;
 //		return getFac().sendLieferscheinAviso(lieferscheinDto, theClientDto) ;
+	}
+	
+	@Override
+	public String createLieferscheinAvisoPost(LieferscheinDto lieferscheinDto,
+			TheClientDto theClientDto) throws RemoteException, NamingException {
+		return getFac().createLieferscheinAvisoPost(lieferscheinDto, theClientDto);		
+	}	
+	
+	@Override
+	public String createLieferscheinAvisoToString(
+			LieferscheinDto lieferscheinDto, TheClientDto theClientDto)
+			throws RemoteException, NamingException {
+		return getFac().createLieferscheinAvisoToString(lieferscheinDto, theClientDto) ;
 	}
 }

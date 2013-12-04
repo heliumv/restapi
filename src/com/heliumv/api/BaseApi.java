@@ -261,6 +261,10 @@ public class BaseApi {
 		getServletResponse().setStatus(Response.Status.NOT_FOUND.getStatusCode()) ;		
 	}
 	
+	public void respondOkay() {
+		getServletResponse().setStatus(Response.Status.OK.getStatusCode()) ;				
+	}
+	
 	public void respondUnprocessableEntity(String key, String value) {
 		getServletResponse().setHeader("x-hv-error-code", HvErrorCode.UNPROCESSABLE_ENTITY.toString()) ;
 		getServletResponse().setHeader("x-hv-error-key", key) ;

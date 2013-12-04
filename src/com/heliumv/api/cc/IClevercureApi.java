@@ -34,9 +34,10 @@ public interface IClevercureApi {
 	 * @param userId
 	 * @param deliveryId
 	 * @param deliveryCnr
+	 * @param doPost mit true wird das Aviso auch gleich an Clevercure gesendet.
 	 * @return
 	 */
-	String createDispatchNotification(String userId, Integer deliveryId, String deliveryCnr) ;
+	String createDispatchNotification(String userId, Integer deliveryId, String deliveryCnr, Boolean doPost) ;
 
-	String createAndTransmitDispatchNotification(String userId, Integer deliveryId, String deliveryCnr) ;	
+//	String createAndTransmitDispatchNotification(String userId, Integer deliveryId, String deliveryCnr) ;	
 }
