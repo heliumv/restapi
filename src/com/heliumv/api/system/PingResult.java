@@ -85,4 +85,12 @@ public class PingResult {
 		this.serverDuration = serverDuration;
 	}
 	
+	public String toString() {
+		return 
+				"apiTime:" + getApiTime() + ", " +
+				"serverTime:" + getServerTime() + ", " +
+				"serverBuildNumber:" + getServerBuildNumber() + ", " +
+				"serverVersionNumber:" + getServerVersionNumber() + ", " + 
+				"serverDuration:" + getServerDuration() + "." ;		
+	}
 }

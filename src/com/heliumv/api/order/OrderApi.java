@@ -2,6 +2,8 @@ package com.heliumv.api.order;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.naming.NamingException;
@@ -44,9 +46,9 @@ public class OrderApi extends BaseApi implements IOrderApi  {
 	@GET
 	@Produces({FORMAT_JSON, FORMAT_XML})
 	public List<OrderEntry> getOrders(
-			@QueryParam("userid") String userId,
-			@QueryParam("limit") Integer limit,
-			@QueryParam("startIndex") Integer startIndex,
+			@QueryParam(Param.USERID) String userId,
+			@QueryParam(Param.LIMIT) Integer limit,
+			@QueryParam(Param.STARTINDEX) Integer startIndex,
 			@QueryParam("filter_cnr") String filterCnr,
 			@QueryParam("filter_customer") String filterCustomer, 
 			@QueryParam("filter_project") String filterProject,
@@ -187,10 +189,75 @@ public class OrderApi extends BaseApi implements IOrderApi  {
 	
 	private void addPositionEntries(List<OrderpositionsEntry> allEntries, Integer orderId, List<OrderpositionEntry> posEntries) {
 		for (OrderpositionEntry orderpositionEntry : posEntries) {
-			OrderpositionsEntry entry = new OrderpositionsEntry(orderId, orderpositionEntry) ;
-			entry.setOrderId(orderId);
-			
+			OrderpositionsEntry entry = new OrderpositionsEntry(orderId, orderpositionEntry) ;			
 			allEntries.add(entry) ;
 		}
+	}
+	
+	@GET
+	@Path("offline")
+	@Produces({FORMAT_JSON, FORMAT_XML})
+	public OfflineOrderEntry getOfflineOrders(
+			@QueryParam(Param.USERID) String userId,
+			@QueryParam(Param.LIMIT) Integer limit,
+			@QueryParam(Param.STARTINDEX) Integer startIndex,
+			@QueryParam("filter_cnr") String filterCnr,
+			@QueryParam("filter_customer") String filterCustomer, 
+			@QueryParam("filter_project") String filterProject,
+			@QueryParam("filter_withHidden") Boolean filterWithHidden) {
+		OfflineOrderEntry entry = new OfflineOrderEntry() ;
+
+		try {
+			if(null == connectClient(userId)) return entry ;
+			if(!mandantCall.hasModulAuftrag()) {
+				respondNotFound() ;
+				return entry ;
+			}
+			
+			FilterKriteriumCollector collector = new FilterKriteriumCollector() ;
+			collector.add(orderQuery.getFilterCnr(StringHelper.removeXssDelimiters(filterCnr))) ;
+			collector.add(orderQuery.getFilterProject(StringHelper.removeXssDelimiters(filterProject))) ;
+			collector.add(orderQuery.getFilterCustomer(StringHelper.removeXssDelimiters(filterCustomer))) ;
+			collector.add(orderQuery.getFilterWithHidden(filterWithHidden)) ;
+			FilterBlock filterCrits = new FilterBlock(collector.asArray(), "AND")  ;
+			
+			QueryParameters params = orderQuery.getDefaultQueryParameters(filterCrits) ;
+			params.setLimit(limit) ;
+			params.setKeyOfSelectedRow(startIndex) ;
+
+			QueryResult result = orderQuery.setQuery(params) ;
+			List<OrderEntry> orders = orderQuery.getResultList(result) ;
+			List<OrderpositionsEntry> positions = new ArrayList<OrderpositionsEntry>() ;
+			List<OrderAddress> addresses = new ArrayList<OrderAddress>() ;
+			HashMap<Integer, OrderAddress> distinctAddress = new HashMap<Integer, OrderAddress>() ;
+			
+			for (OrderEntry orderEntry : orders) {
+				collector = new FilterKriteriumCollector() ;
+				collector.add(orderPositionQuery.getOrderIdFilter(orderEntry.getId())) ;
+				
+				filterCrits = new FilterBlock(collector.asArray(), "AND")  ;
+				
+				params = orderPositionQuery.getDefaultQueryParameters(filterCrits) ;
+				params.setLimit(Integer.MAX_VALUE) ;
+				params.setKeyOfSelectedRow(0) ;
+
+				QueryResult positionResult = orderPositionQuery.setQuery(params) ;
+				List<OrderpositionEntry> posEntries = orderPositionQuery.getResultList(positionResult) ;	
+				
+				addPositionEntries(positions, orderEntry.getId(), posEntries);
+			}
+			
+			entry.setOrders(orders) ;
+			entry.setOrderpositions(positions) ;
+		} catch(NamingException e) {
+			respondUnavailable(e) ;
+			e.printStackTrace() ;
+		} catch(RemoteException e) {
+			respondUnavailable(e) ;
+			e.printStackTrace() ;
+		}
+		
+		
+		return entry ;
 	}
 }

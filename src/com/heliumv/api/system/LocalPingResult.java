@@ -54,4 +54,11 @@ public class LocalPingResult {
 	public void setApiVersionNumber(String apiVersionNumber) {
 		this.apiVersionNumber = apiVersionNumber;
 	}
+	
+	public String toString() {
+		return 
+				"apiTime:" + getApiTime() + ", " +
+				"apiBuildNumber:" + getApiBuildNumber() + ", " +
+				"apiVersionNumber:" + getApiVersionNumber() + "." ;
+	}
 }

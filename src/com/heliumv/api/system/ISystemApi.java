@@ -21,4 +21,6 @@ public interface ISystemApi {
 	 * @return verschiedene Informationen &uuml;ber das System
 	 */
 	LocalPingResult localping() ;
+	
+//	String localpingAsText() ;	
 }

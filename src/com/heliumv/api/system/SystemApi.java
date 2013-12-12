@@ -22,7 +22,7 @@ public class SystemApi extends BaseApi implements ISystemApi {
 	
 	@GET
 	@Path("/ping")
-	@Produces({FORMAT_JSON, FORMAT_XML})
+	@Produces({FORMAT_JSON, FORMAT_XML, "text/html"})
 	@Override
 	public PingResult ping() {
 		PingResult result = new PingResult() ;
@@ -45,13 +45,26 @@ public class SystemApi extends BaseApi implements ISystemApi {
 
 	@GET
 	@Path("/localping")
-	@Produces({FORMAT_JSON, FORMAT_XML})
+	@Produces({FORMAT_JSON, FORMAT_XML, "text/html"})
 	@Override
 	public LocalPingResult localping() {
+		return localpingImpl() ;
+	}	
+	
+//	@GET
+//	@Path("/localping")
+//	@Produces({"text/html"})
+//	@Override
+//	public String localpingAsText() {
+//		LocalPingResult result = localpingImpl();
+//		return result.toString() ;
+//	}		
+
+	private LocalPingResult localpingImpl() {
 		LocalPingResult result = new LocalPingResult() ;
 		result.setApiTime(System.currentTimeMillis());
 		result.setApiBuildNumber(1);
 		result.setApiVersionNumber("1.0.1") ;
-		return result ;
-	}	
+		return result ;		
+	}
 }

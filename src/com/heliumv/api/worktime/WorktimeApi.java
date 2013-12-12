@@ -361,7 +361,7 @@ public class WorktimeApi extends BaseApi implements IWorktimeApi {
 		AuftragpositionDto auftragPositionDto = auftragpositionCall.auftragpositionFindByPrimaryKeyOhneExc(positionId) ;
 		if(auftragPositionDto == null) return false ;
 		
-		return orderId.equals(auftragPositionDto.getAuftragIId()) ;
+		return orderId.equals(auftragPositionDto.getBelegIId()) ;
 	}
 	
 	@GET
