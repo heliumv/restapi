@@ -64,6 +64,9 @@ public class BaseApi {
 
 		public final static String DELIVERYCNR = "deliveryCnr" ;
 		public final static String DELIVERYID  = "deliveryid" ;
+	
+		public final static String ORDERCNR    = "orderCnr" ;
+		public final static String ORDERID     = "orderid" ;
 		
 		public final static String CUSTOMERID = "customerid" ;
 	}

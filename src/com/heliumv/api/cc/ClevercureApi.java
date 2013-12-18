@@ -16,24 +16,18 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
-import org.apache.commons.codec.Charsets;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.heliumv.api.BaseApi;
+import com.heliumv.factory.IAuftragCall;
 import com.heliumv.factory.IAuftragRestCall;
 import com.heliumv.factory.IGlobalInfo;
 import com.heliumv.factory.ILieferscheinCall;
 import com.heliumv.tools.StringHelper;
 import com.lp.server.artikel.service.BaseRequestResult;
+import com.lp.server.auftrag.service.AuftragDto;
 import com.lp.server.auftrag.service.CreateOrderResult;
 import com.lp.server.lieferschein.service.LieferscheinDto;
 import com.lp.server.system.service.WebshopAuthHeader;
@@ -49,15 +43,18 @@ public class ClevercureApi extends BaseApi implements IClevercureApi {
 	
 	@Autowired
 	private ILieferscheinCall lieferscheinCall ;
+
+	@Autowired
+	IAuftragRestCall auftragRestCall ;
+
+	@Autowired
+	IAuftragCall auftragCall ;
 	
 	public static class Param {
 		public final static String TOKEN = "token" ;
 		public final static String COMPANYCODE = "companycode" ;
 		public final static String DATATYPE = "datatype" ;
 	}
-
-	@Autowired
-	IAuftragRestCall auftragRestCall ;
 	
 	@Override
 	@POST
@@ -197,6 +194,10 @@ public class ClevercureApi extends BaseApi implements IClevercureApi {
 		persistDatatype("Osd", ccdata, fileSuffix) ;
 	}
 
+	private void persistOsaData(String ccdata, String fileSuffix) {
+		persistDatatype("Osa", ccdata, fileSuffix) ;
+	}
+
 	private void persistDatatype(String datatype, String ccdata, String fileSuffix) {
 		try {
 			File f = File.createTempFile("CC" + datatype + "_", fileSuffix != null ? ("_" + fileSuffix) : "_.xml") ;
@@ -271,9 +272,9 @@ public class ClevercureApi extends BaseApi implements IClevercureApi {
 	private String createDispatchNotificationImpl(LieferscheinDto deliveryDto, Boolean doPost) throws NamingException, RemoteException {
 		String avisoContent = null ;
 		if(!doPost) {
-			avisoContent = lieferscheinCall.createLieferscheinAvisoToString(deliveryDto, globalInfo.getTheClientDto()) ;
+			avisoContent = lieferscheinCall.createLieferscheinAvisoToString(deliveryDto.getIId(), globalInfo.getTheClientDto()) ;
 		} else {
-			avisoContent = lieferscheinCall.createLieferscheinAvisoPost(deliveryDto, globalInfo.getTheClientDto());
+			avisoContent = lieferscheinCall.createLieferscheinAvisoPost(deliveryDto.getIId(), globalInfo.getTheClientDto());
 			if(avisoContent != null) {
 				persistDndData(avisoContent, null) ;
 			}
@@ -306,4 +307,70 @@ public class ClevercureApi extends BaseApi implements IClevercureApi {
 ////		}		
 //		return status ;
 //	}
+	
+	
+	@Override
+	@POST
+	@Path("/orderresponse")
+	@Produces({FORMAT_XML})
+	public String createOrderresponse(
+			@QueryParam(BaseApi.Param.USERID) String userId, 
+			@QueryParam(BaseApi.Param.ORDERID) Integer orderId, 
+			@QueryParam(BaseApi.Param.ORDERCNR) String orderCnr,
+			@QueryParam("post") @DefaultValue(value="false") Boolean doPost) {
+		try {
+			if(connectClient(userId) == null) return null ;
+			if(orderId != null) {
+				return createOrderResponseId(orderId, doPost) ;
+			}
+			
+			if(!StringHelper.isEmpty(orderCnr)) {
+				return createOrderResponseCnr(orderCnr, doPost) ;
+			}
+
+			respondBadRequestValueMissing(BaseApi.Param.ORDERID) ;
+		} catch(NamingException e) {
+			respondUnavailable(e) ;
+		} catch(RemoteException e) {
+			respondUnavailable(e);
+		} catch(EJBExceptionLP e) {
+			respondBadRequest(e) ;
+		}
+
+		return null;
+	}
+
+	private String createOrderResponseId(Integer orderId, Boolean doPost) throws NamingException, RemoteException {
+		AuftragDto auftragDto = auftragCall.auftragFindByPrimaryKeyOhneExc(orderId) ; 
+		if(auftragDto == null) {
+			respondNotFound(BaseApi.Param.ORDERID, orderId.toString());
+			return null ;				
+		}
+		
+		return createOrderResponseImpl(auftragDto, doPost) ;
+	}
+
+	private String createOrderResponseCnr(String orderCnr, Boolean doPost) throws NamingException, RemoteException {
+		AuftragDto auftragDto = auftragCall.auftragFindByCnr(orderCnr) ;
+		if(auftragDto == null) {
+			respondNotFound(BaseApi.Param.ORDERCNR, orderCnr);
+			return null ;
+		}
+		
+		return createOrderResponseImpl(auftragDto, doPost) ;
+	}
+
+	private String createOrderResponseImpl(AuftragDto auftragDto, Boolean doPost) throws NamingException, RemoteException {
+		String responseContent = null ;
+		if(!doPost) {
+			responseContent = auftragCall.createOrderResponseToString(auftragDto) ;
+		} else {
+			responseContent = auftragCall.createOrderResponsePost(auftragDto);
+			if(responseContent != null) {
+				persistOsaData(responseContent, null) ;
+			}
+		}
+		
+		return responseContent ;
+	}		
 }

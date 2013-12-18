@@ -1,6 +1,7 @@
 package com.heliumv.api.cc;
 
 
+
 public interface IClevercureApi {
 	/**
 	 * Die CC Daten sind im Request-Body direkt enthalten
@@ -39,5 +40,14 @@ public interface IClevercureApi {
 	 */
 	String createDispatchNotification(String userId, Integer deliveryId, String deliveryCnr, Boolean doPost) ;
 
-//	String createAndTransmitDispatchNotification(String userId, Integer deliveryId, String deliveryCnr) ;	
+	/**
+	 * Eine Auftragsbestaetigung erzeugen
+	 * 
+	 * @param userId
+	 * @param orderId
+	 * @param orderCnr
+	 * @param doPost mit true wird der Response auch gleich an Clevercure gesendet
+	 * @return
+	 */
+	String createOrderresponse(String userId, Integer orderId, String orderCnr, Boolean doPost) ;
 }

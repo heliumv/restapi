@@ -28,7 +28,7 @@ public interface ILieferscheinCall {
 	 * @throws RemoteException
 	 */
 	ILieferscheinAviso createLieferscheinAviso(
-			LieferscheinDto lieferscheinDto, TheClientDto theClientDto) throws NamingException, RemoteException ;
+			Integer lieferscheinId, TheClientDto theClientDto) throws NamingException, RemoteException ;
 
 	/**
 	 * Ein Aviso zu einem String-Content transformieren
@@ -54,7 +54,7 @@ public interface ILieferscheinCall {
 	 * @throws NamingException
 	 */
 	String createLieferscheinAvisoToString(
-			LieferscheinDto lieferscheinDto, TheClientDto theClientDto) throws RemoteException, NamingException ;
+			Integer lieferscheinId, TheClientDto theClientDto) throws RemoteException, NamingException ;
 	
 	/**
 	 * Ein LieferscheinAviso erzeugen und versenden 
@@ -66,5 +66,5 @@ public interface ILieferscheinCall {
 	 * @throws NamingException
 	 */
 	String createLieferscheinAvisoPost(
-			LieferscheinDto lieferscheinDto, TheClientDto theClientDto) throws RemoteException, NamingException ;	
+			Integer lieferscheinId, TheClientDto theClientDto) throws RemoteException, NamingException ;	
 }
