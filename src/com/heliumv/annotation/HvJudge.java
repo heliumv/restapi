@@ -13,7 +13,13 @@ import java.lang.annotation.Target;
  */
 public @interface HvJudge {
 	/**
-	 * Der Modulname aus RechteFac.RECHT_PERS_ZEITERFASSUNG_R
+	 * Der Rechtename aus RechteFac.RECHT_PERS_ZEITERFASSUNG_R
 	 */
-	String recht() ;
+	String recht() default "" ;	
+	
+	/**
+	 * Eines dieser Rechte aus RechteFac.RECHT_* muss erfuellt sein
+	 * @return
+	 */
+	String[] rechtOder() default {""};	
 }
