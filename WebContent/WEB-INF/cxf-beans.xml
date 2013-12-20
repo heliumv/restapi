@@ -82,6 +82,7 @@
 			<ref bean="hvStaff" />
 			<ref bean="hvSystem" />
 			<ref bean="hvItemV11" />
+			<ref bean="hvClevercure" />
 		</jaxrs:serviceBeans>
 	</jaxrs:server>	
 	
@@ -107,6 +108,7 @@
 	<bean id="artikelkommentarCall" class="com.heliumv.factory.impl.ArtikelkommentarCall" lazy-init="true"/>
 	<bean id="auftragCall" class="com.heliumv.factory.impl.AuftragCall" lazy-init="true"/>
 	<bean id="auftragpositionCall" class="com.heliumv.factory.impl.AuftragpositionCall" lazy-init="true"/>
+	<bean id="auftragRestCall" class="com.heliumv.factory.impl.AuftragCleverCureCall" lazy-init="true" />
 	<bean id="clientCall" class="com.heliumv.factory.impl.ClientCall" lazy-init="true"/>
 	<bean id="fehlmengeCall" class="com.heliumv.factory.impl.FehlmengeCall" lazy-init="true" />
 	<bean id="fertigungCall" class="com.heliumv.factory.impl.FertigungCallJudge" lazy-init="true"/>
@@ -115,6 +117,7 @@
 	<bean id="kundeCall" class="com.heliumv.factory.impl.KundeCall" lazy-init="true" />
 	<bean id="kundeReportCall" class="com.heliumv.factory.impl.KundeReportCall" lazy-init="true" />
 	<bean id="lagerCall" class="com.heliumv.factory.impl.LagerCall" lazy-init="true"/>
+	<bean id="lieferscheinCall" class="com.heliumv.factory.impl.LieferscheinCall" lazy-init="true" />
 	<bean id="logonCall" class="com.heliumv.factory.impl.LogonCall" lazy-init="true"/>
 	<bean id="mandantCall" class="com.heliumv.factory.impl.MandantCall" lazy-init="true"/>
 	<bean id="panelCall" class="com.heliumv.factory.impl.PanelCall" lazy-init="true" />
@@ -158,4 +161,5 @@
 	<bean id="hvProduction" class="com.heliumv.api.production.ProductionApi" lazy-init="true" />
 	<bean id="hvStaff" class="com.heliumv.api.staff.StaffApi" lazy-init="true"/>
 	<bean id="hvSystem" class="com.heliumv.api.system.SystemApi" lazy-init="true" />
+	<bean id="hvClevercure" class="com.heliumv.api.cc.ClevercureApi" lazy-init="true" />
 </beans>

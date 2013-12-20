@@ -1,5 +1,6 @@
 package com.heliumv.api;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 
 import javax.naming.NamingException;
@@ -10,6 +11,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.apache.cxf.jaxrs.impl.ResponseBuilderImpl;
+import org.apache.http.client.ClientProtocolException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.heliumv.factory.Globals;
@@ -40,6 +42,18 @@ public class BaseApi {
 	public final static String[] FORMAT_JSON_XML = {FORMAT_JSON, FORMAT_XML} ;
 	
 
+	public static class HvErrorCode {
+		public final static Integer REMOTE_EXCEPTION         = 1 ;
+		public final static Integer NAMING_EXCEPTION         = 2 ;
+		public final static Integer UNPROCESSABLE_ENTITY     = 3 ;
+		public final static Integer UNKNOWN_ENTITY           = 4 ;
+		public final static Integer EJB_EXCEPTION            = 5 ;
+		public final static Integer CLIENTPROTOCOL_EXCEPTION = 6 ;
+		public final static Integer IO_EXCEPTION             = 7 ;
+		public final static Integer EXPECTATION_FAILED       = 8 ;
+		public final static Integer VALIDATION_FAILED        = 9 ;
+	}
+	
 	public static class Param {
 		public final static String USERID = "userid" ;
 		public final static String LIMIT = "limit" ;
@@ -47,6 +61,12 @@ public class BaseApi {
 		
 		public final static String ITEMCNR = "itemCnr" ;
 		public final static String ITEMID  = "itemid" ;
+
+		public final static String DELIVERYCNR = "deliveryCnr" ;
+		public final static String DELIVERYID  = "deliveryid" ;
+	
+		public final static String ORDERCNR    = "orderCnr" ;
+		public final static String ORDERID     = "orderid" ;
 		
 		public final static String CUSTOMERID = "customerid" ;
 	}
@@ -121,48 +141,83 @@ public class BaseApi {
 	
 	public Response getInternalServerError(EJBExceptionLP e) {
 		return getResponseBuilder().status(Response.Status.INTERNAL_SERVER_ERROR)
-				.header("x-hv-error-code", 10000 + e.getCode())
-				.header("x-hv-error-description", e.getMessage()).build() ;		
+				.header("x-hv-error-code", HvErrorCode.EJB_EXCEPTION.toString())
+				.header("x-hv-error-code-extended", new Integer(e.getCode()).toString())
+				.header("x-hv-error-description", e.getCause().getMessage()).build() ;		
 	}
 
 	public Response getUnavailable(RemoteException e) {
 		return getResponseBuilder().status(Response.Status.INTERNAL_SERVER_ERROR)
-				.header("x-hv-error-code", 1)
+				.header("x-hv-error-code", HvErrorCode.REMOTE_EXCEPTION.toString())
 				.header("x-hv-error-description", e.getMessage()).build() ;		
 	}
 	
 	public Response getUnavailable(NamingException e) {
 		return getResponseBuilder().status(Response.Status.INTERNAL_SERVER_ERROR)
-				.header("x-hv-error-code", 2)
+				.header("x-hv-error-code", HvErrorCode.NAMING_EXCEPTION.toString())
 				.header("x-hv-error-description", e.getMessage()).build() ;		
 	}
 
+
+	public void respondForbidden() {
+		getServletResponse().setStatus(Response.Status.FORBIDDEN.getStatusCode()) ;
+	}
+
+	public void respondExpectationFailed() {
+//      Enunciate kennt EXPECTATION_FAILED nicht? Obwohl das im jaxws-api-m10.jar enthalten ist?
+//		getServletResponse().setStatus(Response.Status.EXPECTATION_FAILED.getStatusCode()) ;
+		getServletResponse().setStatus(417) ;
+	}
+	
+	public void respondExpectationFailed(Integer hvErrorCode) {
+		getServletResponse().setHeader("x-hv-error-code", HvErrorCode.EXPECTATION_FAILED.toString()) ;
+		getServletResponse().setHeader("x-hv-error-code-extended", hvErrorCode.toString()) ;
+//		getServletResponse().setStatus(Response.Status.EXPECTATION_FAILED.getStatusCode()) ;
+		getServletResponse().setStatus(417) ;
+	}
+
 	public void respondUnavailable(NamingException e) {
-		getServletResponse().setHeader("x-hv-error-code", "2") ;
+		getServletResponse().setHeader("x-hv-error-code", HvErrorCode.NAMING_EXCEPTION.toString()) ;
 		getServletResponse().setHeader("x-hv-error-description", e.getMessage()) ;		
 		getServletResponse().setStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()) ;		
 	}
 	
 	public void respondUnavailable(RemoteException e) {
-		getServletResponse().setHeader("x-hv-error-code", "1") ;
+		getServletResponse().setHeader("x-hv-error-code", HvErrorCode.REMOTE_EXCEPTION.toString()) ;
 		getServletResponse().setHeader("x-hv-error-description", e.getMessage()) ;		
 		getServletResponse().setStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()) ;		
 	}
 
+	public void respondUnavailable(ClientProtocolException e) {
+		getServletResponse().setHeader("x-hv-error-code", HvErrorCode.CLIENTPROTOCOL_EXCEPTION.toString()) ;
+		getServletResponse().setHeader("x-hv-error-description", e.getMessage()) ;		
+// TODO: Enunciate kennt "BAD_GATEWAY" nicht??
+//		getServletResponse().setStatus(Response.Status.BAD_GATEWAY.getStatusCode()) ;			
+		getServletResponse().setStatus(502) ;
+	}
+
+	public void respondUnavailable(IOException e) {
+		getServletResponse().setHeader("x-hv-error-code", HvErrorCode.IO_EXCEPTION.toString()) ;
+		getServletResponse().setHeader("x-hv-error-description", e.getMessage()) ;		
+// TODO: Enunciate kennt "BAD_GATEWAY" nicht??
+//		getServletResponse().setStatus(Response.Status.BAD_GATEWAY.getStatusCode()) ;			
+		getServletResponse().setStatus(502) ;			
+	}
+	
 	public void respondBadRequest(EJBExceptionLP e) {
 		if(e.getCode() == EJBExceptionLP.FEHLER_FALSCHER_MANDANT) {
 			respondNotFound() ;
 			return ;
 		}
 		
-		getServletResponse().setHeader("x-hv-error-code", "5") ;
+		getServletResponse().setHeader("x-hv-error-code", HvErrorCode.EJB_EXCEPTION.toString()) ;
 		getServletResponse().setHeader("x-hv-error-code-extended", new Integer(e.getCode()).toString()) ;
 		getServletResponse().setHeader("x-hv-error-description", e.getCause().getMessage()) ;		
 		getServletResponse().setStatus(Response.Status.BAD_REQUEST.getStatusCode()) ;		
 	}
 
 	public void respondBadRequest(Integer hvErrorCode) {
-		getServletResponse().setHeader("x-hv-error-code", "5") ;
+		getServletResponse().setHeader("x-hv-error-code", HvErrorCode.EXPECTATION_FAILED.toString()) ;
 		getServletResponse().setHeader("x-hv-error-code-extended", hvErrorCode.toString()) ;
 		getServletResponse().setStatus(Response.Status.BAD_REQUEST.getStatusCode()) ;				
 	}
@@ -174,14 +229,14 @@ public class BaseApi {
 	
 	public Response getBadRequest(String key, Object value) {
 		return getResponseBuilder().status(Response.Status.BAD_REQUEST)
-				.header("x-hv-error-code", 3)
+				.header("x-hv-error-code", HvErrorCode.VALIDATION_FAILED)
 				.header("x-hv-error-key", key)
 				.header("x-hv-error-value", value).build() ;
 	}
 	
 	public Response getBadRequest(EJBExceptionLP e) {
 		return getResponseBuilder().status(Response.Status.BAD_REQUEST)
-				.header("x-hv-error-code", "5")
+				.header("x-hv-error-code", HvErrorCode.EJB_EXCEPTION)
 				.header("x-hv-error-code-extended", new Integer(e.getCode()).toString())
 				.header("x-hv-error-description", e.getCause().getMessage()).build() ;
 	}
@@ -190,21 +245,21 @@ public class BaseApi {
 	 * Den Servlet Response auf "UNAUTHORIZED" setzen
 	 */
 	public void respondBadRequest(String key, String value) {
-		getServletResponse().setHeader("x-hv-error-code", "3") ;
+		getServletResponse().setHeader("x-hv-error-code", HvErrorCode.VALIDATION_FAILED.toString()) ;
 		getServletResponse().setHeader("x-hv-error-key", key) ;
 		getServletResponse().setHeader("x-hv-error-value", value) ;
 		getServletResponse().setStatus(Response.Status.BAD_REQUEST.getStatusCode()) ;		
 	}
 	
 	public void respondBadRequestValueMissing(String key) {
-		getServletResponse().setHeader("x-hv-error-code", "3") ;
+		getServletResponse().setHeader("x-hv-error-code", HvErrorCode.VALIDATION_FAILED.toString()) ;
 		getServletResponse().setHeader("x-hv-error-key", key) ;
 		getServletResponse().setHeader("x-hv-error-value", "{empty}") ;
 		getServletResponse().setStatus(Response.Status.BAD_REQUEST.getStatusCode()) ;		
 	}
 	
 	public void respondNotFound(String key, String value) {
-		getServletResponse().setHeader("x-hv-error-code", "4") ;
+		getServletResponse().setHeader("x-hv-error-code", HvErrorCode.UNKNOWN_ENTITY.toString()) ;
 		getServletResponse().setHeader("x-hv-error-key", key) ;
 		getServletResponse().setHeader("x-hv-error-value", value) ;
 		getServletResponse().setStatus(Response.Status.NOT_FOUND.getStatusCode()) ;				
@@ -214,8 +269,12 @@ public class BaseApi {
 		getServletResponse().setStatus(Response.Status.NOT_FOUND.getStatusCode()) ;		
 	}
 	
+	public void respondOkay() {
+		getServletResponse().setStatus(Response.Status.OK.getStatusCode()) ;				
+	}
+	
 	public void respondUnprocessableEntity(String key, String value) {
-		getServletResponse().setHeader("x-hv-error-code", "6") ;
+		getServletResponse().setHeader("x-hv-error-code", HvErrorCode.UNPROCESSABLE_ENTITY.toString()) ;
 		getServletResponse().setHeader("x-hv-error-key", key) ;
 		getServletResponse().setHeader("x-hv-error-value", value) ;
 		getServletResponse().setStatus(UNPROCESSABLE_ENTITY) ;

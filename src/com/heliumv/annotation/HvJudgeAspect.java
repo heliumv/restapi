@@ -44,11 +44,27 @@ public class HvJudgeAspect extends BaseAspect {
 		HvJudge theModul = (HvJudge) method.getAnnotation(HvJudge.class);
 		if(theModul == null) return ;
 		
-		System.out.println("Having the HvJudge Annotation with name '" + theModul.recht() + "<") ;
-		if(!judgeCall.hatRecht(theModul.recht())) {
-			throw new EJBExceptionLP(EJBExceptionLP.FEHLER_UNZUREICHENDE_RECHTE,
-					methodSig.getMethod().getName() + ":" + theModul.recht() ) ;
+		System.out.println("Having the HvJudge Annotation with name '" + theModul.recht() + "|" + theModul.rechtOder() + "<") ;
+		if(theModul.recht().length() > 0) {
+			if(!judgeCall.hatRecht(theModul.recht())) {
+				throw new EJBExceptionLP(EJBExceptionLP.FEHLER_UNZUREICHENDE_RECHTE,
+						methodSig.getMethod().getName() + ":" + theModul.recht() ) ;
+			}
+
+			System.out.println("judge allowed: '" + theModul.recht() + "'") ;
+			return ;
 		}
-		System.out.println("judge allowed: '" + theModul.recht() + "'") ;
+		
+		if(theModul.rechtOder().length > 0) {
+			for (String recht : theModul.rechtOder()) {
+				if(judgeCall.hatRecht(recht)) {
+					System.out.println("judge allowed: '" + recht + "'") ;
+					return ;					
+				}
+			}
+
+			throw new EJBExceptionLP(EJBExceptionLP.FEHLER_UNZUREICHENDE_RECHTE,
+					methodSig.getMethod().getName() + ":" + theModul.rechtOder().toString() ) ;
+		}
 	}
 }

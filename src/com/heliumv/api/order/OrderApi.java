@@ -248,7 +248,7 @@ public class OrderApi extends BaseApi implements IOrderApi  {
 			}
 			
 			entry.setOrders(orders) ;
-			entry.setOrderpositions(positions) ;
+			// entry.setOrderpositions(positions) ;
 		} catch(NamingException e) {
 			respondUnavailable(e) ;
 			e.printStackTrace() ;

@@ -19,6 +19,10 @@
 <!--   
   	<Environment name="java.naming.provider.url" value="jnp://heliumserver:2099" type="java.lang.String" /> 
   -->
-	<Environment name="java.naming.provider.url" value="jnp://localhost:2099" type="java.lang.String" /> -->
+	<Environment name="java.naming.provider.url" value="jnp://localhost:2099" type="java.lang.String" /> 
   	<Environment name="java.naming.factory.initial" value="org.jnp.interfaces.NamingContextFactory" type="java.lang.String" />
+
+  	<Environment name="heliumv.credentials.user" value="webshop1" type="java.lang.String" />
+  	<Environment name="heliumv.credentials.password" value="webshop1" type="java.lang.String" />
+  	<Environment name="heliumv.credentials.webshop" value="mte" type="java.lang.String" />
 </Context>
