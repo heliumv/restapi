@@ -46,7 +46,7 @@ public class HvModulAspect extends BaseAspect {
 //		System.out.println("In method signature: " + methodSig.getMethod().getAnnotations().length + "<") ;
 
 		System.out.println("Having the HvModul Annotation with name '" + theModul.modul() +
-				"<" + methodSig.getMethod().getName() + ":" + theModul.modul() + ">") ;
+				"' <" + methodSig.getMethod().getName() + ":" + theModul.modul() + ">") ;
 		if(!mandantCall.hasNamedModul(theModul.modul())) {
 			throw new EJBExceptionLP(EJBExceptionLP.FEHLER_UNZUREICHENDE_RECHTE,
 					methodSig.getMethod().getName() + ":" + theModul.modul() ) ;
