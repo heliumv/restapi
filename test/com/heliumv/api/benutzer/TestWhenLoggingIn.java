@@ -2,6 +2,9 @@ package com.heliumv.api.benutzer;
 
 import org.springframework.mock.web.MockHttpServletResponse;
 
+import com.heliumv.api.user.LogonEntry;
+import com.heliumv.api.user.UserApi;
+
 import junit.framework.TestCase;
 
 public class TestWhenLoggingIn extends TestCase {

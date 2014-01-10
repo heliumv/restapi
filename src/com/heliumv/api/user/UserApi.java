@@ -1,4 +1,4 @@
-package com.heliumv.api.benutzer;
+package com.heliumv.api.user;
 
 import java.rmi.RemoteException;
 import java.util.Locale;

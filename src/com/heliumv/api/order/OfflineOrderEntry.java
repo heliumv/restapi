@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class OfflineOrderEntry {
 	private List<OrderEntry> orders ;
-//	private List<OrderpositionsEntry> orderpositions ;
+	private List<OrderpositionsEntry> orderpositions ;
 	private List<OrderAddress> addresses ;
 	
 	public List<OrderEntry> getOrders() {
@@ -16,12 +16,12 @@ public class OfflineOrderEntry {
 	public void setOrders(List<OrderEntry> orders) {
 		this.orders = orders;
 	}
-//	public List<OrderpositionsEntry> getOrderpositions() {
-//		return orderpositions;
-//	}
-//	public void setOrderpositions(List<OrderpositionsEntry> orderpositions) {
-//		this.orderpositions = orderpositions;
-//	}
+	public List<OrderpositionsEntry> getOrderpositions() {
+		return orderpositions;
+	}
+	public void setOrderpositions(List<OrderpositionsEntry> orderpositions) {
+		this.orderpositions = orderpositions;
+	}
 	public List<OrderAddress> getAddresses() {
 		return addresses;
 	}

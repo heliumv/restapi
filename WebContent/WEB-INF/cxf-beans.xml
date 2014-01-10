@@ -99,6 +99,8 @@
 	</bean>
  -->
  
+ 	<bean id="modelMapper" class="org.modelmapper.ModelMapper" lazy-init="true"/>
+ 	
  	<bean id="baseCallRegistrant" class="com.heliumv.factory.BaseCallRegistrant" />
 <!--    <bean id="callTracer" class="com.heliumv.calltrace.CallTracer" /> -->
     <bean id="callTracer" class="com.heliumv.calltrace.CallTracerDelaying" />
@@ -154,7 +156,7 @@
  	<bean id="hvInventory" class="com.heliumv.api.inventory.InventoryApi" lazy-init="true" />
  	<bean id="hvItem" class="com.heliumv.api.item.ItemApi" lazy-init="true" />
  	<bean id="hvItemV11" class="com.heliumv.api.item.ItemApiV11" lazy-init="true" />
- 	<bean id="hvUser" class="com.heliumv.api.benutzer.UserApi" lazy-init="true" />
+ 	<bean id="hvUser" class="com.heliumv.api.user.UserApi" lazy-init="true" />
 	<bean id="hvWorktime" class="com.heliumv.api.worktime.WorktimeApi" lazy-init="true"/>
 	<bean id="hvOrder" class="com.heliumv.api.order.OrderApi" lazy-init="true"/>
 	<bean id="hvProject" class="com.heliumv.api.project.ProjectApi" lazy-init="true"/>

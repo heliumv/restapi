@@ -394,5 +394,10 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="libCxf/slf4j-jdk14-1.7.5.jar"/>
+	<classpathentry kind="lib" path="lib/modelmapper-0.6.2.jar">
+		<attributes>
+			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

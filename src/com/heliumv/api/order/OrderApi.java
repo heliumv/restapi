@@ -3,7 +3,6 @@ package com.heliumv.api.order;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import javax.naming.NamingException;
@@ -13,6 +12,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,9 +23,14 @@ import com.heliumv.factory.query.AuftragQuery;
 import com.heliumv.factory.query.AuftragpositionQuery;
 import com.heliumv.tools.FilterKriteriumCollector;
 import com.heliumv.tools.StringHelper;
+import com.lp.server.auftrag.service.AuftragHandlerFeature;
+import com.lp.server.auftrag.service.AuftragQueryResult;
+import com.lp.server.partner.service.IAdresse;
 import com.lp.server.util.fastlanereader.service.query.FilterBlock;
 import com.lp.server.util.fastlanereader.service.query.QueryParameters;
+import com.lp.server.util.fastlanereader.service.query.QueryParametersFeatures;
 import com.lp.server.util.fastlanereader.service.query.QueryResult;
+import com.lp.util.EJBExceptionLP;
 
 @Service("hvOrder")
 @Path("/api/v1/order/")
@@ -42,6 +47,9 @@ public class OrderApi extends BaseApi implements IOrderApi  {
 	
 	@Autowired
 	private AuftragpositionQuery orderPositionQuery ;
+	
+	@Autowired
+	private ModelMapper modelMapper ;
 	
 	@GET
 	@Produces({FORMAT_JSON, FORMAT_XML})
@@ -221,15 +229,16 @@ public class OrderApi extends BaseApi implements IOrderApi  {
 			collector.add(orderQuery.getFilterWithHidden(filterWithHidden)) ;
 			FilterBlock filterCrits = new FilterBlock(collector.asArray(), "AND")  ;
 			
-			QueryParameters params = orderQuery.getDefaultQueryParameters(filterCrits) ;
+			QueryParametersFeatures params = orderQuery.getFeatureQueryParameters(filterCrits) ;
 			params.setLimit(limit) ;
 			params.setKeyOfSelectedRow(startIndex) ;
+			params.addFeature(AuftragHandlerFeature.ADRESSE_KOMPLETT) ;
+			params.addFeature(AuftragHandlerFeature.ADRESSE_ANSCHRIFT);
+			AuftragQueryResult result = (AuftragQueryResult) orderQuery.setQuery(params) ;
 
-			QueryResult result = orderQuery.setQuery(params) ;
 			List<OrderEntry> orders = orderQuery.getResultList(result) ;
 			List<OrderpositionsEntry> positions = new ArrayList<OrderpositionsEntry>() ;
-			List<OrderAddress> addresses = new ArrayList<OrderAddress>() ;
-			HashMap<Integer, OrderAddress> distinctAddress = new HashMap<Integer, OrderAddress>() ;
+			HashMap<Integer, IAdresse> distinctAddresses = new HashMap<Integer, IAdresse>() ;
 			
 			for (OrderEntry orderEntry : orders) {
 				collector = new FilterKriteriumCollector() ;
@@ -237,26 +246,38 @@ public class OrderApi extends BaseApi implements IOrderApi  {
 				
 				filterCrits = new FilterBlock(collector.asArray(), "AND")  ;
 				
-				params = orderPositionQuery.getDefaultQueryParameters(filterCrits) ;
-				params.setLimit(Integer.MAX_VALUE) ;
-				params.setKeyOfSelectedRow(0) ;
+				QueryParameters posParams = orderPositionQuery.getDefaultQueryParameters(filterCrits) ;
+				posParams.setLimit(Integer.MAX_VALUE) ;
+				posParams.setKeyOfSelectedRow(0) ;
 
-				QueryResult positionResult = orderPositionQuery.setQuery(params) ;
+				QueryResult positionResult = orderPositionQuery.setQuery(posParams) ;
 				List<OrderpositionEntry> posEntries = orderPositionQuery.getResultList(positionResult) ;	
 				
-				addPositionEntries(positions, orderEntry.getId(), posEntries);
+				addPositionEntries(positions, orderEntry.getId(), posEntries);				
+			}
+			entry.setOrders(orders) ;
+			entry.setOrderpositions(positions) ;
+
+			for (IAdresse orderAddress : result.getAddresses()) {
+				distinctAddresses.put(orderAddress.getPartnerId(), orderAddress) ;
 			}
 			
-			entry.setOrders(orders) ;
-			// entry.setOrderpositions(positions) ;
+			List<OrderAddress> resultAddresses = new ArrayList<OrderAddress>();
+			for (IAdresse orderAddress : distinctAddresses.values()) {
+				OrderAddress newAddress = modelMapper.map(orderAddress, OrderAddress.class) ;
+				resultAddresses.add(newAddress) ;
+			}
+			entry.setAddresses(resultAddresses);
+			
 		} catch(NamingException e) {
 			respondUnavailable(e) ;
 			e.printStackTrace() ;
 		} catch(RemoteException e) {
 			respondUnavailable(e) ;
 			e.printStackTrace() ;
-		}
-		
+		} catch(EJBExceptionLP e) {
+			respondBadRequest(e);
+		}		
 		
 		return entry ;
 	}
