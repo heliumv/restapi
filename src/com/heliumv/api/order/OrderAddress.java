@@ -3,9 +3,10 @@ package com.heliumv.api.order;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.heliumv.api.BaseEntryId;
+import com.lp.server.partner.service.IAdresse;
 
 @XmlRootElement
-public class OrderAddress extends BaseEntryId {
+public class OrderAddress extends BaseEntryId implements IAdresse{
 	private String[] lines ;
 	private String salutation ;
 	private String titel ;
@@ -21,24 +22,52 @@ public class OrderAddress extends BaseEntryId {
 	private String contact ;
 	
 	
+	@Override
+	public Integer getPartnerId() {
+		return getId() ;
+	}
+	@Override
+	public void setPartnerId(Integer partnerId) {
+		setId(partnerId);
+	}
+	
+	/**
+	 * Formatierte Ausgabe der Adresse
+	 * @return
+	 */
 	public String[] getLines() {
 		return lines;
 	}
 	public void setLines(String[] lines) {
 		this.lines = lines;
 	}
+	
+	/**
+	 * Die Anrede (Frau, Herr, Firma, ...)
+	 * @return
+	 */
 	public String getSalutation() {
 		return salutation;
 	}
 	public void setSalutation(String salutation) {
 		this.salutation = salutation;
 	}
+	
+	/**
+	 * Der vorangestellte Titel 
+	 * @return
+	 */
 	public String getTitel() {
 		return titel;
 	}
 	public void setTitel(String titel) {
 		this.titel = titel;
 	}
+
+	/**
+	 * Der nachgestellte Titel
+	 * @return
+	 */
 	public String getTitelSuffix() {
 		return titelSuffix;
 	}
