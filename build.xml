@@ -147,7 +147,8 @@
 			</fileset>
 			
 			<fileset dir="${dir.client}/lib/jasperreports">
-				<include name="**jasperreports-4.0.1.jar" />
+<!--				<include name="**jasperreports-4.0.1.jar" /> -->
+				<include name="**jasperreports-5.5.0.jar" />
 			</fileset>
 			
 			<fileset dir="${dir.server.dir}/jboss/all/server/helium/lib/">

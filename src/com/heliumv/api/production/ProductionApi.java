@@ -72,6 +72,8 @@ public class ProductionApi extends BaseApi implements IProductionApi {
 	private IJudgeCall judgeCall ;
 	@Autowired
 	private IMandantCall mandantCall ;
+	@Autowired
+	private ProductionQuery productionQuery ;
 	
 	@GET
 	@Path("/{userid}")
@@ -99,13 +101,14 @@ public class ProductionApi extends BaseApi implements IProductionApi {
 				return productions ;
 			}
 
-			ProductionQuery query = new ProductionQuery(parameterCall) ;			
-			QueryParameters params = query.getDefaultQueryParameters(filterCrits) ;
+//			ProductionQuery query = new ProductionQuery(parameterCall) ;			
+//			QueryParameters params = query.getDefaultQueryParameters(filterCrits) ;
+			QueryParameters params = productionQuery.getDefaultQueryParameters(filterCrits) ;
 			params.setLimit(limit) ;
 			params.setKeyOfSelectedRow(startIndex) ;
 		
-			QueryResult result = query.setQuery(params) ;
-			productions = query.getResultList(result) ;
+			QueryResult result = productionQuery.setQuery(params) ;
+			productions = productionQuery.getResultList(result) ;
 		} catch(NamingException e) {
 			e.printStackTrace() ;
 			respondUnavailable(e) ;

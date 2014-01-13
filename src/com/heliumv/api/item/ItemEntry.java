@@ -120,7 +120,7 @@ public class ItemEntry extends BaseEntryId {
 	}
 	
 	/**
-	 * Die Stücklistenart
+	 * Die St&uuml;cklistenart
 	 * @return
 	 */
 	public String getBillOfMaterialType() {
@@ -159,14 +159,19 @@ public class ItemEntry extends BaseEntryId {
 		this.comments = comments;
 	}
 	
+	public Boolean isHidden() {
+		return hidden;
+	}
+	
 	/**
 	 * Ist es ein versteckter Artikel?
 	 * 
 	 * @return true wenn es ein versteckter Artikel ist
 	 */
-	public Boolean isHidden() {
-		return hidden;
+	public Boolean getHidden() {
+		return isHidden() ;
 	}
+	
 	public void setHidden(Boolean hidden) {
 		this.hidden = hidden;
 	}

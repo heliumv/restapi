@@ -3,7 +3,6 @@ package com.heliumv.api.project;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.naming.NamingException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -13,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.heliumv.api.BaseApi;
-import com.heliumv.factory.IParameterCall;
 import com.heliumv.factory.query.ProjectQuery;
 import com.heliumv.tools.FilterKriteriumCollector;
 import com.heliumv.tools.StringHelper;
@@ -28,8 +26,11 @@ import com.lp.server.util.fastlanereader.service.query.QueryResult;
 @Path("/api/v1/project/")
 public class ProjectApi extends BaseApi implements IProjectApi {
 
+//	@Autowired
+//	private IParameterCall parameterCall ;
+	
 	@Autowired
-	private IParameterCall parameterCall ;
+	private ProjectQuery projectQuery ;
 	
 	@GET
 	@Produces({FORMAT_JSON, FORMAT_XML})
@@ -52,15 +53,16 @@ public class ProjectApi extends BaseApi implements IProjectApi {
 			collector.add(buildFilterCompanyName(filterCompany)) ;
 			FilterBlock filterCrits = new FilterBlock(collector.asArray(), "AND")  ;
 
-			ProjectQuery query = new ProjectQuery(parameterCall) ;			
-			QueryParameters params = query.getDefaultQueryParameters(filterCrits) ;
+//			ProjectQuery query = new ProjectQuery(parameterCall) ;			
+//			QueryParameters params = query.getDefaultQueryParameters(filterCrits) ;
+			QueryParameters params = projectQuery.getDefaultQueryParameters(filterCrits) ;
 			params.setLimit(limit) ;
 			params.setKeyOfSelectedRow(startIndex) ;
 			
-			QueryResult result = query.setQuery(params) ;
-			projects = query.getResultList(result) ;
-		} catch(NamingException e) {
-			e.printStackTrace() ;
+			QueryResult result = projectQuery.setQuery(params) ;
+			projects = projectQuery.getResultList(result) ;
+//		} catch(NamingException e) {
+//			e.printStackTrace() ;
 //		} catch(RemoteException e) {
 //			e.printStackTrace() ;
 		} finally {
