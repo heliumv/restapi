@@ -144,6 +144,7 @@
 	
 	<bean id="workItemQuery" class="com.heliumv.factory.query.ArtikelArbeitszeitQuery" lazy-init="true"/>
 	<bean id="orderQuery" class="com.heliumv.factory.query.AuftragQuery" lazy-init="true"/>
+	<bean id="offlineOrderQuery" class="com.heliumv.factory.query.AuftragQueryOffline" lazy-init="true" />
 	<bean id="orderPositionQuery" class="com.heliumv.factory.query.AuftragpositionQuery" lazy-init="true"/>
 	<bean id="customerQuery" class="com.heliumv.factory.query.CustomerQuery" lazy-init="true" />
 	<bean id="itemQuery" class="com.heliumv.factory.query.ItemQuery" lazy-init="true" />

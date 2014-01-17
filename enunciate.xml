@@ -1,0 +1,45 @@
+<enunciate label="heliumv"
+	 xsi:noNamespaceSchemaLocation="http://enunciate.codehaus.org/schemas/enunciate-1.28.xsd">
+<!--
+	<deployment host="www.ifyouwannabecool.com" context="api"/>
+ -->
+ 
+    <api-classes>
+    	<exclude pattern="com.heliumv.api.cc.*" />
+    	<exclude pattern="com.heliumv.api.delivery.*" />
+    </api-classes>
+ <!--
+	<namespaces>
+		<namespace id="api" uri="http://api.ifyouwannabecool.com/"/>
+		<namespace id="link" uri="http://api.ifyouwannabecool.com/link"/>
+		<namespace id="persona" uri="http://api.ifyouwannabecool.com/persona"/>
+	</namespaces>
+ -->
+ 
+	<services>
+    	<rest defaultRestSubcontext="/restapi/services/rest" />
+	</services>
+	
+	<modules>
+		<docs title="HELIUM V REST API" copyright="heliumv.com">
+		</docs>
+		<!-- Disable all the client generation tools -->
+    	<basic-app disabled="true" />
+    	<c disabled="true" />
+    	<csharp disabled="true" />
+    	<java-client disabled="true" />
+	    <jaxws-client disabled="true" />
+	    <jaxws-ri disabled="true" />
+	    <jaxws-support disabled="true" />
+	    <jersey disabled="true" />
+	    <obj-c disabled="true" />
+	    <xml disabled="true" />
+	    <ruby disabled="true" />
+	    <php disabled="true" />
+<!--
+		<docs splashPackage="com.ifyouwannabecool.api" title="If You Wanna Be Cool API" copyright="IfYouWannaBeCool.com">
+			<download name="License" file="LICENSE.txt" description="The license file governing the use of this API."/>
+		</docs>
+ -->		
+	</modules>
+</enunciate>

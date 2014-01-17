@@ -19,8 +19,8 @@ public class OrderAddress extends BaseEntryId implements IAdresse{
 	private String countryCode ;
 	private String zipcode ;
 	private String city ;
-	private String contact ;
-	
+	private String email ;
+	private String phone ;
 	
 	@Override
 	public Integer getPartnerId() {
@@ -122,10 +122,16 @@ public class OrderAddress extends BaseEntryId implements IAdresse{
 	public void setCity(String city) {
 		this.city = city;
 	}
-	public String getContact() {
-		return contact;
+	public String getEmail() {
+		return email;
 	}
-	public void setContact(String contact) {
-		this.contact = contact;
-	}	
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public String getPhone() {
+		return phone;
+	}
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
 }

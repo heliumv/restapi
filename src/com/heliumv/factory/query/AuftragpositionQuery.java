@@ -29,4 +29,10 @@ public class AuftragpositionQuery extends BaseQuery<OrderpositionEntry> {
 						+ AuftragFac.FLR_AUFTRAG_I_ID, true,
 				orderId.toString(), FilterKriterium.OPERATOR_EQUAL, false) ;		
 	}
+	
+	public FilterKriterium getIsIdentFilter() {
+		return new FilterKriterium(
+				AuftragpositionFac.FLR_AUFTRAGPOSITION_POSITIONART_C_NR, true, 
+				"('Ident', 'Handeingabe')", FilterKriterium.OPERATOR_IN, false) ;
+	}
 }

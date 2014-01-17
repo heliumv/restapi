@@ -9,7 +9,7 @@ import javax.naming.NamingException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.heliumv.api.item.ItemEntry;
-import com.heliumv.api.worktime.ItemEntryTransformer;
+import com.heliumv.api.worktime.WorkItemEntryTransformer;
 import com.heliumv.factory.Globals;
 import com.heliumv.factory.IMandantCall;
 import com.heliumv.factory.IParameterCall;
@@ -30,7 +30,7 @@ public class ArtikelArbeitszeitQuery extends BaseQuery<ItemEntry> {
 
 	public ArtikelArbeitszeitQuery() {
 		super(QueryParameters.UC_ID_ARTIKELLISTE) ;
-		setTransformer(new ItemEntryTransformer()) ;
+		setTransformer(new WorkItemEntryTransformer()) ;
 	}
 	
 	

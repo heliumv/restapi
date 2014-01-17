@@ -304,7 +304,7 @@ public class InventoryApi extends BaseApi implements IInventoryApi {
 	}
 	
 	/**
-	 * Offene Inventuren eingeschränkt auf Inventuren die einem bestimmten Lager zugeordnet sind
+	 * Offene Inventuren eingeschr&auml;nkt auf Inventuren die einem bestimmten Lager zugeordnet sind
 	 * Ausserdem muss der abfragende Zugriff auf das Lager haben.
 	 * 
 	 * @return eine (leere) Liste aller Inventuren die noch offen sind

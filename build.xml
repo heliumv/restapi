@@ -98,7 +98,7 @@
 	</target>
 
 	<target name="webdoc" depends="compile" >
-		<enunciate basedir="${dir.src}">
+		<enunciate basedir="${dir.src}" configfile="enunciate.xml">
 			<include name="**/*.java"/>
 			<classpath refid="enunciate.classpath"/>
 <!--

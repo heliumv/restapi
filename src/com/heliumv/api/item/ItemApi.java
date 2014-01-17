@@ -94,7 +94,7 @@ public class ItemApi extends BaseApi implements IItemApi {
 			@QueryParam(Param.USERID) String userId,
 			@QueryParam(Param.LIMIT) Integer limit,
 			@QueryParam(Param.STARTINDEX) Integer startIndex, 
-			@QueryParam("filter_cnr") String filterCnr, 
+			@QueryParam(Filter.CNR) String filterCnr, 
 			@QueryParam("filter_textsearch") String filterTextSearch,
 			@QueryParam("filter_deliverycnr") String filterDeliveryCnr,
 			@QueryParam("filter_itemgroupclass") String filterItemGroupClass,
@@ -202,7 +202,7 @@ public class ItemApi extends BaseApi implements IItemApi {
 			String itemCnr, Boolean returnItemInfo) {
 		List<StockAmountEntry> stockEntries = new ArrayList<StockAmountEntry>() ;
  		if(StringHelper.isEmpty(itemCnr)) {
-			respondBadRequest("itemCnr", "null/empty") ;
+			respondBadRequestValueMissing("itemCnr") ;
 			return stockEntries ;
 		}
 		if(connectClient(userId) == null) return stockEntries ;
