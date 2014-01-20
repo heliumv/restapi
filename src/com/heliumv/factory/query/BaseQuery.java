@@ -22,7 +22,15 @@ public abstract class BaseQuery<T> extends FastLaneReaderCall  {
 		entryTransformer = transformer ;
 	}
 	
+	public BaseFLRTransformer<T> getTransformer() {
+		return entryTransformer ;
+	}
+	
 	public List<T> getResultList(QueryResult result) {
-		return entryTransformer.transform(result.getRowData(), getTableColumnInfo()) ;
+		return transform(result) ;
+	}
+	
+	protected List<T> transform(QueryResult result) {
+		return entryTransformer.transform(result.getRowData(), getTableColumnInfo()) ;		
 	}
 }

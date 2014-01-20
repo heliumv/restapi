@@ -33,7 +33,7 @@ public class PingResult {
 	
 	
 	/**
-	 * Zeitpunkt am API Server
+	 * Zeitpunkt im ms (seit 1.1.1970) am API Server
 	 * 
 	 * @return den Zeitpunkt zu dem der Aufruf vom API Server registriert wurde (Zeitstempel des API Servers)
 	 */
@@ -45,7 +45,7 @@ public class PingResult {
 	}
 	
 	/**
-	 * Zeitpunkt am HELIUMV Server
+	 * Zeitpunkt im ms (seit 1.1.1970) am HELIUMV Server
 	 * 
 	 * @return den Zeitpunkt zu dem der Aufruf vom HELIUM V Server registriert wurde (Zeitstempel des HELIUM V Servers)
 	 */
@@ -78,6 +78,12 @@ public class PingResult {
 	public void setServerVersionNumber(String serverVersionNumber) {
 		this.serverVersionNumber = serverVersionNumber;
 	}
+	
+	/**
+	 * Die Zeitspanne in ms die ben&ouml;tigt wurde, um eine Verbindung zum HELIUM V Server aufzunehmen und
+	 * die Serverinformationen zu erhalten
+	 * @return
+	 */
 	public long getServerDuration() {
 		return serverDuration;
 	}

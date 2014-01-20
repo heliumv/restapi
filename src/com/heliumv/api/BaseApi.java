@@ -71,9 +71,14 @@ public class BaseApi {
 		public final static String CUSTOMERID = "customerid" ;
 	}
 	
+	public static class ParamInHeader {
+		public final static String TOKEN = "hvtoken" ;
+	}
+	
 	public class Filter {
 		private final static String BASE = "filter_" ;
- 		public final static String HIDDEN = BASE + "withHidden" ;
+		public final static String CNR    = BASE + "cnr" ;
+  		public final static String HIDDEN = BASE + "withHidden" ;
 	}
 	
 	private ResponseBuilder getResponseBuilder() {
@@ -86,6 +91,11 @@ public class BaseApi {
 	
 	protected String getValueForUuid(String uuid) {
 		return uuid ;
+	}
+	
+	public TheClientDto connectClient(String headerUserId, String paramUserId) {
+		if(!StringHelper.isEmpty(headerUserId)) return connectClient(headerUserId) ;
+		return connectClient(paramUserId) ;
 	}
 	
 	public TheClientDto connectClient(String userId) {

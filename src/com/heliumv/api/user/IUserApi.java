@@ -1,4 +1,4 @@
-package com.heliumv.api.benutzer;
+package com.heliumv.api.user;
 
 import javax.ws.rs.core.Response;
 

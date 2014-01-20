@@ -2,6 +2,7 @@ package com.heliumv.annotation;
 
 import java.lang.reflect.Method;
 
+import org.apache.commons.lang.StringUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -44,7 +45,9 @@ public class HvJudgeAspect extends BaseAspect {
 		HvJudge theModul = (HvJudge) method.getAnnotation(HvJudge.class);
 		if(theModul == null) return ;
 		
-		System.out.println("Having the HvJudge Annotation with name '" + theModul.recht() + "|" + theModul.rechtOder() + "<") ;
+		System.out.println("Having the HvJudge Annotation with name |'" + theModul.recht() + "'|" +
+				StringUtils.join(theModul.rechtOder(), "|") + "<") ;
+	
 		if(theModul.recht().length() > 0) {
 			if(!judgeCall.hatRecht(theModul.recht())) {
 				throw new EJBExceptionLP(EJBExceptionLP.FEHLER_UNZUREICHENDE_RECHTE,

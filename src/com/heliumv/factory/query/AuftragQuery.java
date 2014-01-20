@@ -71,14 +71,14 @@ public class AuftragQuery extends BaseQuery<OrderEntry> {
 		fk.wrapWithSingleQuotes() ;
 		return fk ;
 	}
-	
-	public FilterKriterium getFilterCustomer(String customer) throws NamingException, RemoteException {
+
+	private FilterKriterium getFilterCustomerAdresstyp(String customer, String adressTyp) throws NamingException, RemoteException {
 		if(null == customer || customer.trim().length() == 0) return null ;
 
 		int percentType = parameterCall
 				.isPartnerSucheWildcardBeidseitig() ? FilterKriteriumDirekt.PROZENT_BOTH : FilterKriteriumDirekt.PROZENT_TRAILING ;
 
-		FilterKriteriumDirekt fk = new FilterKriteriumDirekt(AuftragFac.FLR_AUFTRAG_FLRKUNDE
+		FilterKriteriumDirekt fk = new FilterKriteriumDirekt(adressTyp
 				+ "." + KundeFac.FLR_PARTNER + "."
 				+ PartnerFac.FLR_PARTNER_NAME1NACHNAMEFIRMAZEILE1, StringHelper.removeSqlDelimiters(customer),
 				FilterKriterium.OPERATOR_LIKE, "",
@@ -88,6 +88,27 @@ public class AuftragQuery extends BaseQuery<OrderEntry> {
 		return fk ;
 	}
 	
+	public FilterKriterium getFilterCustomer(String customer) throws NamingException, RemoteException {
+		return getFilterCustomerAdresstyp(customer, AuftragFac.FLR_AUFTRAG_FLRKUNDE) ;
+//		
+//		if(null == customer || customer.trim().length() == 0) return null ;
+//
+//		int percentType = parameterCall
+//				.isPartnerSucheWildcardBeidseitig() ? FilterKriteriumDirekt.PROZENT_BOTH : FilterKriteriumDirekt.PROZENT_TRAILING ;
+//
+//		FilterKriteriumDirekt fk = new FilterKriteriumDirekt(AuftragFac.FLR_AUFTRAG_FLRKUNDE
+//				+ "." + KundeFac.FLR_PARTNER + "."
+//				+ PartnerFac.FLR_PARTNER_NAME1NACHNAMEFIRMAZEILE1, StringHelper.removeSqlDelimiters(customer),
+//				FilterKriterium.OPERATOR_LIKE, "",
+//				percentType, true, true, Facade.MAX_UNBESCHRAENKT); 
+//		fk.wrapWithProzent() ;
+//		fk.wrapWithSingleQuotes() ;
+//		return fk ;
+	}
+	
+	public FilterKriterium getFilterDeliveryCustomer(String customer) throws NamingException, RemoteException {
+		return getFilterCustomerAdresstyp(customer, AuftragFac.FLR_AUFTRAG_FLRKUNDELIEFERADRESSE) ;
+	}
 	
 	public FilterKriterium getFilterWithHidden(Boolean withHidden) {
 		return FilterHelper.createWithHidden(withHidden, AuftragFac.FLR_AUFTRAG_B_VERSTECKT) ;

@@ -19,6 +19,7 @@
 		<fileset dir="${dir.lib}">
 			<include name="**/aspectjweaver.jar"/>
 			<include name="**/jackson-all-1.9.11.jar" />
+			<include name="**/modelmapper-0.6.2.jar" />
 		</fileset>
 		
 	</path>
@@ -41,6 +42,7 @@
 
 		<fileset dir="lib">
 			<include name="**/aspectjweaver.jar" />
+			<include name="**/modelmapper-0.6.2.jar" />
 		</fileset>
 
 		<fileset dir="${dir.client}/deploy/">
@@ -96,7 +98,7 @@
 	</target>
 
 	<target name="webdoc" depends="compile" >
-		<enunciate basedir="${dir.src}">
+		<enunciate basedir="${dir.src}" configfile="enunciate.xml">
 			<include name="**/*.java"/>
 			<classpath refid="enunciate.classpath"/>
 <!--
@@ -124,6 +126,7 @@
 
 			<lib dir="lib">
 				<include name="**/jackson-all-1.9.11.jar" />
+				<include name="**/modelmapper-0.6.2.jar" />
 			</lib>
 			
 <!--
