@@ -3,7 +3,7 @@
 2) Bei einem Update oder der Erstinstallation:
 a) Das Verzeichnis "./lib" auf das Verzeichnis (beispielsweise)
    /apache-tomcat-7.0.42 inklusive der Struktur kopieren.
-b) Die Dateien restapi.war, restapi-doc.war und root.war auf das Verzeichnis
+b) Die Dateien restapi.war, restapi-doc.war und ROOT.war auf das Verzeichnis
    (beispielsweise) /apache-tomcat-7.0.42/webapps kopieren
 c) Die Verzeichnisse restapi, restapi-doc und ROOT löschen 
    (/apache-tomcat-7.0.42/, es reicht nicht, diese Verzeichnis nur zu leeren)
