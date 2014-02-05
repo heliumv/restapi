@@ -38,10 +38,23 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 
 public class BaseAspect {
+	/**
+	 * Methodensignatur im richtigen Typ liefern
+	 * 
+	 * @param pjp
+	 * @return
+	 * @throws Throwable
+	 */
 	public MethodSignature getMethodSignatureFrom(JoinPoint pjp) throws Throwable {
 		return (MethodSignature) pjp.getSignature() ;
 	}
 	
+	/**
+	 * Methode suchen. Sowohl im Interface als auch in der Klasse
+	 * @param pjp
+	 * @return
+	 * @throws Throwable
+	 */
 	public Method getMethodFrom(JoinPoint pjp) throws Throwable {
 		MethodSignature methodSig = getMethodSignatureFrom(pjp) ;
 		Method method = methodSig.getMethod() ;
