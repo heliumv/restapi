@@ -1,9 +1,14 @@
-1) Bei einem Update:
+1) Tomcat beenden (service hvtomcat stop bzw. Dienst HvTomcat beenden)  
+
+2) Bei einem Update oder der Erstinstallation:
 a) Das Verzeichnis "./lib" auf das Verzeichnis (beispielsweise)
    /apache-tomcat-7.0.42 inklusive der Struktur kopieren.
+b) Die Dateien restapi.war, restapi-doc.war und root.war auf das Verzeichnis
+   (beispielsweise) /apache-tomcat-7.0.42/webapps kopieren
+c) Die Verzeichnisse restapi, restapi-doc und ROOT löschen 
+   (/apache-tomcat-7.0.42/, es reicht nicht, diese Verzeichnis nur zu leeren)
 
-
-2) Bei der Erstinstallation zusaetzlich:
+3) Bei der Erstinstallation zusaetzlich:
 a) Das Verzeichnis "./conf" auf das Verzeichnis (beispielsweise)
    /apache-tomcat-7.0.42 inklusive der Struktur kopieren.
 b) Die Datei /apache-tomcat-7.0.42/conf/Catalina/localhost/restapi.xml

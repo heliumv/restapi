@@ -167,6 +167,12 @@
 		<copy todir="${dir.deploy}/tomcat" includeEmptyDirs="true" verbose="true" flatten="false" overwrite="true">
 			<fileset dir="TomcatContent/tomcat"/>
 		</copy>
+
+		<copy todir="${dir.deploy}" includeEmptyDirs="true" verbose="true" flatten="true" overwrite="true">
+			<fileset dir="WebContent">
+				<include name="ROOT.war" />
+			</fileset>
+		</copy>
 			
 		<!-- ein kleiner check, ob alle benoetigten files vorhanden sind. -->
 		<antcall target="webdoc" />		
