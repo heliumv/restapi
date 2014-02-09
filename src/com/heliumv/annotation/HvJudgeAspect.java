@@ -33,6 +33,7 @@
 package com.heliumv.annotation;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 import org.apache.commons.lang.StringUtils;
 import org.aspectj.lang.JoinPoint;
@@ -99,7 +100,7 @@ public class HvJudgeAspect extends BaseAspect {
 			}
 
 			throw new EJBExceptionLP(EJBExceptionLP.FEHLER_UNZUREICHENDE_RECHTE,
-					methodSig.getMethod().getName() + ":" + theModul.rechtOder().toString() ) ;
+					methodSig.getMethod().getName() + ":" + Arrays.toString(theModul.rechtOder())) ;
 		}
 	}
 }

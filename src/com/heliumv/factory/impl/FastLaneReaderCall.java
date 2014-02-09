@@ -34,6 +34,7 @@ package com.heliumv.factory.impl;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -120,7 +121,7 @@ public abstract class FastLaneReaderCall extends BaseCall<FastLaneReader> implem
 	
 	public void getTableInfo() throws NamingException, RemoteException {
 		TableInfo info = getFac().getTableInfo(uuid, usecaseId, Globals.getTheClientDto()) ;
-		System.out.println("" + info.getDataBaseColumnNames()) ;
+		System.out.println("" + Arrays.toString(info.getDataBaseColumnNames())) ;
 	}
 	
 	public TableColumnInformation getTableColumnInfo()  {
