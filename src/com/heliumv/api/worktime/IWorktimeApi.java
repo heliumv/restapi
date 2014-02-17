@@ -117,14 +117,14 @@ public interface IWorktimeApi {
 	Response bookOrder(OrderRecordingEntry entry) ;
 
 	/**
-	 * Liefert eine Liste aller verf&uuml;gbaren T&auml;tigkeiten(Artikel) die innerhalb der Zeiterfassung 
+	 * Liefert eine Liste aller verf&uuml;gbaren T&auml;tigkeiten (Arbeitszeitartikel) die innerhalb der Zeiterfassung 
 	 * durchgef&uuml;hrt werden k&ouml;nnen. </br>
 	 * 
 	 * @param userId des am HELIUM V Servers angemeldeten Benutzers
 	 * @param limit (optional) die maximale Anzahl von gelieferten Eintr&auml;gen. Default ist 50.
 	 * @param startIndex (optional) die Id (eines <code>ItemEntry</code> Eintrags, mit dem die Liste beginnen soll
 	 * @param filterCnr (optional) die Sondert&auml;tigkeiten auf diese Kennung einschr&auml;nken
-	 * @return eine (leere) Liste der f&uuml;r den Benutzer verf&uuml;gbaren Sondert&auml;tigkeiten
+	 * @return eine (leere) Liste der f&uuml;r den Benutzer verf&uuml;gbaren T&auml;tigkeiten
 	 */
 	List<ItemEntry> getActivities(
 			String userId,
@@ -138,7 +138,7 @@ public interface IWorktimeApi {
 	 * <p>Es k&ouml;nnen nur jene Sondert&auml;tigkeiten gebucht werden, die laut HELIUM V Konfiguration
 	 * f&uuml;r den Anwender beziehungsweise dessen Benutzerrolle zur Verf&uuml;gung steht.</p>
 	 * @param userId
-	 * @return
+	 * @return eine (leere) Liste der f&uuml;r den Benutzer verf&uuml;gbaren Sondert&auml;tigkeiten
 	 */
 	public List<SpecialActivity> getSpecialActivities(String userId) ;
 	

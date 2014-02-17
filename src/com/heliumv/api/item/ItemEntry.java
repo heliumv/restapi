@@ -191,17 +191,13 @@ public class ItemEntry extends BaseEntryId {
 		this.comments = comments;
 	}
 	
-	public Boolean isHidden() {
-		return hidden;
-	}
-	
 	/**
 	 * Ist es ein versteckter Artikel?
 	 * 
 	 * @return true wenn es ein versteckter Artikel ist
 	 */
 	public Boolean getHidden() {
-		return isHidden() ;
+		return hidden ;
 	}
 	
 	public void setHidden(Boolean hidden) {
