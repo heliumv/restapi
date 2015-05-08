@@ -32,13 +32,20 @@
  ******************************************************************************/
 package com.heliumv.factory;
 
+import java.math.BigDecimal;
 import java.rmi.RemoteException;
 
 import javax.naming.NamingException;
 
 import com.lp.server.artikel.service.VkpfartikelpreislisteDto;
+import com.lp.server.artikel.service.VkpreisfindungDto;
+import com.lp.util.EJBExceptionLP;
 
 public interface IVkPreisfindungCall {
 
 	VkpfartikelpreislisteDto vkpfartikelpreislisteFindByPrimaryKey(Integer preislisteId) throws RemoteException, NamingException ;
+
+	VkpreisfindungDto verkaufspreisfindung(Integer itemId, Integer customerId, 
+			BigDecimal amount, java.sql.Date date, Integer pricelistId, 
+			Integer mwstsatzbezId, String currencyCnr) throws NamingException, RemoteException, EJBExceptionLP ;
 }

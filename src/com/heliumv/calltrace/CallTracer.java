@@ -36,6 +36,9 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.heliumv.annotation.HvCallrate;
 import com.lp.util.EJBExceptionLP;
 
@@ -46,7 +49,8 @@ import com.lp.util.EJBExceptionLP;
  * To change this template use File | Settings | File Templates.
  */
 public class CallTracer {
-    private Map<Method, TraceData> traceData = new HashMap<Method, TraceData>() ;
+	private static Logger log = LoggerFactory.getLogger(CallTracer.class) ;
+	private Map<Method, TraceData> traceData = new HashMap<Method, TraceData>() ;
 
     public void trace(HvCallrate theModul, Method theMethod) {
         TraceData theTrace = traceData.get(theMethod) ;
@@ -57,6 +61,7 @@ public class CallTracer {
 
         if(theTrace.incrementCount() > theModul.maxCalls()) {
         	if(theTrace.getTimespan() < theModul.durationMs()) {
+            	log.info("Overrated! count '" + theTrace.getCount() + "' in '" + theTrace.getTimespan() + "' ms.");
         		handleOverrated(); 
         	} else {
         		theTrace.clear() ;

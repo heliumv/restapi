@@ -124,15 +124,23 @@ public class TableColumnInformationMapper {
 		Integer columnIndex = getColumnInfos().getViewIndexObject(flrColumnName) ;
 		if(columnIndex != null) {
 			try {
-				theMethod.invoke(theInstance, flrObject[columnIndex]) ;
-				return ;
+				if(flrObject[columnIndex] == null) {
+					theMethod.invoke(theInstance, flrObject[columnIndex]) ;					
+				} else {
+					if(theMethod.getParameterTypes()[0].equals(flrObject[columnIndex].getClass())) {
+						theMethod.invoke(theInstance, flrObject[columnIndex]) ;
+					}					
+				}
 			} catch(InvocationTargetException e) {
-				
+				System.out.println("InvocationTargetException " + e.getMessage());				
 			} catch(IllegalAccessException e) {
+				System.out.println("IllegalAccessException " + e.getMessage());
 			} catch(ClassCastException e) {
-				System.out.println();
+				System.out.println("ClassCastException " + e.getMessage());
 			} catch(IllegalArgumentException e) {
-				System.out.println();				
+				System.out.println("IllegalArgumentException" + e.getMessage());				
+			} catch(NullPointerException e) {
+				System.out.println("NullPointerException" + e.getMessage());								
 			}
 		}		
 	}

@@ -33,7 +33,7 @@
 -->
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
 
-<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" debug="true">
 
   <appender name="MeinAppender" class="org.apache.log4j.DailyRollingFileAppender">
     <param name="datePattern" value="'.'yyyy-MM-dd_HH-mm" />
@@ -44,6 +44,26 @@
     </layout>
   </appender>
 
+  <appender name="SpringAppender" class="org.apache.log4j.DailyRollingFileAppender">
+    <param name="datePattern" value="'.'yyyy-MM-dd_HH-mm" />
+    <param name="file" value="${catalina.home}/logs/spring.log" />
+    <param name="Append" value="true" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{ISO8601} %-5p [%t] %c: %m%n" />
+    </layout>
+  </appender>
+
+
+ <logger name="org.springframework">
+     <level value="DEBUG" /> 
+     <appender-ref ref="SpringAppender" />     
+ </logger>
+ 
+ <logger name="org.jboss">
+     <level value="DEBUG" /> 
+     <appender-ref ref="MeinAppender" />     
+ </logger>
+ 
   <root>
     <priority value="DEBUG" />
     <appender-ref ref="MeinAppender" />

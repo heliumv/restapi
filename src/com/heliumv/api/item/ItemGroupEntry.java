@@ -68,7 +68,7 @@ public class ItemGroupEntry extends BaseEntryId {
 	}
 	
 	/**
-	 * Soll die R�ckgabe eines Leihartikels automatisch gebucht werden?
+	 * Soll die R&uuml;ckgabe eines Leihartikels automatisch gebucht werden?
 	 * @return
 	 */
 	public Boolean getBookReturn() {

@@ -39,12 +39,12 @@ import javax.naming.NamingException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.heliumv.factory.BaseCall;
-import com.heliumv.factory.Globals;
 import com.heliumv.factory.IGlobalInfo;
 import com.heliumv.factory.IParameterCall;
 import com.lp.server.artikel.service.ArtikelFac;
 import com.lp.server.system.service.ParameterFac;
 import com.lp.server.system.service.ParametermandantDto;
+import com.lp.util.EJBExceptionLP;
 
 public class ParameterCall extends BaseCall<ParameterFac> implements IParameterCall {
 	@Autowired
@@ -56,15 +56,23 @@ public class ParameterCall extends BaseCall<ParameterFac> implements IParameterC
 
 	public boolean isZeitdatenAufErledigteBuchbar() throws NamingException, RemoteException {
 		ParametermandantDto param = getFac()
-			.getMandantparameter(Globals.getTheClientDto().getMandant(),
+			.getMandantparameter(globalInfo.getMandant(),
 					ParameterFac.KATEGORIE_PERSONAL,
 					ParameterFac.PARAMETER_ZEITBUCHUNG_AUF_ERLEDIGTE_MOEGLICH) ;
+		return "1".equals(param.getCWert()) ;
+	}
+
+	public boolean isZeitdatenAufAngelegteLoseBuchbar() throws NamingException, RemoteException {
+		ParametermandantDto param = getFac()
+			.getMandantparameter(globalInfo.getMandant(),
+					ParameterFac.KATEGORIE_PERSONAL,
+					ParameterFac.PARAMETER_ZEITBUCHUNG_AUF_ANGELEGTE_LOSE_MOEGLICH) ;
 		return "1".equals(param.getCWert()) ;
 	}
 	
 	public boolean isPartnerSucheWildcardBeidseitig() throws NamingException, RemoteException {
 		ParametermandantDto param = getFac()
-				.getMandantparameter(Globals.getTheClientDto().getMandant(),
+				.getMandantparameter(globalInfo.getMandant(),
 						ParameterFac.KATEGORIE_PARTNER,
 						ParameterFac.PARAMETER_PARTNERSUCHE_WILDCARD_BEIDSEITIG) ;
 		return (Boolean) param.getCWertAsObject() ;
@@ -73,7 +81,7 @@ public class ParameterCall extends BaseCall<ParameterFac> implements IParameterC
 	
 	public boolean isKeineAutomatischeMaterialbuchung() throws NamingException, RemoteException {
 		ParametermandantDto param = getFac()
-				.getMandantparameter(Globals.getTheClientDto().getMandant(),
+				.getMandantparameter(globalInfo.getMandant(),
 						ParameterFac.KATEGORIE_FERTIGUNG,
 						ParameterFac.PARAMETER_KEINE_AUTOMATISCHE_MATERIALBUCHUNG) ;
 		return (Boolean) param.getCWertAsObject() ;
@@ -81,7 +89,7 @@ public class ParameterCall extends BaseCall<ParameterFac> implements IParameterC
 	
 	public boolean isBeiLosErledigenMaterialNachbuchen() throws NamingException, RemoteException {
 		ParametermandantDto param = getFac()
-				.getMandantparameter(Globals.getTheClientDto().getMandant(),
+				.getMandantparameter(globalInfo.getMandant(),
 						ParameterFac.KATEGORIE_FERTIGUNG,
 						ParameterFac.PARAMETER_BEI_LOS_ERLEDIGEN_MATERIAL_NACHBUCHEN) ;
 		return (Boolean) param.getCWertAsObject() ;	
@@ -91,7 +99,7 @@ public class ParameterCall extends BaseCall<ParameterFac> implements IParameterC
 		int defaultLaenge = ArtikelFac.MAX_ARTIKEL_ARTIKELNUMMER ;
 		
 		ParametermandantDto parameter = getFac()
-				.getMandantparameter(Globals.getTheClientDto().getMandant(),
+				.getMandantparameter(globalInfo.getMandant(),
 						ParameterFac.KATEGORIE_ARTIKEL,
 						ParameterFac.PARAMETER_ARTIKEL_MAXIMALELAENGE_ARTIKELNUMMER);
 		if (parameter.getCWertAsObject() != null) {
@@ -102,12 +110,26 @@ public class ParameterCall extends BaseCall<ParameterFac> implements IParameterC
 	}
 	
 	public boolean isArtikelDirektfilterGruppeKlasseStattReferenznummer() throws NamingException, RemoteException {
-		String mandant = globalInfo.getMandant() ;
-
 		ParametermandantDto param = getFac()
-				.getMandantparameter(mandant,
+				.getMandantparameter(globalInfo.getMandant(),
 						ParameterFac.KATEGORIE_ARTIKEL,
 						ParameterFac.PARAMETER_DIREKTFILTER_GRUPPE_KLASSE_STATT_REFERENZNUMMER) ;
 		return (Boolean) param.getCWertAsObject() ;	
+	}
+	
+	public Integer getGeschaeftsjahr(String mandantCNr) throws NamingException, RemoteException, EJBExceptionLP {
+		return getFac().getGeschaeftsjahr(mandantCNr) ;
+	}
+	
+	public Integer getGeschaeftsjahr() throws NamingException, RemoteException, EJBExceptionLP {
+		return getFac().getGeschaeftsjahr(globalInfo.getMandant()) ;
+	}
+
+	public String getMailAdresseAdmin() throws NamingException, RemoteException, EJBExceptionLP {
+		ParametermandantDto param = getFac()
+				.getMandantparameter(globalInfo.getMandant(),
+						ParameterFac.KATEGORIE_VERSANDAUFTRAG,
+						ParameterFac.PARAMETER_MAILADRESSE_ADMIN) ;
+		return param.getCWert() ;			
 	}
 }

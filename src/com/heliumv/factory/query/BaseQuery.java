@@ -40,7 +40,7 @@ import com.lp.server.util.fastlanereader.service.query.QueryResult;
 
 public abstract class BaseQuery<T> extends FastLaneReaderCall  {
 
-	private BaseFLRTransformer<T> entryTransformer ;
+	private BaseFLRTransformer<T> transformer ;
 	
 	protected BaseQuery(Integer usecaseId) {
 		super(usecaseId) ;
@@ -51,11 +51,11 @@ public abstract class BaseQuery<T> extends FastLaneReaderCall  {
 	}
 	
 	public void setTransformer(BaseFLRTransformer<T> transformer) {
-		entryTransformer = transformer ;
+		this.transformer = transformer ;
 	}
 	
 	public BaseFLRTransformer<T> getTransformer() {
-		return entryTransformer ;
+		return transformer ;
 	}
 	
 	public List<T> getResultList(QueryResult result) {
@@ -63,6 +63,6 @@ public abstract class BaseQuery<T> extends FastLaneReaderCall  {
 	}
 	
 	protected List<T> transform(QueryResult result) {
-		return entryTransformer.transform(result.getRowData(), getTableColumnInfo()) ;		
+		return transformer.transform(result.getRowData(), getTableColumnInfo()) ;		
 	}
 }

@@ -39,6 +39,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.heliumv.annotation.HvFlrMapper;
 import com.heliumv.api.BaseEntryId;
+import com.heliumv.tools.StringHelper;
 
 @XmlRootElement
 /**
@@ -68,6 +69,9 @@ public class ItemEntry extends BaseEntryId {
 	
 	private StockAmountInfoEntry stockAmountInfo ;
 
+	private String preferredType ;
+	private String customerItemCnr ;
+
 	/**
 	 * Die Kennung des Artikels (Artikelnummer)
 	 * @return
@@ -75,9 +79,10 @@ public class ItemEntry extends BaseEntryId {
 	public String getCnr() {
 		return cnr;
 	}
-	@HvFlrMapper(flrName="artikel.artikelnummerlang")
+	
+	@HvFlrMapper(flrName="artikel.artikelnummerlang", flrFieldName="artikelliste.c_nr")
 	public void setCnr(String cnr) {
-		this.cnr = cnr;
+		this.cnr = StringHelper.trim(cnr) ;
 	}
 	
 	/**
@@ -87,7 +92,7 @@ public class ItemEntry extends BaseEntryId {
 	public String getDescription() {
 		return description;
 	}
-	@HvFlrMapper(flrName="bes.artikelbezeichnung") 
+	@HvFlrMapper(flrName="bes.artikelbezeichnung", flrFieldName="aspr.c_bez") 
 	public void setDescription(String description) {
 		this.description = description;
 	}
@@ -99,7 +104,7 @@ public class ItemEntry extends BaseEntryId {
 	public String getDescription2() {
 		return description2;
 	}
-	@HvFlrMapper(flrName = "artikel.zusatzbez")
+	@HvFlrMapper(flrName = "artikel.zusatzbez", flrFieldName="aspr.c_zbez")
 	public void setDescription2(String description2) {
 		this.description2 = description2;
 	}
@@ -160,7 +165,7 @@ public class ItemEntry extends BaseEntryId {
 	}
 	@HvFlrMapper(flrName = "lp.stuecklistenart")
 	public void setBillOfMaterialType(String billOfMaterialType) {
-		this.billOfMaterialType = billOfMaterialType;
+		this.billOfMaterialType = StringHelper.trim(billOfMaterialType) ;
 	}
 
 	/**
@@ -177,6 +182,11 @@ public class ItemEntry extends BaseEntryId {
 	@HvFlrMapper(flrName="Icon")
 	public void setAvailable(Object[] iconInfo) {
 		available = iconInfo == null ;
+	}
+
+	@HvFlrMapper(flrName="Icon")
+	public void setAvailable(String value) {
+		available = value == null ;
 	}
 	
 	/**
@@ -213,7 +223,7 @@ public class ItemEntry extends BaseEntryId {
 	}
 	
 	public void setUnitCnr(String unitCnr) {
-		this.unitCnr = unitCnr;
+		this.unitCnr = StringHelper.trim(unitCnr) ;
 	}
 	
 	/**
@@ -224,7 +234,7 @@ public class ItemEntry extends BaseEntryId {
 		return typeCnr;
 	}
 	public void setTypeCnr(String typeCnr) {
-		this.typeCnr = typeCnr;
+		this.typeCnr = StringHelper.trim(typeCnr);
 	}
 	
 	/**
@@ -236,7 +246,7 @@ public class ItemEntry extends BaseEntryId {
 	}
 	@HvFlrMapper(flrNames= {"lp.artikelgruppeInAbmessung", "lp.artikelgruppe" })
 	public void setItemgroupCnr(String itemgroupCnr) {
-		this.itemgroupCnr = itemgroupCnr;
+		this.itemgroupCnr = StringHelper.trim(itemgroupCnr);
 	}
 	
 	/**
@@ -247,7 +257,7 @@ public class ItemEntry extends BaseEntryId {
 	}
 	@HvFlrMapper(flrName="lp.artikelklasse")
 	public void setItemclassCnr(String itemclassCnr) {
-		this.itemclassCnr = itemclassCnr;
+		this.itemclassCnr = StringHelper.trim(itemclassCnr) ;
 	}
 	
 	/**
@@ -293,6 +303,21 @@ public class ItemEntry extends BaseEntryId {
 	}
 	public void setIndex(String index) {
 		this.index = index;
+	}
+	
+	public String getPreferredType() {
+		return preferredType;
 	}	
-
+	@HvFlrMapper(flrName="artikel.vorzugsteil", flrFieldName="vz.c_nr")
+	public void setPreferredType(String preferredType) {
+		this.preferredType = preferredType;
+	}
+	
+	public String getCustomerItemCnr() {
+		return customerItemCnr;
+	}
+	@HvFlrMapper(flrFieldName="soko.c_kundeartikelnummer")
+	public void setCustomerItemCnr(String customerItemCnr) {
+		this.customerItemCnr = customerItemCnr;
+	}	
 }

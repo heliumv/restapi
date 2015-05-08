@@ -36,9 +36,13 @@ import java.rmi.RemoteException;
 
 import javax.naming.NamingException;
 
+import com.lp.util.EJBExceptionLP;
+
 public interface IParameterCall {
 	
 	boolean isZeitdatenAufErledigteBuchbar() throws NamingException, RemoteException ;
+	boolean isZeitdatenAufAngelegteLoseBuchbar() throws NamingException, RemoteException ;
+
 	boolean isPartnerSucheWildcardBeidseitig() throws NamingException, RemoteException ;
 
 	/**
@@ -61,9 +65,16 @@ public interface IParameterCall {
 	/**
 	 * Im Direktfilter nach Artikelgruppe/Klasse anstatt Referenznummer suchen
 	 * 
-	 * @return
+	 * @return true wenn die Gruppe bzw. Klasse anstatt der Referenznummer verwendet wird
 	 * @throws NamingException
 	 * @throws RemoteException
 	 */
 	boolean isArtikelDirektfilterGruppeKlasseStattReferenznummer() throws NamingException, RemoteException ;
+	
+	Integer getGeschaeftsjahr() throws NamingException, RemoteException, EJBExceptionLP ;
+	
+	Integer getGeschaeftsjahr(String mandantCNr) throws NamingException, RemoteException, EJBExceptionLP ;
+
+	String getMailAdresseAdmin() throws NamingException, RemoteException, EJBExceptionLP ;
+
 }

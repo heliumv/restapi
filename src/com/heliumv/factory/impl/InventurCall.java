@@ -117,4 +117,11 @@ public class InventurCall extends BaseCall<InventurFac> implements IInventurCall
 			RemoteException, EJBExceptionLP {
 		return getFac().updateInventurliste(inventurlisteDto, bPruefeAufZuGrosseMenge, globalInfo.getTheClientDto()) ;
 	}
+	
+	@Override
+	@HvModul(modul=LocaleFac.BELEGART_ARTIKEL)
+	@HvJudge(recht=RechteFac.RECHT_WW_ARTIKEL_CUD)
+	public void removeInventurListe(InventurlisteDto inventurlisteDto) throws NamingException, RemoteException, EJBExceptionLP {
+		getFac().removeInventurliste(inventurlisteDto, globalInfo.getTheClientDto()) ;
+	}
 }

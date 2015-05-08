@@ -42,25 +42,32 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.heliumv.api.production.ProductionEntry;
 import com.heliumv.api.production.ProductionEntryTransformer;
-import com.heliumv.factory.Globals;
+import com.heliumv.factory.IGlobalInfo;
 import com.heliumv.factory.IParameterCall;
 import com.heliumv.tools.StringHelper;
+import com.lp.client.fertigung.FertigungFilterFactory;
 import com.lp.server.util.fastlanereader.service.query.FilterKriterium;
 import com.lp.server.util.fastlanereader.service.query.QueryParameters;
 
 public class ProductionQuery extends BaseQuery<ProductionEntry> {
 	@Autowired
 	private IParameterCall parameterCall ;
+	@Autowired
+	private IGlobalInfo globalInfo ;
+	@Autowired
+	private ProductionEntryTransformer productionEntryTransformer ;
 	
 	public ProductionQuery() {
 		super(QueryParameters.UC_ID_LOS) ;
-		setTransformer(new ProductionEntryTransformer()) ;
+	//	setTransformer(new ProductionEntryTransformer()) ;
+		setTransformer(productionEntryTransformer);
 	}
 	
 	
 	public ProductionQuery(IParameterCall parameterCall) throws NamingException {
 		super(UUID.randomUUID().toString(), QueryParameters.UC_ID_LOS) ;
-		setTransformer(new ProductionEntryTransformer()) ;
+//		setTransformer(new ProductionEntryTransformer()) ;
+		setTransformer(productionEntryTransformer) ;
 		this.parameterCall = parameterCall ;
 	}
 	
@@ -69,13 +76,20 @@ public class ProductionQuery extends BaseQuery<ProductionEntry> {
 	protected List<FilterKriterium> getRequiredFilters() {
 		List<FilterKriterium> filters = new ArrayList<FilterKriterium>() ;
 
-		filters.add(getMandantFilter()) ;		
+		filters.add(getMandantFilter()) ;	
+		try {
+			filters.add(FertigungFilterFactory.getInstance().createFKBebuchbareLosStatus(
+					parameterCall.isZeitdatenAufErledigteBuchbar(), true, 
+					parameterCall.isZeitdatenAufAngelegteLoseBuchbar())) ;
+		} catch(Throwable t) {			
+		}
+
 		return filters ;
 	}
 
 	private FilterKriterium getMandantFilter() {
 		return new FilterKriterium("flrlos.mandant_c_nr", true,
-				StringHelper.asSqlString( Globals.getTheClientDto().getMandant()),
+				StringHelper.asSqlString( globalInfo.getMandant()),
 				FilterKriterium.OPERATOR_EQUAL, false);
 	}
 }

@@ -37,12 +37,10 @@ import java.util.Set;
 
 import javax.naming.NamingException;
 
-import com.heliumv.api.item.ItemEntry;
+import com.heliumv.api.item.ItemEntryInternal;
 
 public interface IArtikelLoaderCall  {
-//	enum Attribute { COMMENTS, PRICE, PROPERTIES } ;	
+	ItemEntryInternal artikelFindByCNrOhneExc(String cnr) throws RemoteException, NamingException ;
 
-	ItemEntry artikelFindByCNrOhneExc(String cnr) throws RemoteException, NamingException ;
-
-	ItemEntry artikelFindByCNrOhneExc(String cnr, Set<IItemLoaderAttribute> attributes) throws RemoteException, NamingException ;	
+	ItemEntryInternal artikelFindByCNrOhneExc(String cnr, Set<IItemLoaderAttribute> attributes) throws RemoteException, NamingException ;	
 }

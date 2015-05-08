@@ -46,14 +46,17 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.heliumv.api.BaseApi;
 import com.heliumv.factory.IArtikelCall;
+import com.heliumv.factory.IGlobalInfo;
 import com.heliumv.factory.ILagerCall;
 import com.heliumv.factory.IPanelCall;
 import com.heliumv.factory.IParameterCall;
+import com.heliumv.factory.IPartnerCall;
 import com.heliumv.factory.legacy.AllLagerEntry;
 import com.heliumv.factory.legacy.PaneldatenPair;
 import com.heliumv.factory.loader.IArtikelLoaderCall;
@@ -61,18 +64,12 @@ import com.heliumv.factory.loader.IItemLoaderAttribute;
 import com.heliumv.factory.loader.ItemLoaderComments;
 import com.heliumv.factory.loader.ItemLoaderStockinfoSummary;
 import com.heliumv.factory.query.ItemQuery;
-import com.heliumv.tools.FilterHelper;
-import com.heliumv.tools.FilterKriteriumCollector;
+import com.heliumv.feature.FeatureFactory;
 import com.heliumv.tools.StringHelper;
 import com.lp.server.artikel.service.ArtgruDto;
 import com.lp.server.artikel.service.ArtikelDto;
-import com.lp.server.artikel.service.ArtikelFac;
 import com.lp.server.artikel.service.LagerDto;
 import com.lp.server.system.service.PanelFac;
-import com.lp.server.util.Facade;
-import com.lp.server.util.fastlanereader.service.query.FilterBlock;
-import com.lp.server.util.fastlanereader.service.query.FilterKriterium;
-import com.lp.server.util.fastlanereader.service.query.FilterKriteriumDirekt;
 import com.lp.server.util.fastlanereader.service.query.QueryParameters;
 import com.lp.server.util.fastlanereader.service.query.QueryResult;
 import com.lp.util.EJBExceptionLP;
@@ -91,7 +88,10 @@ import com.lp.util.EJBExceptionLP;
 @Path("/api/v1/item")
 public class ItemApi extends BaseApi implements IItemApi {
 	@Autowired
-	private IArtikelCall artikelCall ;
+	protected IGlobalInfo globalInfo ;
+	
+	@Autowired
+	protected IArtikelCall artikelCall ;
 
 	@Autowired
 	private IArtikelLoaderCall artikelLoaderCall ;
@@ -104,7 +104,7 @@ public class ItemApi extends BaseApi implements IItemApi {
 	private ILagerCall lagerCall ;
 
 	@Autowired
-	private ItemQuery itemQuery ;
+	protected ItemQuery itemQuery ;
 	
 	@Autowired
 	private IParameterCall parameterCall ;
@@ -117,6 +117,18 @@ public class ItemApi extends BaseApi implements IItemApi {
 	
 	@Autowired
 	private ItemPropertyEntryMapper itempropertyEntryMapper ;
+	
+	@Autowired
+	private ModelMapper modelMapper ;
+	
+	@Autowired
+	protected ItemListBuilder itemlistBuilder ;
+	
+	@Autowired
+	private FeatureFactory featureFactory ;
+	
+	@Autowired
+	private IPartnerCall partnerCall ;
 	
 	@Override
 	@GET
@@ -136,24 +148,30 @@ public class ItemApi extends BaseApi implements IItemApi {
 		try {
 			if(connectClient(userId) == null) return itemEntries ;
 
-			FilterKriteriumCollector collector = new FilterKriteriumCollector() ;
-			collector.add(buildFilterCnr(filterCnr)) ;
-			collector.add(buildFilterTextSearch(filterTextSearch)) ;
-			collector.add(buildFilterDeliveryCnr(filterDeliveryCnr)) ;
-			collector.add(buildFilterItemGroupClass(filterItemGroupClass)) ;
-			collector.add(buildFilterItemReferenceNr(filterItemReferenceNr)) ;
+			featureFactory.getObject().applyItemListFilter(itemlistBuilder, filterCnr, 
+					filterTextSearch, filterDeliveryCnr, filterItemGroupClass, filterItemReferenceNr, filterWithHidden, null, null, null);
+//			if(!featureFactory.hasCustomerPartlist()) {
+//				itemlistBuilder
+//				.clear()
+//				.addFilterCnr(filterCnr)
+//				.addFilterTextSearch(filterTextSearch)
+//				.addFilterDeliveryCnr(filterDeliveryCnr)
+//				.addFilterItemGroupClass(filterItemGroupClass)
+//				.addFilterItemReferenceNr(filterItemReferenceNr)
+//				.addFilterWithHidden(filterWithHidden);				
+//			} else {
+//				Integer partnerId = featureFactory.getPartnerIdFromAnsprechpartnerId() ;
+//				itemlistBuilder
+//					.clear()
+//					.addFilterStuecklistenPartner(partnerId)
+//					.addFilterTextSearch(filterCnr);				
+//			}
 			
-			collector.add(buildFilterWithHidden(filterWithHidden)) ;
-			FilterBlock filterCrits = new FilterBlock(collector.asArray(), "AND") ;
-			
-			QueryParameters params = itemQuery.getDefaultQueryParameters(filterCrits) ;
+			QueryParameters params = itemQuery.getDefaultQueryParameters(itemlistBuilder.andFilterBlock()) ;
 			params.setLimit(limit) ;
 			params.setKeyOfSelectedRow(startIndex) ;
 			
-			QueryResult result = itemQuery.setQuery(params) ;
-			params.setLimit(limit) ;
-			params.setKeyOfSelectedRow(startIndex) ;
-			
+			QueryResult result = itemQuery.setQuery(params) ;			
 			itemEntries = itemQuery.getResultList(result) ;	
 		} catch(RemoteException e) {
 			respondUnavailable(e) ;
@@ -161,6 +179,8 @@ public class ItemApi extends BaseApi implements IItemApi {
 			respondUnavailable(e) ;
 		} catch(EJBExceptionLP e) {
 			respondBadRequest(e) ;
+		} catch(Exception e) {
+			respondBadRequest(new EJBExceptionLP(e));
 		}
 		
 		return itemEntries ;
@@ -184,6 +204,14 @@ public class ItemApi extends BaseApi implements IItemApi {
 
 		if(connectClient(userId) == null) return null ;
 
+		Set<IItemLoaderAttribute> attributes = getAttributes(addComments, addStockAmountInfos) ;
+		ItemEntryInternal itemEntryInternal = findItemBySerialnumberOrCnr(serialnumber, cnr, attributes) ;
+		if(itemEntryInternal == null) return null ;
+		
+		return mapFromInternal(itemEntryInternal) ;
+	}
+	
+	protected Set<IItemLoaderAttribute> getAttributes(Boolean addComments, Boolean addStockAmountInfos) {
 		Set<IItemLoaderAttribute> attributes = new HashSet<IItemLoaderAttribute>() ;
 		if(addComments != null && addComments) {
 			attributes.add(itemloaderComments) ;
@@ -191,17 +219,21 @@ public class ItemApi extends BaseApi implements IItemApi {
 		if(addStockAmountInfos != null && addStockAmountInfos) {
 			attributes.add(itemloaderStockinfoSummary) ;
 		}
-		
+		return attributes ;
+	}
+	
+	protected ItemEntryInternal findItemBySerialnumberOrCnr(
+			String serialnumber, String cnr, Set<IItemLoaderAttribute> attributes) {
 		try {
 			if(!StringHelper.isEmpty(serialnumber)) {
-				ItemEntry itemEntry = findItemEntryBySerialnumberCnr(serialnumber, cnr, attributes) ;
+				ItemEntryInternal itemEntry = findItemEntryBySerialnumberCnr(serialnumber, cnr, attributes) ;
 				if(itemEntry == null) {
 					respondNotFound() ;				
 				}
 				return itemEntry ;
 			}
 
-			ItemEntry itemEntry = findItemEntryByCnrImpl(cnr, attributes) ;
+			ItemEntryInternal itemEntry = findItemEntryByCnrImpl(cnr, attributes) ;
 			if(itemEntry == null) {
 				respondNotFound() ;				
 			}
@@ -214,10 +246,9 @@ public class ItemApi extends BaseApi implements IItemApi {
 			respondBadRequest(e) ;
 		}
 		
-		return null;
+		return null;		
 	}
 	
-
 	@Override
 	@GET
 	@Path("/stocks")
@@ -253,10 +284,12 @@ public class ItemApi extends BaseApi implements IItemApi {
 			for (AllLagerEntry allLagerEntry : stocks) {
 				if(lagerCall.hatRolleBerechtigungAufLager(allLagerEntry.getStockId())) {
 					LagerDto lagerDto = lagerCall.lagerFindByPrimaryKeyOhneExc(allLagerEntry.getStockId()) ;
+					if(lagerDto.getBVersteckt() > 0) continue ;
+					
 					BigDecimal amount = lagerCall.getLagerstandOhneExc(itemDto.getIId(), lagerDto.getIId()) ;
 					if(amount.signum() == 1) {
 						StockAmountEntry stockAmountEntry = new StockAmountEntry(
-								returnItemInfo ? itemMapper.mapEntry(itemDto) : null,
+								returnItemInfo ? mapFromInternal(itemMapper.mapEntry(itemDto)) : null,
 								stockMapper.mapEntry(lagerDto), amount) ;
 						stockEntries.add(stockAmountEntry) ;
 					}
@@ -361,7 +394,7 @@ public class ItemApi extends BaseApi implements IItemApi {
 		return properties ;	
 	}
 	
-	private ItemEntry findItemEntryBySerialnumberCnr(String serialnumber, String cnr, Set<IItemLoaderAttribute> attributes) throws RemoteException, NamingException {
+	private ItemEntryInternal findItemEntryBySerialnumberCnr(String serialnumber, String cnr, Set<IItemLoaderAttribute> attributes) throws RemoteException, NamingException {
 		Integer itemId = lagerCall.artikelIdFindBySeriennummerOhneExc(serialnumber) ;
 		if(itemId == null) return null ;
 		
@@ -373,86 +406,103 @@ public class ItemApi extends BaseApi implements IItemApi {
 		}
 		
 		return artikelLoaderCall.artikelFindByCNrOhneExc(artikelDto.getCNr(), attributes) ;
-//		ItemEntryMapper mapper = new ItemEntryMapper() ;
-//		return mapper.mapEntry(artikelDto) ;
 	}
 	
-	private ItemEntry findItemEntryByCnrImpl(String cnr, 
+	private ItemEntryInternal findItemEntryByCnrImpl(String cnr, 
 			Set<IItemLoaderAttribute> attributes) throws RemoteException, NamingException {
-		ItemEntry itemEntry = artikelLoaderCall.artikelFindByCNrOhneExc(cnr, attributes) ;
+		ItemEntryInternal itemEntry = artikelLoaderCall.artikelFindByCNrOhneExc(cnr, attributes) ;
 		return itemEntry ;
 	}
 
 	
-	private FilterKriterium buildFilterCnr(String filterCnr) throws RemoteException, NamingException {
-		if(StringHelper.isEmpty(filterCnr)) return null ;
+//	private FilterKriterium buildFilterCnr(String filterCnr) throws RemoteException, NamingException {
+//		if(StringHelper.isEmpty(filterCnr)) return null ;
+//		
+//		int itemCnrLength = parameterCall.getMaximaleLaengeArtikelnummer() ;
+//		
+//		FilterKriteriumDirekt fk = new FilterKriteriumDirekt(
+//				"artikelliste.c_nr",StringHelper.removeSqlDelimiters(filterCnr),
+//				FilterKriterium.OPERATOR_LIKE, "",
+//				FilterKriteriumDirekt.PROZENT_TRAILING,
+//				true, 
+//				true, itemCnrLength); 
+//		fk.wrapWithProzent() ;
+//		fk.wrapWithSingleQuotes() ;
+//		return fk ;
+//	}
+//
+//	private FilterKriterium buildFilterTextSearch(String filterCnr) throws RemoteException, NamingException {
+//		if(StringHelper.isEmpty(filterCnr)) return null ;
+//		FilterKriteriumDirekt fk = new FilterKriteriumDirekt(
+//				ArtikelFac.FLR_ARTIKELLISTE_C_VOLLTEXT,StringHelper.removeSqlDelimiters(filterCnr),
+//				FilterKriterium.OPERATOR_LIKE, "",
+//				FilterKriteriumDirekt.PROZENT_BOTH,
+//				true, 
+//				true, Facade.MAX_UNBESCHRAENKT); 
+//		fk.wrapWithProzent() ;
+//		fk.wrapWithSingleQuotes() ;
+//		return fk ;
+//	}
+//	
+//	private FilterKriterium buildFilterDeliveryCnr(String deliveryCnr) throws RemoteException, NamingException {
+//		if(StringHelper.isEmpty(deliveryCnr)) return null ;
+//		FilterKriteriumDirekt fk = new FilterKriteriumDirekt(
+//				ArtikelFac.FLR_ARTIKELLIEFERANT_C_ARTIKELNRLIEFERANT, StringHelper.removeSqlDelimiters(deliveryCnr),
+//				FilterKriterium.OPERATOR_LIKE, "",
+//				FilterKriteriumDirekt.PROZENT_BOTH,
+//				true, 
+//				true, Facade.MAX_UNBESCHRAENKT); 
+//		fk.wrapWithProzent() ;
+//		fk.wrapWithSingleQuotes() ;
+//		return fk ;
+//	}
+//	
+//	private FilterKriterium buildFilterItemGroupClass(String itemGroupClass) throws RemoteException, NamingException {
+//		if(StringHelper.isEmpty(itemGroupClass)) return null ;
+//		FilterKriteriumDirekt fk = new FilterKriteriumDirekt(
+//				"akag", StringHelper.removeSqlDelimiters(itemGroupClass),
+//				FilterKriterium.OPERATOR_LIKE, "",
+//				FilterKriteriumDirekt.PROZENT_BOTH,
+//				true, 
+//				true, Facade.MAX_UNBESCHRAENKT); 
+//		fk.wrapWithProzent() ;
+//		fk.wrapWithSingleQuotes() ;
+//		return fk ;
+//	}
+//
+//	private FilterKriterium buildFilterItemReferenceNr(String itemReferenceNr) throws RemoteException, NamingException {
+//		if(StringHelper.isEmpty(itemReferenceNr)) return null ;
+//		FilterKriteriumDirekt fk = new FilterKriteriumDirekt(
+//				"artikelliste."+ ArtikelFac.FLR_ARTIKELLISTE_C_REFERENZNR, StringHelper.removeSqlDelimiters(itemReferenceNr),
+//				FilterKriterium.OPERATOR_LIKE, "",
+//				FilterKriteriumDirekt.PROZENT_BOTH,
+//				true, 
+//				true, Facade.MAX_UNBESCHRAENKT); 
+//		fk.wrapWithProzent() ;
+//		fk.wrapWithSingleQuotes() ;
+//		return fk ;
+//	}
+//	
+//	private FilterKriterium buildFilterWithHidden(Boolean withHidden) {
+//		return FilterHelper.createWithHidden(withHidden, ArtikelFac.FLR_ARTIKELLISTE_B_VERSTECKT) ;
+//	}
+	
+	protected ItemEntry mapFromInternal(ItemEntryInternal itemEntryInternal) {
+		if(itemEntryInternal == null) return null ;
 		
-		int itemCnrLength = parameterCall.getMaximaleLaengeArtikelnummer() ;
-		
-		FilterKriteriumDirekt fk = new FilterKriteriumDirekt(
-				"artikelliste.c_nr",StringHelper.removeSqlDelimiters(filterCnr),
-				FilterKriterium.OPERATOR_LIKE, "",
-				FilterKriteriumDirekt.PROZENT_TRAILING,
-				true, 
-				true, itemCnrLength); 
-		fk.wrapWithProzent() ;
-		fk.wrapWithSingleQuotes() ;
-		return fk ;
+		ItemEntry itemEntry = modelMapper.map(itemEntryInternal, ItemEntry.class) ;
+		return itemEntry ;
+	}
+	
+	protected ModelMapper getModelMapper() {
+		return modelMapper ;
 	}
 
-	private FilterKriterium buildFilterTextSearch(String filterCnr) throws RemoteException, NamingException {
-		if(StringHelper.isEmpty(filterCnr)) return null ;
-		FilterKriteriumDirekt fk = new FilterKriteriumDirekt(
-				ArtikelFac.FLR_ARTIKELLISTE_C_VOLLTEXT,StringHelper.removeSqlDelimiters(filterCnr),
-				FilterKriterium.OPERATOR_LIKE, "",
-				FilterKriteriumDirekt.PROZENT_BOTH,
-				true, 
-				true, Facade.MAX_UNBESCHRAENKT); 
-		fk.wrapWithProzent() ;
-		fk.wrapWithSingleQuotes() ;
-		return fk ;
+	protected ItemLoaderComments getItemLoaderComments() {
+		return itemloaderComments ;
 	}
 	
-	private FilterKriterium buildFilterDeliveryCnr(String deliveryCnr) throws RemoteException, NamingException {
-		if(StringHelper.isEmpty(deliveryCnr)) return null ;
-		FilterKriteriumDirekt fk = new FilterKriteriumDirekt(
-				ArtikelFac.FLR_ARTIKELLIEFERANT_C_ARTIKELNRLIEFERANT, StringHelper.removeSqlDelimiters(deliveryCnr),
-				FilterKriterium.OPERATOR_LIKE, "",
-				FilterKriteriumDirekt.PROZENT_BOTH,
-				true, 
-				true, Facade.MAX_UNBESCHRAENKT); 
-		fk.wrapWithProzent() ;
-		fk.wrapWithSingleQuotes() ;
-		return fk ;
+	protected ItemLoaderStockinfoSummary getItemLoaderStockinfoSummary() {
+		return itemloaderStockinfoSummary ;
 	}
-	
-	private FilterKriterium buildFilterItemGroupClass(String itemGroupClass) throws RemoteException, NamingException {
-		if(StringHelper.isEmpty(itemGroupClass)) return null ;
-		FilterKriteriumDirekt fk = new FilterKriteriumDirekt(
-				"akag", StringHelper.removeSqlDelimiters(itemGroupClass),
-				FilterKriterium.OPERATOR_LIKE, "",
-				FilterKriteriumDirekt.PROZENT_BOTH,
-				true, 
-				true, Facade.MAX_UNBESCHRAENKT); 
-		fk.wrapWithProzent() ;
-		fk.wrapWithSingleQuotes() ;
-		return fk ;
-	}
-
-	private FilterKriterium buildFilterItemReferenceNr(String itemReferenceNr) throws RemoteException, NamingException {
-		if(StringHelper.isEmpty(itemReferenceNr)) return null ;
-		FilterKriteriumDirekt fk = new FilterKriteriumDirekt(
-				"artikelliste."+ ArtikelFac.FLR_ARTIKELLISTE_C_REFERENZNR, StringHelper.removeSqlDelimiters(itemReferenceNr),
-				FilterKriterium.OPERATOR_LIKE, "",
-				FilterKriteriumDirekt.PROZENT_BOTH,
-				true, 
-				true, Facade.MAX_UNBESCHRAENKT); 
-		fk.wrapWithProzent() ;
-		fk.wrapWithSingleQuotes() ;
-		return fk ;
-	}
-	
-	private FilterKriterium buildFilterWithHidden(Boolean withHidden) {
-		return FilterHelper.createWithHidden(withHidden, ArtikelFac.FLR_ARTIKELLISTE_B_VERSTECKT) ;
-	}	
 }

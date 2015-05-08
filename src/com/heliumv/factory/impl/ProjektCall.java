@@ -36,12 +36,20 @@ import java.rmi.RemoteException;
 
 import javax.naming.NamingException;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.heliumv.factory.BaseCall;
+import com.heliumv.factory.IGlobalInfo;
 import com.heliumv.factory.IProjektCall;
 import com.lp.server.projekt.service.ProjektDto;
 import com.lp.server.projekt.service.ProjektFac;
+import com.lp.server.system.service.TheClientDto;
+import com.lp.util.EJBExceptionLP;
 
 public class ProjektCall extends BaseCall<ProjektFac> implements IProjektCall {
+	@Autowired
+	private IGlobalInfo globalInfo ;
+	
 	public ProjektCall() {
 		super(ProjektFacBean) ;
 	}
@@ -49,5 +57,31 @@ public class ProjektCall extends BaseCall<ProjektFac> implements IProjektCall {
 	@Override
 	public ProjektDto projektFindByPrimaryKeyOhneExc(Integer projectId) throws NamingException, RemoteException {
 		return getFac().projektFindByPrimaryKeyOhneExc(projectId) ;
+	}
+	
+	@Override
+	public ProjektDto projektFindByMandantCNrCNrOhneExc(String mandantCnr, String cnr) throws NamingException {
+		return getFac().projektFindByMandantCNrCNrOhneExc(mandantCnr, cnr);
+	}
+
+	@Override
+	public ProjektDto projektFindByCNrOhneExc(String cnr) throws NamingException {
+		return getFac().projektFindByMandantCNrCNrOhneExc(globalInfo.getMandant(), cnr);
+	}
+
+	public String getBelegnr(Integer projektNummer, Integer geschaeftsjahr) throws NamingException, RemoteException {
+		return getFac().getBelegnr(projektNummer, geschaeftsjahr, globalInfo.getTheClientDto());
+	}
+	
+	@Override
+	public String getBelegnr(Integer projektNummer, Integer geschaeftsjahr,
+			TheClientDto theClientDto) throws NamingException, RemoteException {
+		return getFac().getBelegnr(projektNummer, geschaeftsjahr, theClientDto);
+	}
+	
+	@Override
+	public void updateProjekt(ProjektDto projektDto) throws NamingException,
+			RemoteException, EJBExceptionLP {
+		getFac().updateProjekt(projektDto, globalInfo.getTheClientDto());
 	}
 }

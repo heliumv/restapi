@@ -32,7 +32,10 @@
  ******************************************************************************/
 package com.heliumv.api.user;
 
-import javax.ws.rs.core.Response;
+import java.rmi.RemoteException;
+
+import javax.naming.NamingException;
+
 
 
 public interface IUserApi {
@@ -51,8 +54,15 @@ public interface IUserApi {
 	 * Erm&ouml;glicht das Abmelden.</br>
 	 * 
 	 * @param token wurde zuvor von einem "logon" ermittelt.
-	 * 
-	 * @return
 	 */
-	Response logout(String token) ;
+	void logoutPathParam(String token) ;
+	
+	/**
+	 * Erm&ouml;glicht das Abmelden.</br>
+	 * 
+	 * @param userId wurde zuvor von einem "logon" ermittelt.
+	 */
+	void logout(String userId) ;
+
+	LoggedOnTenantEntry logonExternal(LogonTenantEntry logonEntry) throws NamingException, RemoteException ;
 }

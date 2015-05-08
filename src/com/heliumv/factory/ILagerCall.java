@@ -40,6 +40,7 @@ import javax.naming.NamingException;
 
 import com.heliumv.factory.legacy.AllLagerEntry;
 import com.lp.server.artikel.service.LagerDto;
+import com.lp.server.artikel.service.SeriennrChargennrMitMengeDto;
 import com.lp.util.EJBExceptionLP;
 
 public interface ILagerCall {
@@ -59,6 +60,16 @@ public interface ILagerCall {
 	LagerDto lagerFindByPrimaryKeyOhneExc(Integer lagerIId)
 			throws NamingException;
 
+	/**
+	 * Ermittelt ein Lager auf Grund seiner Nummer
+	 * 
+	 * @param lagerCnr die Lagernummer
+	 * @return 
+	 * @throws NamingException
+	 * @throws RemoteException
+	 */
+	LagerDto lagerFindByCnrOhnExc(String lagerCnr) throws NamingException, RemoteException ;
+	
 	BigDecimal getLagerstandOhneExc(Integer itemId, Integer lagerIId)
 			throws NamingException, RemoteException;
 
@@ -73,5 +84,22 @@ public interface ILagerCall {
 	
 	BigDecimal getLagerstandAllerLagerEinesMandanten(Integer itemId, Boolean mitKonsignationsLager) throws NamingException, RemoteException ;
 	BigDecimal getPaternosterLagerstand(Integer itemId) throws NamingException, RemoteException ;
-
+	
+	List<SeriennrChargennrMitMengeDto> getAllSeriennrchargennrEinerBelegartposition(
+			String belegartCNr, Integer belegartpositionIId) throws NamingException, RemoteException ;
+	
+	List<SeriennrChargennrMitMengeDto> getAllSeriennrchargennrEinerBelegartpositionUeberHibernate(
+			String belegartCNr, Integer belegartpositionIId) throws NamingException, RemoteException ;
+	
+	void bucheZu(String belegartCNr, Integer belegartIId,
+			Integer belegartpositionIId, Integer artikelIId,
+			BigDecimal fMengeAbsolut, BigDecimal nEinstansdpreis,
+			Integer lagerIId,
+			List<SeriennrChargennrMitMengeDto> alSeriennrchargennr,
+			java.sql.Timestamp tBelegdatum) throws NamingException, RemoteException ;
+	
+	BigDecimal getEinstandspreis(String belegartCNr,
+			Integer belegartpositionIId, String cSeriennrChargennr)
+			throws NamingException, RemoteException, EJBExceptionLP ;
+		
 }

@@ -35,18 +35,22 @@ package com.heliumv.factory;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class BaseCallRegistrant {
-//	private static Log log = LogFactory.getLog(BaseCall.class) ;
+	private static Logger log = LoggerFactory.getLogger(BaseCallRegistrant.class) ;
 	private Map<String, BaseCall<?>> registeredCalls = new HashMap<String, BaseCall<?>>() ;
 		
 	public void register(BaseCall<?> theCall) {
 		registeredCalls.put(theCall.getBeanName(), theCall) ;
 		
-//		log.debug("Registered {" + theCall.getBeanName() + "}. Counting {" + registeredCalls.size() + "} elements") ;
+		log.debug("Registered {" + theCall.getBeanName() + "}. Counting {" + registeredCalls.size() + "} elements.") ;
 	}
 	
 	public void unregister(BaseCall<?> theCall) {
 		registeredCalls.remove(theCall.getBeanName()) ;
+		log.debug("Unregistered {" + theCall.getBeanName() + "}. Counting {" + registeredCalls.size() + "} elements.") ;
 	}
 	
 	public void resetCalls() {

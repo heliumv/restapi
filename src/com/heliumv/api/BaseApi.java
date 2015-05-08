@@ -44,16 +44,24 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.apache.cxf.jaxrs.impl.ResponseBuilderImpl;
 import org.apache.http.client.ClientProtocolException;
+import org.jboss.tm.JBossRollbackException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.heliumv.factory.Globals;
 import com.heliumv.factory.IClientCall;
 import com.heliumv.factory.IGlobalInfo;
 import com.heliumv.tools.StringHelper;
+import com.lp.client.frame.ExceptionLP;
+import com.lp.client.pc.LPMain;
+import com.lp.client.pc.LPMessages;
 import com.lp.server.system.service.TheClientDto;
 import com.lp.util.EJBExceptionLP;
 
-public class BaseApi {
+public class BaseApi implements IBaseApiHeaderConstants {
+	private static Logger log = LoggerFactory.getLogger(BaseApi.class) ;
+
 	@Context
 	private HttpServletResponse response ;
 	
@@ -66,13 +74,18 @@ public class BaseApi {
 	@Autowired
 	private IGlobalInfo globalInfo ;
 	
+//	@Context
+//	protected MessageContext mc ;
+	
+	
 	public final static int  UNPROCESSABLE_ENTITY  = 422 ;  /* RFC 4918 */
+	public final static int  LOCKED                = 423 ;
+	public final static int  TOO_MANY_REQUESTS     = 429 ;
 	
 	public final static String FORMAT_JSON = "application/json;charset=UTF-8" ;
 	public final static String FORMAT_XML = "application/xml;charset=UTF-8" ;
 	
 	public final static String[] FORMAT_JSON_XML = {FORMAT_JSON, FORMAT_XML} ;
-	
 
 	public static class HvErrorCode {
 		public final static Integer REMOTE_EXCEPTION         = 1 ;
@@ -101,6 +114,13 @@ public class BaseApi {
 		public final static String ORDERID     = "orderid" ;
 		
 		public final static String CUSTOMERID = "customerid" ;
+		
+		public final static String POSITIONID  = "positionid" ;
+		public final static String PARTLISTID  = "partlistid" ;
+		
+		public final static String MACHINEID   = "machineid" ;
+		
+		public final static String ORDERBY     = "$orderby" ;
 	}
 	
 	public static class ParamInHeader {
@@ -113,17 +133,17 @@ public class BaseApi {
   		public final static String HIDDEN = BASE + "withHidden" ;
 	}
 	
+	
+	public class With {
+		private final static String BASE = "with_" ;
+		public final static String DESCRIPTION = BASE + "description" ;
+	}
+
+	
 	private ResponseBuilder getResponseBuilder() {
 		return new ResponseBuilderImpl() ;
 	}
-	
-	protected String getUuidForValue(String value) {
-		return value ;
-	}
-	
-	protected String getValueForUuid(String uuid) {
-		return uuid ;
-	}
+		
 	
 	public TheClientDto connectClient(String headerUserId, String paramUserId) {
 		if(!StringHelper.isEmpty(headerUserId)) return connectClient(headerUserId) ;
@@ -139,13 +159,12 @@ public class BaseApi {
 			return null ;
 		}
 
-		if(getServletRequest().getContentLength() >1000) {
+		if(getServletRequest() != null && getServletRequest().getContentLength() >1000) {
 			respondBadRequestValueMissing("userid") ;
 			return null ;			
 		}
 		
-		String hvId = getValueForUuid(userId) ;
-		TheClientDto theClientDto = clientCall.theClientFindByUserLoggedIn(hvId) ;
+		TheClientDto theClientDto = clientCall.theClientFindByUserLoggedIn(userId) ;
 		if (null == theClientDto || null == theClientDto.getIDPersonal()) {
 			respondUnauthorized() ; 
 		} else {
@@ -161,6 +180,10 @@ public class BaseApi {
 	 */
 	public void respondUnauthorized() {
 		getServletResponse().setStatus(Response.Status.UNAUTHORIZED.getStatusCode()) ;		
+	}
+	
+	public void respondTooManyRequests() {
+		getServletResponse().setStatus(TOO_MANY_REQUESTS);
 	}
 	
 	public Response getUnauthorized() {
@@ -183,21 +206,21 @@ public class BaseApi {
 	
 	public Response getInternalServerError(EJBExceptionLP e) {
 		return getResponseBuilder().status(Response.Status.INTERNAL_SERVER_ERROR)
-				.header("x-hv-error-code", HvErrorCode.EJB_EXCEPTION.toString())
-				.header("x-hv-error-code-extended", new Integer(e.getCode()).toString())
-				.header("x-hv-error-description", e.getCause().getMessage()).build() ;		
+				.header(X_HV_ERROR_CODE, HvErrorCode.EJB_EXCEPTION.toString())
+				.header(X_HV_ERROR_CODE_EXTENDED, new Integer(e.getCode()).toString())
+				.header(X_HV_ERROR_CODE_DESCRIPTION, e.getCause().getMessage()).build() ;		
 	}
 
 	public Response getUnavailable(RemoteException e) {
 		return getResponseBuilder().status(Response.Status.INTERNAL_SERVER_ERROR)
-				.header("x-hv-error-code", HvErrorCode.REMOTE_EXCEPTION.toString())
-				.header("x-hv-error-description", e.getMessage()).build() ;		
+				.header(X_HV_ERROR_CODE, HvErrorCode.REMOTE_EXCEPTION.toString())
+				.header(X_HV_ERROR_CODE_DESCRIPTION, e.getMessage()).build() ;		
 	}
 	
 	public Response getUnavailable(NamingException e) {
 		return getResponseBuilder().status(Response.Status.INTERNAL_SERVER_ERROR)
-				.header("x-hv-error-code", HvErrorCode.NAMING_EXCEPTION.toString())
-				.header("x-hv-error-description", e.getMessage()).build() ;		
+				.header(X_HV_ERROR_CODE, HvErrorCode.NAMING_EXCEPTION.toString())
+				.header(X_HV_ERROR_CODE_DESCRIPTION, e.getMessage()).build() ;		
 	}
 
 
@@ -212,99 +235,137 @@ public class BaseApi {
 	}
 	
 	public void respondExpectationFailed(Integer hvErrorCode) {
-		getServletResponse().setHeader("x-hv-error-code", HvErrorCode.EXPECTATION_FAILED.toString()) ;
-		getServletResponse().setHeader("x-hv-error-code-extended", hvErrorCode.toString()) ;
+		getServletResponse().setHeader(X_HV_ERROR_CODE, HvErrorCode.EXPECTATION_FAILED.toString()) ;
+		getServletResponse().setHeader(X_HV_ERROR_CODE_EXTENDED, hvErrorCode.toString()) ;
 //		getServletResponse().setStatus(Response.Status.EXPECTATION_FAILED.getStatusCode()) ;
 		getServletResponse().setStatus(417) ;
 	}
 
 	public void respondUnavailable(NamingException e) {
-		getServletResponse().setHeader("x-hv-error-code", HvErrorCode.NAMING_EXCEPTION.toString()) ;
-		getServletResponse().setHeader("x-hv-error-description", e.getMessage()) ;		
+		log.info("default-log", e);
+		getServletResponse().setHeader(X_HV_ERROR_CODE, HvErrorCode.NAMING_EXCEPTION.toString()) ;
+		getServletResponse().setHeader(X_HV_ERROR_CODE_DESCRIPTION, e.getMessage()) ;		
 		getServletResponse().setStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()) ;		
 	}
 	
 	public void respondUnavailable(RemoteException e) {
-		getServletResponse().setHeader("x-hv-error-code", HvErrorCode.REMOTE_EXCEPTION.toString()) ;
-		getServletResponse().setHeader("x-hv-error-description", e.getMessage()) ;		
+		log.info("default-log", e);
+		getServletResponse().setHeader(X_HV_ERROR_CODE, HvErrorCode.REMOTE_EXCEPTION.toString()) ;
+		getServletResponse().setHeader(X_HV_ERROR_CODE_DESCRIPTION, e.getMessage()) ;		
 		getServletResponse().setStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()) ;		
 	}
 
 	public void respondUnavailable(ClientProtocolException e) {
-		getServletResponse().setHeader("x-hv-error-code", HvErrorCode.CLIENTPROTOCOL_EXCEPTION.toString()) ;
-		getServletResponse().setHeader("x-hv-error-description", e.getMessage()) ;		
+		log.info("default-log", e);
+		getServletResponse().setHeader(X_HV_ERROR_CODE, HvErrorCode.CLIENTPROTOCOL_EXCEPTION.toString()) ;
+		getServletResponse().setHeader(X_HV_ERROR_CODE_DESCRIPTION, e.getMessage()) ;		
 // TODO: Enunciate kennt "BAD_GATEWAY" nicht??
 //		getServletResponse().setStatus(Response.Status.BAD_GATEWAY.getStatusCode()) ;			
 		getServletResponse().setStatus(502) ;
 	}
 
 	public void respondUnavailable(IOException e) {
-		getServletResponse().setHeader("x-hv-error-code", HvErrorCode.IO_EXCEPTION.toString()) ;
-		getServletResponse().setHeader("x-hv-error-description", e.getMessage()) ;		
+		log.info("default-log", e);
+		getServletResponse().setHeader(X_HV_ERROR_CODE, HvErrorCode.IO_EXCEPTION.toString()) ;
+		getServletResponse().setHeader(X_HV_ERROR_CODE_DESCRIPTION, e.getMessage()) ;		
 // TODO: Enunciate kennt "BAD_GATEWAY" nicht??
 //		getServletResponse().setStatus(Response.Status.BAD_GATEWAY.getStatusCode()) ;			
 		getServletResponse().setStatus(502) ;			
 	}
 	
 	public void respondBadRequest(EJBExceptionLP e) {
+		log.info("default-log", e);
 		if(e.getCode() == EJBExceptionLP.FEHLER_FALSCHER_MANDANT) {
 			respondNotFound() ;
 			return ;
 		}
-		
-		getServletResponse().setHeader("x-hv-error-code", HvErrorCode.EJB_EXCEPTION.toString()) ;
-		getServletResponse().setHeader("x-hv-error-code-extended", new Integer(e.getCode()).toString()) ;
-		getServletResponse().setHeader("x-hv-error-description", e.getCause().getMessage()) ;		
+
+		getServletResponse().setHeader(X_HV_ERROR_CODE, HvErrorCode.EJB_EXCEPTION.toString()) ;
+		getServletResponse().setHeader(X_HV_ERROR_CODE_EXTENDED, new Integer(e.getCode()).toString()) ;
+		getServletResponse().setHeader(X_HV_ERROR_CODE_DESCRIPTION, e.getCause().getMessage()) ;	
+
+		try {
+			ExceptionLP elp = handleThrowable(e);
+			LPMain.getInstance().setUISprLocale(globalInfo.getTheClientDto().getLocUi());
+			String clientErrorMessage = new LPMessages().getMsg(elp) ;
+			if(clientErrorMessage != null) {
+				getServletResponse().setHeader(X_HV_ERROR_CODE_TRANSLATED, clientErrorMessage);
+			}
+		} catch(Throwable t) {
+			log.error("Throwable on handleThrowable", t);
+		}
 		getServletResponse().setStatus(Response.Status.BAD_REQUEST.getStatusCode()) ;		
 	}
 
 	public void respondBadRequest(Integer hvErrorCode) {
-		getServletResponse().setHeader("x-hv-error-code", HvErrorCode.EXPECTATION_FAILED.toString()) ;
-		getServletResponse().setHeader("x-hv-error-code-extended", hvErrorCode.toString()) ;
+		getServletResponse().setHeader(X_HV_ERROR_CODE, HvErrorCode.EXPECTATION_FAILED.toString()) ;
+		getServletResponse().setHeader(X_HV_ERROR_CODE_EXTENDED, hvErrorCode.toString()) ;
 		getServletResponse().setStatus(Response.Status.BAD_REQUEST.getStatusCode()) ;				
 	}
 	
 	public void appendBadRequestData(String key, String value) {
-		getServletResponse().setHeader("x-hv-error-additional-data-key", key) ;				
-		getServletResponse().setHeader("x-hv-error-additional-data-value", value) ;				
+		getServletResponse().addHeader(X_HV_ADDITIONAL_ERROR_KEY, key) ;				
+		getServletResponse().addHeader(X_HV_ADDITIONAL_ERROR_VALUE, value) ;				
 	}
 	
 	public Response getBadRequest(String key, Object value) {
 		return getResponseBuilder().status(Response.Status.BAD_REQUEST)
-				.header("x-hv-error-code", HvErrorCode.VALIDATION_FAILED)
-				.header("x-hv-error-key", key)
-				.header("x-hv-error-value", value).build() ;
+				.header(X_HV_ERROR_CODE, HvErrorCode.VALIDATION_FAILED)
+				.header(X_HV_ERROR_KEY, key)
+				.header(X_HV_ERROR_VALUE, value == null ? "null" : value).build() ;
 	}
-	
+
+	public Response getBadRequestValueMissing(String key) {
+		return getResponseBuilder().status(Response.Status.BAD_REQUEST)
+				.header(X_HV_ERROR_CODE, HvErrorCode.VALIDATION_FAILED.toString())
+				.header(X_HV_ERROR_KEY, key)
+				.header(X_HV_ERROR_VALUE, "{empty}").build() ;	
+	}
+
 	public Response getBadRequest(EJBExceptionLP e) {
 		return getResponseBuilder().status(Response.Status.BAD_REQUEST)
-				.header("x-hv-error-code", HvErrorCode.EJB_EXCEPTION)
-				.header("x-hv-error-code-extended", new Integer(e.getCode()).toString())
-				.header("x-hv-error-description", e.getCause().getMessage()).build() ;
+				.header(X_HV_ERROR_CODE, HvErrorCode.EJB_EXCEPTION)
+				.header(X_HV_ERROR_CODE_EXTENDED, new Integer(e.getCode()).toString())
+				.header(X_HV_ERROR_CODE_DESCRIPTION, e.getCause().getMessage()).build() ;
 	}
 	
 	/**
-	 * Den Servlet Response auf "UNAUTHORIZED" setzen
+	 * Den Servlet Response auf "BAD_REQUEST" setzen
 	 */
 	public void respondBadRequest(String key, String value) {
-		getServletResponse().setHeader("x-hv-error-code", HvErrorCode.VALIDATION_FAILED.toString()) ;
-		getServletResponse().setHeader("x-hv-error-key", key) ;
-		getServletResponse().setHeader("x-hv-error-value", value) ;
+		getServletResponse().setHeader(X_HV_ERROR_CODE, HvErrorCode.VALIDATION_FAILED.toString()) ;
+		getServletResponse().setHeader(X_HV_ERROR_KEY, key) ;
+		getServletResponse().setHeader(X_HV_ERROR_VALUE, value) ;
 		getServletResponse().setStatus(Response.Status.BAD_REQUEST.getStatusCode()) ;		
 	}
 	
 	public void respondBadRequestValueMissing(String key) {
-		getServletResponse().setHeader("x-hv-error-code", HvErrorCode.VALIDATION_FAILED.toString()) ;
-		getServletResponse().setHeader("x-hv-error-key", key) ;
-		getServletResponse().setHeader("x-hv-error-value", "{empty}") ;
+		getServletResponse().setHeader(X_HV_ERROR_CODE, HvErrorCode.VALIDATION_FAILED.toString()) ;
+		getServletResponse().setHeader(X_HV_ERROR_KEY, key) ;
+		getServletResponse().setHeader(X_HV_ERROR_VALUE, "{empty}") ;
 		getServletResponse().setStatus(Response.Status.BAD_REQUEST.getStatusCode()) ;		
 	}
 	
 	public void respondNotFound(String key, String value) {
-		getServletResponse().setHeader("x-hv-error-code", HvErrorCode.UNKNOWN_ENTITY.toString()) ;
-		getServletResponse().setHeader("x-hv-error-key", key) ;
-		getServletResponse().setHeader("x-hv-error-value", value) ;
+		getServletResponse().setHeader(X_HV_ERROR_CODE, HvErrorCode.UNKNOWN_ENTITY.toString()) ;
+		getServletResponse().setHeader(X_HV_ERROR_KEY, key) ;
+		getServletResponse().setHeader(X_HV_ERROR_VALUE, value) ;
 		getServletResponse().setStatus(Response.Status.NOT_FOUND.getStatusCode()) ;				
+	}
+
+	public void respondModified() {
+		getServletResponse().setStatus(Response.Status.CONFLICT.getStatusCode());
+	}
+
+	public void respondGone() {
+		getServletResponse().setStatus(Response.Status.GONE.getStatusCode());		
+	}
+	
+	public void respondLocked() {
+//		getServletResponse().setHeader(X_HV_ERROR_CODE, HvErrorCode.UNKNOWN_ENTITY.toString()) ;
+//		getServletResponse().setHeader(X_HV_ERROR_KEY, key) ;
+//		getServletResponse().setHeader(X_HV_ERROR_VALUE, value) ;
+		getServletResponse().setStatus(LOCKED) ;				
 	}
 	
 	public void respondNotFound() {
@@ -316,9 +377,9 @@ public class BaseApi {
 	}
 	
 	public void respondUnprocessableEntity(String key, String value) {
-		getServletResponse().setHeader("x-hv-error-code", HvErrorCode.UNPROCESSABLE_ENTITY.toString()) ;
-		getServletResponse().setHeader("x-hv-error-key", key) ;
-		getServletResponse().setHeader("x-hv-error-value", value) ;
+		getServletResponse().setHeader(X_HV_ERROR_CODE, HvErrorCode.UNPROCESSABLE_ENTITY.toString()) ;
+		getServletResponse().setHeader(X_HV_ERROR_KEY, key) ;
+		getServletResponse().setHeader(X_HV_ERROR_VALUE, value) ;
 		getServletResponse().setStatus(UNPROCESSABLE_ENTITY) ;
 	}
 	
@@ -326,11 +387,104 @@ public class BaseApi {
 		response = theResponse ;
 	}
 	
-	protected HttpServletResponse getServletResponse() {
+	public HttpServletResponse getServletResponse() {
 		return response ;
 	}	
 	
 	protected HttpServletRequest getServletRequest() {
 		return request ;
+	}
+	
+	/**
+	 * Ein bewusstes Duplikat von Delegate.handleThrowable im LPClientPC</br>
+	 * <p>Traue mich momentan noch nicht dr&uuml;ber das zu refaktoren</p>
+	 * 
+	 * @param t
+	 * @return
+	 */
+	protected ExceptionLP handleThrowable(Throwable t) {
+		if(t instanceof ExceptionLP) return (ExceptionLP) t ;
+		
+		if(t instanceof RuntimeException) {
+			RuntimeException reI = (RuntimeException) t;
+			// Throwable t2 = reI.getCause();
+			// if (t2 != null && t2 instanceof ServerException) {
+			Throwable t3 = reI.getCause();
+			if (t3 instanceof EJBExceptionLP) {
+				EJBExceptionLP ejbt4 = (EJBExceptionLP) t3;
+				if (ejbt4 instanceof EJBExceptionLP) {
+					Throwable ejbt5 = ejbt4.getCause();
+					if (ejbt5 instanceof EJBExceptionLP) {
+						// wegen zB. unique key knaller
+						EJBExceptionLP ejbt6 = (EJBExceptionLP) ejbt5;
+						return new ExceptionLP(ejbt6.getCode(),
+								ejbt6.getMessage(),
+								ejbt6.getAlInfoForTheClient(), ejbt6.getCause());
+					} else if (ejbt5 != null) {
+						Throwable ejbt7 = ejbt5.getCause();
+						if (ejbt7 instanceof EJBExceptionLP) {
+							// zB. fuer WARNUNG_KTO_BESETZT
+							EJBExceptionLP ejbt8 = (EJBExceptionLP) ejbt7;
+							return new ExceptionLP(ejbt8.getCode(),
+									ejbt8.getMessage(),
+									ejbt8.getAlInfoForTheClient(),
+									ejbt8.getCause());
+						} else {
+							return new ExceptionLP(ejbt4.getCode(),
+									ejbt4.getMessage(),
+									ejbt4.getAlInfoForTheClient(),
+									ejbt4.getCause());
+						}
+					} else {
+						return new ExceptionLP(ejbt4.getCode(),
+								ejbt4.getMessage(),
+								ejbt4.getAlInfoForTheClient(), ejbt4.getCause());
+					}
+				}
+			} else if (reI instanceof EJBExceptionLP) {
+				EJBExceptionLP exc = (EJBExceptionLP) reI;
+				return new ExceptionLP(exc.getCode(), exc.getMessage(),
+						exc.getAlInfoForTheClient(), exc.getCause());
+			} else if (t3 instanceof JBossRollbackException) {
+				// zB. unique key knaller.
+				JBossRollbackException ejb = (JBossRollbackException) t3;
+				return new ExceptionLP(EJBExceptionLP.FEHLER_DUPLICATE_UNIQUE,
+						ejb.getMessage(), null, ejb.getCause());
+			} else if (t3 instanceof EJBExceptionLP) {
+				// MB 13. 03. 06 wird ausgeloest, wenn belegnummern ausserhalb
+				// des gueltigen bereichs generiert werden
+				// (liegt vermutlich am localen interface des BN-Generators)
+				EJBExceptionLP ejbt6 = (EJBExceptionLP) t3;
+				return new ExceptionLP(ejbt6.getCode(), ejbt6.getMessage(),
+						ejbt6.getAlInfoForTheClient(), ejbt6.getCause());
+			} else if (t3 instanceof java.io.InvalidClassException) {
+				// zB. unique key knaller.
+				java.io.InvalidClassException ejb = (java.io.InvalidClassException) t3;
+				return new ExceptionLP(EJBExceptionLP.FEHLER_BUILD_CLIENT,
+						ejb.getMessage(), null, ejb.getCause());
+			} else if (t3 instanceof java.lang.NoClassDefFoundError) {
+				// zB. unique key knaller.
+				java.lang.NoClassDefFoundError ejb = (java.lang.NoClassDefFoundError) t3;
+				return new ExceptionLP(
+						EJBExceptionLP.FEHLER_NOCLASSDEFFOUNDERROR,
+						ejb.getMessage(), null, ejb.getCause());
+			}
+		}
+		
+		if (t instanceof java.lang.IllegalStateException) {
+			return new ExceptionLP(EJBExceptionLP.FEHLER_TRANSACTION_TIMEOUT, t);
+		}
+		
+		if (t != null && t.getCause() != null) {
+			return new ExceptionLP(EJBExceptionLP.FEHLER, t.getMessage(), null,
+					t.getCause());
+		}
+		
+		if(t != null) {
+			return new ExceptionLP(
+					EJBExceptionLP.FEHLER, t.getMessage(), null, t);
+		} else {
+			return new ExceptionLP(EJBExceptionLP.FEHLER, "null exception", new Exception()) ;
+		}
 	}
 }

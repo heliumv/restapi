@@ -34,14 +34,10 @@ package com.heliumv.factory.query;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-
-import javax.naming.NamingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.heliumv.api.customer.CustomerEntry;
-import com.heliumv.api.customer.CustomerEntryTransformer;
 import com.heliumv.factory.IGlobalInfo;
 import com.heliumv.factory.IParameterCall;
 import com.heliumv.tools.StringHelper;
@@ -58,15 +54,8 @@ public class CustomerQuery extends BaseQuery<CustomerEntry> {
 	
 	public CustomerQuery() {
 		super(QueryParameters.UC_ID_KUNDE2) ;
-		setTransformer(new CustomerEntryTransformer()) ;
 	}
 	
-	public CustomerQuery(IParameterCall parameterCall) throws NamingException {
-		super(UUID.randomUUID().toString(), QueryParameters.UC_ID_KUNDE2) ;
-		setTransformer(new CustomerEntryTransformer()) ;
-		this.parameterCall = parameterCall ;
-	}
-
 
 	@Override
 	protected List<FilterKriterium> getRequiredFilters() {

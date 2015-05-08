@@ -32,9 +32,11 @@
  ******************************************************************************/
 package com.heliumv.api.staff;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.naming.NamingException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -46,14 +48,22 @@ import org.springframework.stereotype.Service;
 import com.heliumv.api.BaseApi;
 import com.heliumv.factory.IMandantCall;
 import com.heliumv.factory.query.StaffQuery;
+import com.heliumv.tools.FilterHelper;
 import com.heliumv.tools.FilterKriteriumCollector;
+import com.lp.server.personal.service.PersonalFac;
 import com.lp.server.util.fastlanereader.service.query.FilterBlock;
+import com.lp.server.util.fastlanereader.service.query.FilterKriterium;
 import com.lp.server.util.fastlanereader.service.query.QueryParameters;
 import com.lp.server.util.fastlanereader.service.query.QueryResult;
 
+/**
+ * Funktionalit&auml;t rund um das Personal</br>
+ * 
+ * @author Gerold
+ */
 @Service("hvStaff")
 @Path("/api/v1/staff/")
-public class StaffApi extends BaseApi {
+public class StaffApi extends BaseApi implements IStaffApi {
 
 	@Autowired
 	private IMandantCall mandantCall ;
@@ -71,8 +81,7 @@ public class StaffApi extends BaseApi {
 		if(connectClient(userId) == null) return entries ;
 	
 		FilterKriteriumCollector collector = new FilterKriteriumCollector() ;
-//		collector.add(buildFilterCnr(filterCnr)) ;
-//		collector.add(buildFilterCompanyName(filterCompany)) ;
+		collector.add(buildFilterWithHidden(false)) ;
 		FilterBlock filterCrits = new FilterBlock(collector.asArray(), "AND")  ;
 		
 		try {
@@ -82,10 +91,17 @@ public class StaffApi extends BaseApi {
 		
 			QueryResult result = staffQuery.setQuery(params) ;
 			entries = staffQuery.getResultList(result) ;			
-//		} catch(NamingException e) {
-//			respondUnavailable(e) ;
+		} catch(RemoteException e) {
+			respondUnavailable(e);
+		} catch(NamingException e) {
+			respondUnavailable(e) ;
 		} finally {
 		}
 		return entries ;
 	}
+	
+	private FilterKriterium buildFilterWithHidden(Boolean withHidden) {
+		return FilterHelper.createWithHidden(withHidden, PersonalFac.FLR_PERSONAL_B_VERSTECKT) ;
+	}
+		
 }

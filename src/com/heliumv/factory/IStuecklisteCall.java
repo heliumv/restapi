@@ -33,15 +33,32 @@
 package com.heliumv.factory;
 
 import java.rmi.RemoteException;
+import java.util.List;
 
 import javax.naming.NamingException;
 
+import com.lp.server.stueckliste.service.KundenStuecklistepositionDto;
 import com.lp.server.stueckliste.service.MontageartDto;
 import com.lp.server.stueckliste.service.StuecklisteDto;
+import com.lp.server.stueckliste.service.StuecklistepositionDto;
 import com.lp.util.EJBExceptionLP;
 
 public interface IStuecklisteCall {
 	StuecklisteDto stuecklisteFindByPrimaryKey(Integer stuecklisteId) throws RemoteException, NamingException ;
-	
+	StuecklistepositionDto[] stuecklistepositionFindByStuecklisteIId( 
+			Integer stuecklisteIId) throws RemoteException, NamingException ;
+	List<KundenStuecklistepositionDto> stuecklistepositionFindByStuecklisteIIdAllData(
+			Integer stuecklisteIId) throws RemoteException, NamingException ;
+	List<KundenStuecklistepositionDto> stuecklistepositionFindByStuecklisteIIdAllData(
+			Integer stuecklisteIId, boolean withPrice) throws RemoteException, NamingException ;
+
+	StuecklistepositionDto stuecklistepositionFindByPrimaryKey(
+			Integer iId) throws RemoteException, NamingException, EJBExceptionLP ; 
+	Integer createStuecklisteposition(
+			StuecklistepositionDto stuecklistepositionDto) throws EJBExceptionLP, RemoteException, NamingException ;
+	void updateStuecklisteposition(StuecklistepositionDto originalDto, StuecklistepositionDto aenderungDto)  throws EJBExceptionLP, RemoteException, NamingException ;
+	void removeStuecklisteposition(StuecklistepositionDto originalDto, 
+			StuecklistepositionDto removeDto) throws EJBExceptionLP, RemoteException, NamingException ;
+
 	MontageartDto[] montageartFindByMandantCNr() throws RemoteException, NamingException, EJBExceptionLP ;
 }

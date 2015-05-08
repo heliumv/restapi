@@ -33,18 +33,24 @@
 package com.heliumv.factory.impl;
 
 import java.rmi.RemoteException;
+import java.util.List;
 
 import javax.naming.NamingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.heliumv.annotation.HvJudge;
+import com.heliumv.annotation.HvModul;
 import com.heliumv.factory.BaseCall;
-import com.heliumv.factory.Globals;
 import com.heliumv.factory.IGlobalInfo;
 import com.heliumv.factory.IStuecklisteCall;
+import com.lp.server.benutzer.service.RechteFac;
+import com.lp.server.stueckliste.service.KundenStuecklistepositionDto;
 import com.lp.server.stueckliste.service.MontageartDto;
 import com.lp.server.stueckliste.service.StuecklisteDto;
 import com.lp.server.stueckliste.service.StuecklisteFac;
+import com.lp.server.stueckliste.service.StuecklistepositionDto;
+import com.lp.server.system.service.LocaleFac;
 import com.lp.util.EJBExceptionLP;
 
 public class StuecklisteCall extends BaseCall<StuecklisteFac> implements IStuecklisteCall {
@@ -58,12 +64,64 @@ public class StuecklisteCall extends BaseCall<StuecklisteFac> implements IStueck
 	@Override
 	public StuecklisteDto stuecklisteFindByPrimaryKey(Integer stuecklisteId)
 			throws RemoteException, NamingException {
-		return getFac().stuecklisteFindByPrimaryKey(stuecklisteId, Globals.getTheClientDto());
+		return getFac().stuecklisteFindByPrimaryKey(stuecklisteId, globalInfo.getTheClientDto());
 	}
 
 	@Override
 	public MontageartDto[] montageartFindByMandantCNr() throws RemoteException,
 			NamingException, EJBExceptionLP {
 		return getFac().montageartFindByMandantCNr(globalInfo.getTheClientDto()) ;
+	}
+	
+	@Override
+	public StuecklistepositionDto[] stuecklistepositionFindByStuecklisteIId(
+			Integer stuecklisteIId) throws RemoteException, NamingException {
+		return getFac().stuecklistepositionFindByStuecklisteIId(
+				stuecklisteIId, globalInfo.getTheClientDto()) ;
+	}	
+	
+	@Override
+	public List<KundenStuecklistepositionDto> stuecklistepositionFindByStuecklisteIIdAllData(
+			Integer stuecklisteIId) throws RemoteException, NamingException {
+		return getFac().stuecklistepositionFindByStuecklisteIIdAllData(
+				stuecklisteIId, false, globalInfo.getTheClientDto()) ;
+	}
+
+	@Override
+	public List<KundenStuecklistepositionDto> stuecklistepositionFindByStuecklisteIIdAllData(
+			Integer stuecklisteIId, boolean withPrice) throws RemoteException, NamingException {
+		return getFac().stuecklistepositionFindByStuecklisteIIdAllData(
+				stuecklisteIId, withPrice, globalInfo.getTheClientDto()) ;
+	}
+	
+	@Override
+	public StuecklistepositionDto stuecklistepositionFindByPrimaryKey(
+			Integer iId) throws RemoteException, NamingException, EJBExceptionLP {
+		return getFac().stuecklistepositionFindByPrimaryKey(iId, globalInfo.getTheClientDto());
+	}
+	
+	@Override
+	@HvModul(modul=LocaleFac.BELEGART_STUECKLISTE)
+	@HvJudge(recht=RechteFac.RECHT_STK_STUECKLISTE_CUD)
+	public Integer createStuecklisteposition(
+			StuecklistepositionDto stuecklistepositionDto)
+			throws EJBExceptionLP, NamingException, RemoteException {
+		return getFac().createStuecklisteposition(
+				stuecklistepositionDto, globalInfo.getTheClientDto());
+	}
+	
+	@Override
+	@HvModul(modul=LocaleFac.BELEGART_STUECKLISTE)
+	@HvJudge(recht=RechteFac.RECHT_STK_STUECKLISTE_CUD)
+	public void updateStuecklisteposition(StuecklistepositionDto originalDto,
+			StuecklistepositionDto aenderungDto) throws EJBExceptionLP,
+			RemoteException, NamingException {
+		getFac().updateStuecklisteposition(originalDto, aenderungDto, globalInfo.getTheClientDto());
+	}
+
+	@Override
+	public void removeStuecklisteposition(StuecklistepositionDto originalDto,
+			StuecklistepositionDto removePositionDto) throws EJBExceptionLP, RemoteException, NamingException {
+		getFac().removeStuecklisteposition(originalDto, removePositionDto, globalInfo.getTheClientDto());
 	}	
 }

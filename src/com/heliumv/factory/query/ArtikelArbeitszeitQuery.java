@@ -41,8 +41,7 @@ import javax.naming.NamingException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.heliumv.api.item.ItemEntry;
-import com.heliumv.api.worktime.WorkItemEntryTransformer;
-import com.heliumv.factory.Globals;
+import com.heliumv.factory.IGlobalInfo;
 import com.heliumv.factory.IMandantCall;
 import com.heliumv.factory.IParameterCall;
 import com.heliumv.factory.ISystemCall;
@@ -59,15 +58,16 @@ public class ArtikelArbeitszeitQuery extends BaseQuery<ItemEntry> {
 	private ISystemCall systemCall ;
 	@Autowired
 	private IParameterCall parameterCall ;
+	@Autowired
+	private IGlobalInfo globalInfo ;
+
 
 	public ArtikelArbeitszeitQuery() {
 		super(QueryParameters.UC_ID_ARTIKELLISTE) ;
-		setTransformer(new WorkItemEntryTransformer()) ;
 	}
 	
-	
 	@Override
-	protected List<FilterKriterium> getRequiredFilters() {
+	protected List<FilterKriterium> getRequiredFilters() throws NamingException {
 		List<FilterKriterium> filters = new ArrayList<FilterKriterium>() ;
 		
 		filters.add(getArbeitszeitArtikelFilter()) ;
@@ -82,20 +82,15 @@ public class ArtikelArbeitszeitQuery extends BaseQuery<ItemEntry> {
 				FilterKriterium.OPERATOR_EQUAL, false) ;
 	}
 	
-	private FilterKriterium getArtikelMandantFilter() {
-		String mandant = Globals.getTheClientDto().getMandant() ;
-		try {
-			if (mandantCall.hasFunctionZentralerArtikelstamm()) {
-				mandant = systemCall.getHauptmandant() ;
-			}
-
-			return new FilterKriterium("artikelliste.mandant_c_nr",
-						true, StringHelper.asSqlString(mandant),
-						FilterKriterium.OPERATOR_EQUAL, false) ;
-		} catch(NamingException e) {
-			// TODO: getDefaultFilters auf throws NamingException umstellen
-			return null ;
+	private FilterKriterium getArtikelMandantFilter() throws NamingException {
+		String mandant = globalInfo.getMandant() ;
+		if (mandantCall.hasFunctionZentralerArtikelstamm()) {
+			mandant = systemCall.getHauptmandant() ;
 		}
+
+		return new FilterKriterium("artikelliste.mandant_c_nr",
+					true, StringHelper.asSqlString(mandant),
+					FilterKriterium.OPERATOR_EQUAL, false) ;
 	}
 	
 	public FilterKriterium getFilterArtikelNummer(String filterCnr) throws NamingException, RemoteException {

@@ -32,6 +32,8 @@
  ******************************************************************************/
 package com.heliumv.api.customer;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.lp.server.artikel.service.VkpfartikelpreislisteDto;
 import com.lp.server.partner.service.KundeDto;
 import com.lp.server.partner.service.PartnerDto;
@@ -39,7 +41,33 @@ import com.lp.server.personal.service.PersonalDto;
 import com.lp.server.system.service.LandplzortDto;
 
 public class CustomerEntryMapper {
+	@Autowired
+	private PartnerEntryMapper partnerMapper ;
+	
+	protected PartnerEntryMapper getPartnerMapper() {
+		return partnerMapper ;
+	}
+	
 	public CustomerDetailEntry mapDetailEntry(KundeDto kundeDto) {
+		CustomerDetailEntry customer = new CustomerDetailEntry() ;
+		if(kundeDto != null) {
+			customer.setId(kundeDto.getIId()) ;
+			// customer.setAddressType("");
+			if(kundeDto.getPartnerDto() != null) {
+				getPartnerMapper().mapPartnerEntry(customer, kundeDto.getPartnerDto()) ;
+	
+				customer.setDeliveryAllowed(kundeDto.getTLiefersperream() == null) ;
+				customer.setClassification(kundeDto.getCAbc()) ;
+//				customer.setRepresentativeSign(kundeDto.getPersonaliIdProvisionsempfaenger());
+//				customer.setPostofficebox(partnerDto.getCPostfach()) ;
+				
+//				kundeDto.getVkpfArtikelpreislisteIIdStdpreisliste() ;
+			}
+		}
+		return customer ;
+	}
+	
+	public CustomerDetailEntry mapDetailEntryOld(KundeDto kundeDto) {
 		CustomerDetailEntry customer = new CustomerDetailEntry() ;
 		if(kundeDto != null) {
 			customer.setId(kundeDto.getIId()) ;

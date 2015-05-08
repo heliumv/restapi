@@ -58,21 +58,19 @@ public class StaffQuery extends BaseQuery<StaffEntry> {
 	private IJudgeCall judgeCall ;
 	@Autowired
 	private IPersonalCall personalCall ;
-	
+	@Autowired
+	private StaffEntryTransformer staffEntryTransformer ;
 	
 	public StaffQuery() {
 		super(QueryParameters.UC_ID_PERSONAL) ;
-		setTransformer(new StaffEntryTransformer()) ;
+		setTransformer(staffEntryTransformer);
 	}
 	
 	@Override
-	protected List<FilterKriterium> getRequiredFilters() {
+	protected List<FilterKriterium> getRequiredFilters() throws NamingException {
 		List<FilterKriterium> filters = new ArrayList<FilterKriterium>() ;
 		filters.add(getMandantFilter()) ;
-		try {
-			filters.addAll(getPersonalFilter()) ;
-		} catch(NamingException e) {			
-		}
+		filters.addAll(getPersonalFilter()) ;
 		return filters ;
 	}
 

@@ -34,7 +34,6 @@ package com.heliumv.factory.impl;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -60,8 +59,8 @@ public abstract class FastLaneReaderCall extends BaseCall<FastLaneReader> implem
 	private Integer usecaseId ;
 	private TableColumnInformation cachedColumnInfo ;
 
-	protected FastLaneReaderCall(Integer theUsercaseId) {
-		this(UUID.randomUUID().toString(), theUsercaseId) ;
+	protected FastLaneReaderCall(Integer theUsecaseId) {
+		this(UUID.randomUUID().toString(), theUsecaseId) ;
 	}
 	
 	protected FastLaneReaderCall(String theUuid, Integer theUsecaseId) {
@@ -75,7 +74,7 @@ public abstract class FastLaneReaderCall extends BaseCall<FastLaneReader> implem
 		return usecaseId ;
 	}
 	
-	public QueryResult setQuery(QueryParameters queryParams) {
+	public QueryResult setQuery(QueryParameters queryParams) throws NamingException, RemoteException, EJBExceptionLP {
 		installRequiredFilters(queryParams) ;
 		
 		try {
@@ -89,13 +88,16 @@ public abstract class FastLaneReaderCall extends BaseCall<FastLaneReader> implem
 			return result ;
 		} catch(RemoteException e) {
 			e.printStackTrace() ;
+			throw e ;
 		} catch(EJBExceptionLP e) {
 			e.printStackTrace() ;
+			throw e ;
 		} catch(NamingException e) {
 			e.printStackTrace() ;
+			throw e ;
 		}
 		
-		return new QueryResult(new Object[0][0], 0, 0, 0, 0) ;
+//		return new QueryResult(new Object[0][0], 0, 0, 0, 0) ;
 	}
 	
 	public QueryParameters getDefaultQueryParameters() {
@@ -103,25 +105,27 @@ public abstract class FastLaneReaderCall extends BaseCall<FastLaneReader> implem
 	}
 	
 	public QueryParameters getDefaultQueryParameters(FilterBlock filterCrits) {
-		ArrayList<?> listOfExtraData = new ArrayList() ;
+		ArrayList<?> listOfExtraData = new ArrayList<Object>() ;
 		SortierKriterium[] sortCrits = new SortierKriterium[0] ;
 		QueryParameters params = new QueryParameters(
 				getUsecaseId(), sortCrits, filterCrits, 0, listOfExtraData) ;
-
+		params.setIsApi(true) ;
 		return params ;		
 	}
 	
 	public QueryParametersFeatures getFeatureQueryParameters(FilterBlock filterCrits) {
-		ArrayList<?> listOfExtraData = new ArrayList() ;
+		ArrayList<?> listOfExtraData = new ArrayList<Object>() ;
 		SortierKriterium[] sortCrits = new SortierKriterium[0] ;
 		QueryParametersFeatures params = new QueryParametersFeatures(
 				getUsecaseId(), sortCrits, filterCrits, 0, listOfExtraData) ;
+		params.setIsApi(true) ;
 		return params ;
 	}
 	
-	public void getTableInfo() throws NamingException, RemoteException {
-		TableInfo info = getFac().getTableInfo(uuid, usecaseId, Globals.getTheClientDto()) ;
-		System.out.println("" + Arrays.toString(info.getDataBaseColumnNames())) ;
+	public TableInfo getTableInfo() throws NamingException, RemoteException {
+		return getFac().getTableInfo(uuid, usecaseId, Globals.getTheClientDto()) ;
+//		TableInfo info = getFac().getTableInfo(uuid, usecaseId, Globals.getTheClientDto()) ;
+//		System.out.println("" + Arrays.toString(info.getDataBaseColumnNames())) ;
 	}
 	
 	public TableColumnInformation getTableColumnInfo()  {
@@ -129,7 +133,7 @@ public abstract class FastLaneReaderCall extends BaseCall<FastLaneReader> implem
 //		return getFac().getTableColumnInfo(uuid, usecaseId, Globals.getTheClientDto()) ;
 	}
 	
-	private void installRequiredFilters(QueryParameters queryParams) {
+	private void installRequiredFilters(QueryParameters queryParams) throws NamingException, RemoteException {
 		List<FilterKriterium> requiredFilters = getRequiredFilters() ;
 		if(requiredFilters == null || requiredFilters.size() == 0) return ;
 		
@@ -146,5 +150,5 @@ public abstract class FastLaneReaderCall extends BaseCall<FastLaneReader> implem
 	 * 
 	 * @return null, oder eine (auch leere) Liste von immer notwendigen Filtern
 	 */
-	protected abstract List<FilterKriterium> getRequiredFilters() ;
+	protected abstract List<FilterKriterium> getRequiredFilters() throws NamingException, RemoteException ;
 }

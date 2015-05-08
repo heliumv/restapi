@@ -39,6 +39,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -54,7 +56,9 @@ import com.heliumv.calltrace.CallTracer;
 @Component
 @Aspect
 public class HvCallrateAspect extends BaseAspect {
-    @Autowired
+	private static Logger log = LoggerFactory.getLogger(HvCallrateAspect.class) ;
+
+	@Autowired
     private CallTracer callTracer ;
 
     @Pointcut("execution(public * *(..))")
@@ -67,7 +71,6 @@ public class HvCallrateAspect extends BaseAspect {
     public void processHvCallTracerPointcut() {
     }
 
-//    @Before("anyPublicOperation() && inHeliumv() && @annotation(com.heliumv.annotation.HvCallTracer)")
     @Before("anyPublicOperation() && inHeliumv() && processHvCallTracerPointcut()")
     public void processAttribute(JoinPoint pjp) throws Throwable {
         MethodSignature methodSig = getMethodSignatureFrom(pjp) ;
@@ -75,7 +78,7 @@ public class HvCallrateAspect extends BaseAspect {
         HvCallrate theModul = (HvCallrate) method.getAnnotation(HvCallrate.class);
         if(theModul == null) return ;
 
-        System.out.println("Having the HvCallTrace Annotation with '" + theModul.maxCalls()
+		log.debug("'" + theModul.maxCalls()
                 + "' maxCalls and '" + theModul.durationMs() + "' duration<") ;
         callTracer.trace(theModul, methodSig.getMethod()) ;
     }

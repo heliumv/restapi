@@ -43,7 +43,8 @@ public class ProjectEntryTransformer extends BaseFLRTransformer<ProjectEntry> {
 		entry.setId((Integer) flrObject[0]) ;
 		entry.setCnr((String) flrObject[1]) ;
 		entry.setCustomerName((String) flrObject[2]) ;
-		
+		entry.setCategory((String) flrObject[4]) ;
+		entry.setTitle((String)  flrObject[5]) ;
 		return entry ;
 	}
 }

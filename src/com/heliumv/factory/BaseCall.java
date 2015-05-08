@@ -38,12 +38,15 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.heliumv.tools.UncheckedCasts;
 
 
 public class BaseCall<T> implements IBaseCallBeans {
-//	private static Log log = LogFactory.getLog(BaseCall.class) ;
-//	private static Logger log = LoggerFactory.getLogger(BaseCall.class) ;
+	private static Logger log = LoggerFactory.getLogger(BaseCall.class) ;
 	
 	private Context context = null ;
 	private T callFac = null ;
@@ -55,8 +58,6 @@ public class BaseCall<T> implements IBaseCallBeans {
   	protected BaseCall(String beanName) {
   		if(null == beanName || beanName.trim().length() == 0) throw new IllegalArgumentException("beanName == null or empty") ;
   		this.beanName = beanName ;
-//		context = getInitialContext() ;
-//		callFac = (T) context.lookup(getServerBeanName(beanName)) ;
 	}
 
 	private String getServerBeanName(String beanName) {
@@ -92,8 +93,8 @@ public class BaseCall<T> implements IBaseCallBeans {
 		String namingFactory = (String) env.lookup(Context.INITIAL_CONTEXT_FACTORY) ;
 		String urlProvider = (String) env.lookup(Context.PROVIDER_URL) ;
 		
-//		log.debug("namingFactory = {" + namingFactory +"}") ;
-//		log.debug("urlProvider = {" + urlProvider + "}") ;
+		log.debug("namingFactory = {" + namingFactory +"}") ;
+		log.debug("urlProvider = {" + urlProvider + "}") ;
 		
 		Hashtable<String, String> environment = new Hashtable<String, String>();
 
@@ -105,7 +106,7 @@ public class BaseCall<T> implements IBaseCallBeans {
 	protected T getFac() throws NamingException {
 		if(callFac == null) {
 			context = getInitialContext() ;
-			callFac = (T) context.lookup(getServerBeanName(beanName)) ;
+			callFac = UncheckedCasts.cast(context.lookup(getServerBeanName(beanName))) ;
 			
 			baseCallRegistrant.register(this);
 		}

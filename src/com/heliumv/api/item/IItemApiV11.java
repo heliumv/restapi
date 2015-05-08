@@ -32,6 +32,13 @@
  ******************************************************************************/
 package com.heliumv.api.item;
 
+import java.math.BigDecimal;
+import java.rmi.RemoteException;
+
+import javax.naming.NamingException;
+
+import com.lp.util.EJBExceptionLP;
+
 
 public interface IItemApiV11 extends IItemApi {
 	/**
@@ -45,5 +52,91 @@ public interface IItemApiV11 extends IItemApi {
 	 * betreffenden Artikels zur&uuml;ckgeliefert.
 	 * @return eine (leere) Liste von Lagerst&auml;nden
 	 */
-	StockAmountEntryList getStockAmountList(String userId, String itemCnr, Boolean returnItemInfo) ;	
+	StockAmountEntryList getStockAmountList(String userId, String itemCnr, Boolean returnItemInfo) ;
+	
+	/**
+	 * Einen Artikel anhand seiner Artikelnummer ermitteln</br>
+	 * 
+	 * @param userId des bei HELIUM V angemeldeten API Benutzer
+	 * @param cnr (optional) die gesuchte Artikelnummer
+	 * @param serialnumber (optional) die Seriennummer des Artikels</br>
+	 * <p>Eineindeutige Artikel k&ouml;nnen &uuml;ber ihre Seriennummer ermittelt werden. Dabei wird
+	 * zuerst im aktuellen Lagerstand gesucht, danach in den Abgangsbuchungen. Ist die <code>cnr</code>
+	 * ebenfalls angegeben, muss der Artikel der &uuml;ber die Seriennummer ermittelt wurde mit der 
+	 * angegebenen Artikelnummer &uuml;bereinstimmen.</p>
+	 * @param addComments (optional) mit <code>true</code> die Artikelkommentar der Art text/html ebenfalls liefern
+	 * @param addStockAmountInfos (optional) mit <code>true</code> die allgemeinen Lagerstandsinformationen liefern
+	 * @return den Artikel sofern vorhanden. Gibt es den Artikel/Seriennummer nicht wird mit 
+	 * StatusCode <code>NOT_FOUND (404)</code> geantwortet
+	 */
+	ItemV1Entry findItemV1ByAttributes(
+			String userId,
+			String cnr, 
+			String serialnumber,
+			Boolean addComments, 
+			Boolean addStockAmountInfos) ;
+	
+	BigDecimal getPrice(
+			String userId,
+			Integer itemId,
+			Integer customerId,
+			BigDecimal amount,
+			String unitCnr) throws NamingException, RemoteException, EJBExceptionLP ;
+	
+	/**
+	 * Eine Liste aller Artikel ermitteln.</br>
+	 * <p>Das Ergebnis kann dabei durch Filter eingeschr&auml;nkt werden</p>
+	 * 
+	 * @param userId des angemeldeten HELIUM V Benutzer
+	 * @param limit die maximale Anzahl von zur&uuml;ckgelieferten Datens&auml;tzen
+	 * @param startIndex die Index-Nummer desjenigen Satzes mit dem begonnen werden soll
+	 * @param filterCnr die (optionale) Artikelnummer nach der die Suche eingeschr&auml;nkt werden soll
+	 * @param filterTextSearch der (optionale) Text der die Suche einschr&auml;nkt 
+	 * @param filterDeliveryCnr auf die (optionale) Lieferantennr. bzw Bezeichnung einschr&auml;nken
+	 * @param filterItemGroupClass auf die (optionale) Artikelgruppe bzw. Artikelklasse einschr&auml;nken
+	 * @param filterItemReferenceNr auf die (optionale) Artikelreferenznummer einschr&auml;nken
+	 * @param filterWithHidden mit <code>true</code> werden auch versteckte Artikel in die Suche einbezogen
+	 * @param filterItemgroupId die (optionale) IId der Artikelgruppe in der die Artikel gesucht werden. Die
+	 *  cnr wird aus der angegebenen iid ermittelt und dann auch f&uuml;r die Artikelklasse verwendet
+	 * @param filterCustomerItemCnr die (optionale) Kundenartikelnummer nach der gesucht werden kann 
+	 * @param filterShopGroupIds die (optionale) auch leere Liste von Shopgruppen IIds in denen die Artikel
+	 *   gesucht werden sollen
+	 * @param orderBy definiert die Sortierung der Daten. Es k&ouml;nnen durch Komma getrennt mehrere
+	 *  Datenfelder angegeben werden. Getrennt durch Leerzeichen kann "asc" (aufsteigend) oder auch "desc" (absteigend)
+	 *  sortiert werden. "cnr desc" oder auch "cnr asc, customerItemCnr desc", oder auch "cnr, customerItemCnr desc"
+	 * @return eine (leere) Liste von <code>ItemEntry</code>
+	 */
+	ItemEntryList getItemsList(String userId, Integer limit, Integer startIndex, 
+			String filterCnr, String filterTextSearch, String filterDeliveryCnr, String filterItemGroupClass,
+			String filterItemReferenceNr,
+			Boolean filterWithHidden, Integer filterItemgroupId, String filterCustomerItemCnr,
+			String filterShopGroupIds, String orderBy) throws RemoteException, NamingException, EJBExceptionLP, Exception ;
+	
+	/**
+	 * Eine Liste aller Artikelgruppen ermitteln</br>
+	 * <p>Diese Methode ist f&uuml;r die Verwendung in Listboxen/Comboboxen gedacht</p>
+	 * 
+	 * @param userId des angemeldeten HELIUM V Benutzer
+	 * @return eine (leere) Liste aller Artikelgruppen
+	 */
+	ItemGroupEntryList getItemGroupsList(
+			String userId) throws RemoteException, NamingException, EJBExceptionLP, Exception ;
+	
+	/**
+	 * Eine Liste aller Shopgruppen ermitteln</br>
+	 * 
+	 * @param userId des angemeldeten HELIUM V Benutzer
+	 * @param limit (optional) die maximale Anzahl von zu liefernden Shopgruppen. Bei 0 werden alle geliefert
+	 * @param startIndex (optional) die Index-Nummer desjenigen Satzes mit dem begonnen werden soll
+	 * @return eine (leere) Liste von <code>ShopGroupEntry</code>
+	 * 
+	 * @throws RemoteException
+	 * @throws NamingException
+	 * @throws EJBExceptionLP
+	 * @throws Exception
+	 */
+	ShopGroupEntryList getShopGroupsList(
+			String userId,
+			Integer limit,
+			Integer startIndex) throws RemoteException, NamingException, EJBExceptionLP, Exception ;
 }

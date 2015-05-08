@@ -37,6 +37,13 @@ import com.heliumv.annotation.HvFlrMapper;
 public class BaseEntryId {
 	private Integer id ;
 
+	public BaseEntryId() {
+	}
+	
+	public BaseEntryId(Integer flrId) {
+		id = flrId ;
+	}
+	
 	/**
 	 * Die eindeutige Id des Eintrags
 	 * 

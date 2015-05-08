@@ -33,24 +33,51 @@
 package com.heliumv.api.inventory;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
+
+import com.heliumv.api.production.IdentityAmountEntry;
 
 @XmlRootElement
 public class InventoryDataEntry {
 	private String itemCnr ;
 	private BigDecimal amount ;
-	
+	private List<IdentityAmountEntry> identities ;
+
+	/**
+	 * Die Artikelnummer
+	 * @return die Artikelnummer
+	 */
 	public String getItemCnr() {
 		return itemCnr;
 	}
 	public void setItemCnr(String itemCnr) {
 		this.itemCnr = itemCnr;
 	}
+	
+	/**
+	 * Die Menge des Artikels</br>
+	 * <p>Die Menge ist optional, wenn es sich um einen Seriennr/Chargennr-
+	 * behafteten Artikel handelt. In diesem Falle sind die Daten &uuml;ber
+	 * die <code>Identities</code> zu &uuml;bermitteln.</p>
+	 * @return die Menge des Artikels
+	 */
 	public BigDecimal getAmount() {
 		return amount;
 	}
 	public void setAmount(BigDecimal amount) {
 		this.amount = amount;
+	}
+	
+	/**
+	 * Die Liste der Seriennr/Chargennr Informationen
+	 * @return die (leere) Liste
+	 */
+	public List<IdentityAmountEntry> getIdentities() {
+		return identities;
+	}
+	public void setIdentities(List<IdentityAmountEntry> identities) {
+		this.identities = identities;
 	}
 }

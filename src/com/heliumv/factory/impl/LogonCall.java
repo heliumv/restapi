@@ -54,7 +54,15 @@ public class LogonCall extends BaseCall<LogonFac> implements ILogonCall {
 	@HvCallrate(maxCalls=5, durationMs=10000)
 	public TheClientDto logon(String benutzer, char[] kennwort,
 			Locale uILocale, String sMandantI) throws NamingException, RemoteException {
+		return logonImpl(benutzer, kennwort, uILocale, sMandantI) ;
+	}
+	
+	public TheClientDto programmedLogon(
+			String benutzer, char[] kennwort, Locale uILocale, String sMandantI) throws NamingException, RemoteException {
+		return logonImpl(benutzer, kennwort, uILocale, sMandantI) ;		
+	}
 
+	protected TheClientDto logonImpl(String benutzer, char[] kennwort, Locale uILocale, String sMandantI)  throws NamingException, RemoteException {
 		String logonCredential = benutzer ;
 		int indexPipe = benutzer.indexOf("|") ;
 		if(indexPipe > 0) {
@@ -64,13 +72,21 @@ public class LogonCall extends BaseCall<LogonFac> implements ILogonCall {
 		TheClientDto theClientDto = getFac().logon(
 			benutzer, 
 			Helper.getMD5Hash((logonCredential + new String(kennwort)).toCharArray()), 
-			uILocale, sMandantI, null, new Timestamp(System.currentTimeMillis()));
+			uILocale, sMandantI, new Timestamp(System.currentTimeMillis()));
 		
 		return theClientDto ;
+		
 	}
 	
-
 	public void logout(TheClientDto theClientDto) throws NamingException, RemoteException {
 		getFac().logout(theClientDto) ;
-	}	
+	}
+	
+	@Override
+	@HvCallrate(maxCalls=5, durationMs=10000)
+	public TheClientDto logonExtern(int appType, String benutzer,
+			char[] kennwort, Locale uiLocale, String mandantCnr, String source) throws NamingException,
+			RemoteException {
+		return getFac().logonExtern(appType, benutzer, kennwort, uiLocale, mandantCnr, source) ;
+	}
 }

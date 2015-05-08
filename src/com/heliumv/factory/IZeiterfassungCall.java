@@ -34,14 +34,17 @@ package com.heliumv.factory;
 
 import java.rmi.RemoteException;
 import java.util.List;
+import java.util.Locale;
 
 import javax.naming.NamingException;
 
 import com.heliumv.annotation.HvJudge;
 import com.heliumv.annotation.HvModul;
+import com.heliumv.api.worktime.DayTypeEntry;
 import com.heliumv.api.worktime.DocumentType;
 import com.heliumv.api.worktime.SpecialActivity;
 import com.lp.server.benutzer.service.RechteFac;
+import com.lp.server.personal.service.MaschineDto;
 import com.lp.server.personal.service.TaetigkeitDto;
 import com.lp.server.personal.service.ZeitdatenDto;
 import com.lp.server.system.service.LocaleFac;
@@ -76,6 +79,7 @@ public interface IZeiterfassungCall {
 	
 	@HvModul(modul=LocaleFac.BELEGART_ZEITERFASSUNG)
 	List<DocumentType> getBebuchbareBelegarten(TheClientDto theClientDto) throws NamingException ;
+	List<DocumentType> getBebuchbareBelegarten() throws NamingException ;
 
 	@HvModul(modul=LocaleFac.BELEGART_ZEITERFASSUNG)
 	@HvJudge(recht=RechteFac.RECHT_PERS_ZEITEREFASSUNG_CUD) 
@@ -84,4 +88,9 @@ public interface IZeiterfassungCall {
 	@HvModul(modul=LocaleFac.BELEGART_ZEITERFASSUNG)
 	@HvJudge(recht=RechteFac.RECHT_PERS_ZEITERFASSUNG_R)	
 	ZeitdatenDto zeitdatenFindByPrimaryKey(Integer id) throws NamingException, RemoteException ;
+	
+	List<DayTypeEntry> getAllSprTagesarten() throws NamingException, RemoteException ;
+	List<DayTypeEntry> getAllSprTagesarten(Locale locale) throws NamingException, RemoteException ;
+	
+	MaschineDto maschineFindByPrimaryKey(Integer maschineId) throws NamingException, RemoteException ;
 }

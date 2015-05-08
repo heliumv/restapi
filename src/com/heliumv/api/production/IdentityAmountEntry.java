@@ -38,14 +38,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class IdentityAmountEntry {
-	private String identiy ;
+	private String identity ;
 	private BigDecimal amount ;
 	
-	public String getIdentiy() {
-		return identiy;
+	public String getIdentity() {
+		return identity;
 	}
-	public void setIdentiy(String identiy) {
-		this.identiy = identiy;
+	public void setIdentity(String identiy) {
+		this.identity = identiy;
 	}
 	public BigDecimal getAmount() {
 		return amount;

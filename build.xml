@@ -1,4 +1,4 @@
-<!-- Build file fuer die Rest-API -->
+﻿<!-- Build file fuer die Rest-API -->
 <project name="restapi" basedir="." default="compile">
 
 	<property environment="env"/>
@@ -21,7 +21,9 @@
 			<include name="**/jackson-all-1.9.11.jar" />
 			<include name="**/modelmapper-0.6.2.jar" />
 		</fileset>
-		
+		<fileset dir="${dir.client}/deploy/">
+				<include name="**/lpclientpc.jar" />
+		</fileset>		
 	</path>
 
 	<path id="enunciate.classpath">
@@ -79,7 +81,7 @@
 		<echo message="compile the restapi."/>
 		<echo>JAVA_HOME: ${env.JAVA_HOME}</echo>
 
-		<javac
+		<javac includeantruntime="false"
     destdir="${dir.classes}"
     includes="**/*.java"
     debug="true"
@@ -98,24 +100,40 @@
 	</target>
 
 	<target name="webdoc" depends="compile" >
-		<enunciate basedir="${dir.src}" configfile="enunciate.xml">
+		<enunciate verbose="true" basedir="${dir.src}" configfile="enunciate.xml">
 			<include name="**/*.java"/>
 			<classpath refid="enunciate.classpath"/>
-<!--
+<!-- Doku mit in enunciate.xml eingestellten Clients
 				<export artifactId="war.file" destination="${dir.deploy}/restapi-doc.war"/> 
  -->
-<!--
+
+<!-- nur die Doku
  -->		
 				<export artifactId="docs" destination="${dir.deploy}/restapi-doc.war"/>
 			<javacArgument argument="-g"/>
+			<javacArgument argument="-source"/>
+			<javacArgument argument="1.7" />
+			<javacArgument argument="-target"/>
+			<javacArgument argument="1.7" />
 		</enunciate>
 	</target>
 
 	<target name="build" depends="clean,compile">
+		<!-- das im lpclientpc.jar enthaltene log4.xml entfernen -->
+		<delete file="lib/lpclientpc.jar" />
+		<jar destfile="lib/lpclientpc.jar">
+			<zipfileset src="${dir.client}/deploy/lpclientpc.jar" excludes="**/log4j.xml"/>
+		</jar>
+		
 		<war destfile="${dir.deploy}/restapi.war" webxml="WebContent/WEB-INF/web.xml">
 			<classes dir="${dir.classes}">
 				<include name="**/*.class" />
 			</classes>
+
+			<classes dir="${dir.src}">
+				<include name="**/*.properties" />
+			</classes>
+			
 			<webinf dir="WebContent/WEB-INF">
 				<include name="**/*.xml" />
 			</webinf>
@@ -127,22 +145,27 @@
 			<lib dir="lib">
 				<include name="**/jackson-all-1.9.11.jar" />
 				<include name="**/modelmapper-0.6.2.jar" />
+				<include name="**/lpclientpc.jar" />
+				<include name="**/log4j-1.2.17.jar" />
+				<include name="**/aspectjweaver.jar"/>
+				<include name="**/ejb3-persistence.jar"/>
+				<include name="**/jbossall-client.jar"/>
+				<include name="**/jasperreports-5.5.0.jar"/>
+				<include name="**/iText-2.1.7.js2.jar" />
 			</lib>
-			
-<!--
+
 			<lib dir="${dir.server.dir}/jboss/all/server/helium/lib/">				
-				<include name="**/jbossall-client.jar" />
-				<include name="**/ejb3-persistence.jar" />
 				<include name="**/jai_codec.jar" />
 				<include name="**/jai_core.jar" />
 			</lib>
- -->			
 		</war>
 		
 		<copy todir="${dir.deploy}/tomcat/lib">
 			<flattenmapper />
 			<fileset dir="lib">
 				<include name="**/aspectjweaver.jar" />
+				<include name="**/jcr-1.0.jar" />
+				<include name="**/commons-digester-1.7.jar" />
 			</fileset>
 			
 			<fileset dir="${dir.client}/deploy/">
@@ -150,7 +173,6 @@
 			</fileset>
 			
 			<fileset dir="${dir.client}/lib/jasperreports">
-<!--				<include name="**jasperreports-4.0.1.jar" /> -->
 				<include name="**jasperreports-5.5.0.jar" />
 			</fileset>
 			

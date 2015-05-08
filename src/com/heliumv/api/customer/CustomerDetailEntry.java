@@ -35,7 +35,7 @@ package com.heliumv.api.customer;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class CustomerDetailEntry extends CustomerEntry {
+public class CustomerDetailEntry extends CustomerEntry implements IPartnerEntry {
 	private String name3 ;
 	private String countryName ;
 	private String street ;
@@ -50,6 +50,7 @@ public class CustomerDetailEntry extends CustomerEntry {
 	private String fax ;
 	private String formattedCity ;
 	private String pricelistCnr ;
+	private String formattedSalutation ;
 	
 	/**
 	 * Der Name des Landes
@@ -226,5 +227,15 @@ public class CustomerDetailEntry extends CustomerEntry {
 
 	public void setPricelistCnr(String pricelistCnr) {
 		this.pricelistCnr = pricelistCnr;
+	}
+
+	@Override
+	public String getFormattedSalutation() {
+		return formattedSalutation ;
+	}
+
+	@Override
+	public void setFormattedSalutation(String formattedSalutation) {
+		this.formattedSalutation = formattedSalutation ;
 	}	
 }

@@ -32,7 +32,10 @@
  ******************************************************************************/
 package com.heliumv.api.customer;
 
+import java.rmi.RemoteException;
 import java.util.List;
+
+import javax.naming.NamingException;
 
 import com.lp.server.partner.service.CustomerPricelistReportDto;
 
@@ -153,7 +156,18 @@ public interface ICustomerApi {
 	 * 
 	 * @param userId ist der Token der durch die Anmeldung (<code>login</code>) erhalten wurde
 	 * @param customerId ist die Id des Kunden f&uuml;r den die Daten ermittelt werden sollen.
-	 * @return
+	 * @return die Kundendaten
 	 */
-	CustomerDetailEntry getCustomer(String userId, Integer customerId) ;
+	CustomerDetailEntry getCustomer(String userId, Integer customerId) throws NamingException, RemoteException ;
+	
+	/**
+	 * Die Kundendaten eines Kunden ermitteln, der &uuml;ber seine Anmeldung  bekannt ist.
+	 * 
+	 * @param userId ist der Token der durch die Anmeldung (<code>login</code>) erhalten wurde
+	 * @return die Kundendaten
+	 * @throws Exception 
+	 */
+	CustomerDetailLoggedOnEntry getLoggedOnCustomer(
+			String userId) throws NamingException, RemoteException, Exception ;
+
 }

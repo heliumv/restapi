@@ -32,10 +32,14 @@
  ******************************************************************************/
 package com.heliumv.factory;
 
+import java.rmi.RemoteException;
+
 import javax.naming.NamingException;
 
 import com.lp.server.personal.service.PersonalDto;
 
 public interface IPersonalCall {
-	PersonalDto byPrimaryKeySmall(Integer personalIId) throws NamingException  ;
+	PersonalDto byPrimaryKeySmall(Integer personalIId) throws NamingException ;
+	PersonalDto byCPersonalnrMandantCNrOhneExc(
+			String cPersonalnr) throws RemoteException, NamingException ;
 }

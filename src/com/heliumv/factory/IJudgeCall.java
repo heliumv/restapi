@@ -32,9 +32,12 @@
  ******************************************************************************/
 package com.heliumv.factory;
 
+import java.rmi.RemoteException;
+
 import javax.naming.NamingException;
 
 import com.lp.server.system.service.TheClientDto;
+import com.lp.util.EJBExceptionLP;
 
 public interface IJudgeCall {
 	
@@ -56,7 +59,7 @@ public interface IJudgeCall {
 	boolean hasFertDarfLosErledigen(TheClientDto theClientDto) throws NamingException ;
 
 	/**
-	 * Darf ein Los erzeugt(Create)/ge�ndert(Update)/gel�scht(Delete) werden?
+	 * Darf ein Los erzeugt(Create)/ge&auml;ndert(Update)/gel&ouml;scht(Delete) werden?
 	 * @return
 	 * @throws NamingException
 	 */
@@ -64,7 +67,7 @@ public interface IJudgeCall {
 	boolean hasFertLosCUD(TheClientDto theClientDto) throws NamingException ;
 
 	/**
-	 * Darf f�r ein Los Sollmaterial erzeugt/ge�ndert/gel�scht werden?
+	 * Darf f&uuml;r ein Los Sollmaterial erzeugt/ge&auml;ndert/gel&ouml;scht werden?
 	 * @return
 	 * @throws NamingException
 	 */
@@ -72,11 +75,14 @@ public interface IJudgeCall {
 	boolean hasFertDarfSollmaterialCUD(TheClientDto theClientDto) throws NamingException ;
 
 	/**
-	 * Darf Istmaterial nachtr�glich gebucht werden?
+	 * Darf Istmaterial nachtr&auml;glich gebucht werden?
 	 * 
 	 * @return
 	 * @throws NamingException
 	 */
 	boolean hasFertDarfIstmaterialManuellNachbuchen() throws NamingException ;
 	boolean hasFertDarfIstmaterialManuellNachbuchen(TheClientDto theClientDto) throws NamingException ;
+	
+	void addLock(String lockedTable, Integer id) throws NamingException, RemoteException, EJBExceptionLP ;	
+	void removeLock(String lockedTable, Integer id) throws NamingException, RemoteException, EJBExceptionLP ;	
 }

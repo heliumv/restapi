@@ -32,9 +32,11 @@
  ******************************************************************************/
 package com.heliumv.api.project;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.naming.NamingException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -57,9 +59,6 @@ import com.lp.server.util.fastlanereader.service.query.QueryResult;
 @Service("hvProject")
 @Path("/api/v1/project/")
 public class ProjectApi extends BaseApi implements IProjectApi {
-
-//	@Autowired
-//	private IParameterCall parameterCall ;
 	
 	@Autowired
 	private ProjectQuery projectQuery ;
@@ -85,18 +84,16 @@ public class ProjectApi extends BaseApi implements IProjectApi {
 			collector.add(buildFilterCompanyName(filterCompany)) ;
 			FilterBlock filterCrits = new FilterBlock(collector.asArray(), "AND")  ;
 
-//			ProjectQuery query = new ProjectQuery(parameterCall) ;			
-//			QueryParameters params = query.getDefaultQueryParameters(filterCrits) ;
 			QueryParameters params = projectQuery.getDefaultQueryParameters(filterCrits) ;
 			params.setLimit(limit) ;
 			params.setKeyOfSelectedRow(startIndex) ;
 			
 			QueryResult result = projectQuery.setQuery(params) ;
 			projects = projectQuery.getResultList(result) ;
-//		} catch(NamingException e) {
-//			e.printStackTrace() ;
-//		} catch(RemoteException e) {
-//			e.printStackTrace() ;
+		} catch(NamingException  e) {
+			respondUnavailable(e); ;
+		} catch(RemoteException e) {
+			respondUnavailable(e) ;
 		} finally {
 			
 		}

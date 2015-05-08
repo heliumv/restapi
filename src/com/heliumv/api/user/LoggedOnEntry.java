@@ -44,6 +44,15 @@ public class LoggedOnEntry {
 	private String client ;
 	private String localeString ;
 	
+	public LoggedOnEntry() {
+	}
+	
+	public LoggedOnEntry(String token, String client, String localeString) {
+		this.token = token ;
+		this.client = client ;
+		this.localeString = localeString ;
+	}
+	
 	/**
 	 * Der vom HELIUM V System ermittelte "token". Sp&auml;ter auch als "userId"
 	 * referenziert.

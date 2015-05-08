@@ -40,7 +40,7 @@ import javax.naming.NamingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.heliumv.api.item.ItemEntry;
+import com.heliumv.api.item.ItemEntryInternal;
 import com.heliumv.api.item.ItemEntryMapper;
 import com.heliumv.factory.IArtikelCall;
 import com.lp.server.artikel.service.ArtikelDto;
@@ -52,12 +52,12 @@ public class ArtikelLoaderCall implements IArtikelLoaderCall {
 	private ItemEntryMapper itemEntryMapper ;
 	
 	@Override
-	public ItemEntry artikelFindByCNrOhneExc(String cnr) throws NamingException, RemoteException {
+	public ItemEntryInternal artikelFindByCNrOhneExc(String cnr) throws NamingException, RemoteException {
 		return artikelFindByCNrOhneExc(cnr, new HashSet<IItemLoaderAttribute>());
 	}
 
 	@Override
-	public ItemEntry artikelFindByCNrOhneExc(
+	public ItemEntryInternal artikelFindByCNrOhneExc(
 			String cnr, Set<IItemLoaderAttribute> attributes) throws NamingException, RemoteException {
 
 		ArtikelDto artikelDto = artikelCall.artikelFindByCNrOhneExc(cnr) ;
@@ -71,7 +71,7 @@ public class ArtikelLoaderCall implements IArtikelLoaderCall {
 			artikelDto.setArtklaDto(artikelCall.artikelklasseFindByPrimaryKeyOhneExc(artikelDto.getArtklaIId()));
 		}
 		
-		ItemEntry entry = itemEntryMapper.mapEntry(artikelDto) ;
+		ItemEntryInternal entry = itemEntryMapper.mapEntry(artikelDto) ;
 		
 		for (IItemLoaderAttribute loaderAttribute : attributes) {
 			loaderAttribute.load(entry, artikelDto) ;

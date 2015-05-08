@@ -32,15 +32,22 @@
  ******************************************************************************/
 package com.heliumv.factory.impl;
 
+import java.rmi.RemoteException;
+
 import javax.naming.NamingException;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.heliumv.factory.BaseCall;
+import com.heliumv.factory.IGlobalInfo;
 import com.heliumv.factory.IPersonalCall;
 import com.lp.server.personal.service.PersonalDto;
 import com.lp.server.personal.service.PersonalFac;
 
 public class PersonalCall extends BaseCall<PersonalFac> implements IPersonalCall {
-
+	@Autowired 
+	private IGlobalInfo globalInfo ;
+	
 	public PersonalCall() {
 		super(PersonalFacBean) ;
 	}
@@ -48,4 +55,9 @@ public class PersonalCall extends BaseCall<PersonalFac> implements IPersonalCall
 	public PersonalDto byPrimaryKeySmall(Integer personalIId) throws NamingException {
 		return getFac().personalFindByPrimaryKeySmallOhneExc(personalIId) ;
 	}	
+
+	public PersonalDto byCPersonalnrMandantCNrOhneExc(
+			String cPersonalnr) throws RemoteException, NamingException {
+		return getFac().personalFindByCPersonalnrMandantCNr(cPersonalnr, globalInfo.getMandant()) ;
+	}
 }

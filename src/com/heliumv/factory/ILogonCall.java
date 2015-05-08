@@ -41,8 +41,11 @@ import com.lp.server.system.service.TheClientDto;
 
 public interface ILogonCall {
 	
-	 public TheClientDto logon(String benutzer, char[] kennwort, Locale uILocale, String sMandantI) throws NamingException, RemoteException ;
-	
-	 public void logout(TheClientDto theClientDto) throws NamingException, RemoteException ;
+	 TheClientDto logon(String benutzer, char[] kennwort, Locale uILocale, String sMandantI) throws NamingException, RemoteException ;
 
+	 TheClientDto programmedLogon(String benutzer, char[] kennwort, Locale uILocale, String sMandantI) throws NamingException, RemoteException ;
+
+	 void logout(TheClientDto theClientDto) throws NamingException, RemoteException ;
+
+	 TheClientDto logonExtern(int appType, String userName, char[] cKennwortI, Locale uiLocale, String mandantCnr, String source) throws NamingException, RemoteException ;
 }

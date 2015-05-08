@@ -38,7 +38,6 @@ import java.util.Calendar;
 import java.util.List;
 
 import com.heliumv.api.worktime.ZeitdatenEntry;
-import com.heliumv.api.worktime.ZeitdatenEntryTransformer;
 import com.heliumv.tools.StringHelper;
 import com.lp.server.personal.service.ZeiterfassungFac;
 import com.lp.server.util.Facade;
@@ -48,9 +47,9 @@ import com.lp.server.util.fastlanereader.service.query.QueryParameters;
 import com.lp.util.Helper;
 
 public class ZeitdatenQuery extends BaseQuery<ZeitdatenEntry> {
+	
 	public ZeitdatenQuery() {
 		super(QueryParameters.UC_ID_ZEITDATEN) ;
-		setTransformer(new ZeitdatenEntryTransformer()) ;
 	}
 
 	@Override
@@ -108,5 +107,4 @@ public class ZeitdatenQuery extends BaseQuery<ZeitdatenEntry> {
 		fk.wrapWithSingleQuotes() ;
 		return fk ;		
 	}
-	
 }

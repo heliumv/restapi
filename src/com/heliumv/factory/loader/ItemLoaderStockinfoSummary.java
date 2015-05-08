@@ -38,7 +38,7 @@ import javax.naming.NamingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.heliumv.api.item.ItemEntry;
+import com.heliumv.api.item.ItemEntryInternal;
 import com.heliumv.api.item.StockAmountInfoEntry;
 import com.heliumv.factory.IFehlmengeCall;
 import com.heliumv.factory.ILagerCall;
@@ -54,7 +54,7 @@ public class ItemLoaderStockinfoSummary implements IItemLoaderAttribute {
 	private IFehlmengeCall fehlmengeCall ;
 	
 	@Override
-	public ItemEntry load(ItemEntry entry, ArtikelDto artikelDto) {
+	public ItemEntryInternal load(ItemEntryInternal entry, ArtikelDto artikelDto) {
 		try {
 			StockAmountInfoEntry infoEntry = new StockAmountInfoEntry() ;
 			infoEntry.setStockAmount(lagerCall.getLagerstandAllerLagerEinesMandanten(

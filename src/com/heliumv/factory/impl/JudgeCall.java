@@ -32,6 +32,8 @@
  ******************************************************************************/
 package com.heliumv.factory.impl;
 
+import java.rmi.RemoteException;
+
 import javax.naming.NamingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,8 +42,10 @@ import com.heliumv.factory.BaseCall;
 import com.heliumv.factory.IGlobalInfo;
 import com.heliumv.factory.IJudgeCall;
 import com.lp.server.benutzer.service.RechteFac;
+import com.lp.server.system.service.LockMeDto;
 import com.lp.server.system.service.TheClientDto;
 import com.lp.server.system.service.TheJudgeFac;
+import com.lp.util.EJBExceptionLP;
 
 public class JudgeCall extends BaseCall<TheJudgeFac> implements IJudgeCall {
 	@Autowired 
@@ -142,4 +146,31 @@ public class JudgeCall extends BaseCall<TheJudgeFac> implements IJudgeCall {
 			throws NamingException {
 		return hatRechtImpl(RechteFac.RECHT_PERS_DARF_KOMMT_GEHT_AENDERN, theClientDto) ;
 	}	
+	
+	/**
+	 * Versucht den Datensatz mit der angegebenen Id in der Tabelle zu sperren.</br>
+	 * <p>Wirft Exception wenn bereits ein Lock vorhanden ist</p>
+	 * 
+	 * @param lockedTable HelperClient.LOCKME_***
+	 * @param id
+	 * @throws NamingException
+	 * @throws EJBExceptionLP
+	 */
+	public void addLock(String lockedTable, Integer id) throws NamingException, RemoteException, EJBExceptionLP {
+		LockMeDto lockMeDto = buildLockMeDto(lockedTable, id) ;
+		getFac().addLockedObject(lockMeDto, globalInfo.getTheClientDto());
+	}
+	
+	public void removeLock(String lockedTable, Integer id) throws NamingException, RemoteException, EJBExceptionLP {
+		LockMeDto lockmeDto = buildLockMeDto(lockedTable, id) ;
+		getFac().removeLockedObject(lockmeDto);
+		
+	}
+	
+	private LockMeDto buildLockMeDto(String lockedTable, Integer id) {
+		LockMeDto lockmeDto = new LockMeDto(
+				lockedTable, id.toString(), globalInfo.getTheClientDto().getIDUser()) ;
+		lockmeDto.setPersonalIIdLocker(globalInfo.getTheClientDto().getIDPersonal()) ;
+		return lockmeDto ;
+	}
 }

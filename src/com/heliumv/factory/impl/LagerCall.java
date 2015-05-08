@@ -50,6 +50,7 @@ import com.heliumv.factory.ILagerCall;
 import com.heliumv.factory.legacy.AllLagerEntry;
 import com.lp.server.artikel.service.LagerDto;
 import com.lp.server.artikel.service.LagerFac;
+import com.lp.server.artikel.service.SeriennrChargennrMitMengeDto;
 import com.lp.util.EJBExceptionLP;
 
 public class LagerCall extends BaseCall<LagerFac> implements ILagerCall {
@@ -88,6 +89,12 @@ public class LagerCall extends BaseCall<LagerFac> implements ILagerCall {
 	}
 
 	@Override
+	public LagerDto lagerFindByCnrOhnExc(String lagerCnr) throws NamingException, RemoteException {
+		LagerDto lagerDto = getFac().lagerFindByCNrByMandantCNrOhneExc(lagerCnr, globalInfo.getMandant()) ;
+		return lagerDto ;
+	}
+	
+	@Override
 	public BigDecimal getLagerstandOhneExc(Integer itemId, Integer lagerIId)
 			throws NamingException, RemoteException {
 		return getFac().getLagerstandOhneExc(itemId, lagerIId, globalInfo.getTheClientDto());
@@ -113,6 +120,7 @@ public class LagerCall extends BaseCall<LagerFac> implements ILagerCall {
 	public List<AllLagerEntry> getAllLager() throws NamingException,
 			RemoteException, EJBExceptionLP {
 		List<AllLagerEntry> stocks = new ArrayList<AllLagerEntry>() ;
+		@SuppressWarnings("unchecked")
 		Map<Integer,String> m = (Map<Integer,String>) getFac().getAllLager(globalInfo.getTheClientDto()) ;
 		for (Entry<Integer, String> entry : m.entrySet()) {
 			stocks.add(new AllLagerEntry(entry.getKey(), entry.getValue())) ;
@@ -125,6 +133,37 @@ public class LagerCall extends BaseCall<LagerFac> implements ILagerCall {
 			Integer artikelIId, Integer lagerIId, Timestamp tVon, Timestamp tBis)
 			throws NamingException, RemoteException {
 		return getFac().getLagerstandsVeraenderungOhneInventurbuchungen(
-				artikelIId, lagerIId, tVon, tBis, globalInfo.getTheClientDto());
+				artikelIId, lagerIId, tVon, tBis,null, globalInfo.getTheClientDto());
+	}
+
+	@Override
+	public List<SeriennrChargennrMitMengeDto> getAllSeriennrchargennrEinerBelegartposition(
+			String belegartCNr, Integer belegartpositionIId) throws NamingException, RemoteException {
+		return getFac().getAllSeriennrchargennrEinerBelegartpositionUeberHibernate(belegartCNr, belegartpositionIId) ;
+	}
+	
+	@Override
+	public List<SeriennrChargennrMitMengeDto> getAllSeriennrchargennrEinerBelegartpositionUeberHibernate(
+			String belegartCNr, Integer belegartpositionIId) throws NamingException, RemoteException {
+		return getFac().getAllSeriennrchargennrEinerBelegartpositionUeberHibernate(belegartCNr, belegartpositionIId) ;
+	}
+	
+	@Override
+	public void bucheZu(String belegartCNr, Integer belegartIId,
+			Integer belegartpositionIId, Integer artikelIId,
+			BigDecimal fMengeAbsolut, BigDecimal nEinstansdpreis,
+			Integer lagerIId,
+			List<SeriennrChargennrMitMengeDto> alSeriennrchargennr,
+			java.sql.Timestamp tBelegdatum) throws NamingException, RemoteException {
+		getFac().bucheZu(belegartCNr, belegartIId, belegartpositionIId, artikelIId,
+				fMengeAbsolut, nEinstansdpreis, lagerIId, alSeriennrchargennr,
+				tBelegdatum, globalInfo.getTheClientDto(), null, null);
+	}
+
+	@Override
+	public BigDecimal getEinstandspreis(String belegartCNr,
+			Integer belegartpositionIId, String cSeriennrChargennr)
+			throws NamingException, RemoteException, EJBExceptionLP {
+		return getFac().getEinstandspreis(belegartCNr, belegartpositionIId, cSeriennrChargennr) ;
 	}
 }

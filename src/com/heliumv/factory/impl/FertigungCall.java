@@ -51,6 +51,7 @@ import com.lp.server.fertigung.service.LosDto;
 import com.lp.server.fertigung.service.LosablieferungDto;
 import com.lp.server.fertigung.service.LosistmaterialDto;
 import com.lp.server.fertigung.service.LoslagerentnahmeDto;
+import com.lp.server.fertigung.service.LossollarbeitsplanDto;
 import com.lp.server.fertigung.service.LossollmaterialDto;
 import com.lp.util.EJBExceptionLP;
 
@@ -110,20 +111,24 @@ public class FertigungCall extends BaseCall<FertigungFac> implements IFertigungC
 		return losDto ;
 	}	
 	
+	@Override
 	public LosDto losFindByCNrMandantCNrOhneExc(String cNr) throws NamingException {
 		return losFindByCNrMandantCNrOhneExc(cNr, globalInfo.getMandant()) ;
 	}
 
+	@Override
 	public LosDto losFindByCNrMandantCNrOhneExc(String cNr, String mandantCNr) throws NamingException {
 		return getFac().losFindByCNrMandantCNrOhneExc(cNr, mandantCNr) ;
 	}
 	
+	@Override
 	public LoslagerentnahmeDto[] loslagerentnahmeFindByLosIId(Integer losIId)
 			throws NamingException, RemoteException, EJBExceptionLP {
 		return getFac().loslagerentnahmeFindByLosIId(losIId) ;
 	}
 	
 	
+	@Override
 	public void gebeMaterialNachtraeglichAus(
 			LossollmaterialDto lossollmaterialDto, LosistmaterialDto losistmaterialDto, 
 			List<SeriennrChargennrMitMengeDto> listSnrChnr, boolean reduzierFehlmenge)
@@ -132,18 +137,52 @@ public class FertigungCall extends BaseCall<FertigungFac> implements IFertigungC
 				losistmaterialDto, listSnrChnr, reduzierFehlmenge, globalInfo.getTheClientDto());		
 	}
 	
+	@Override
 	public LossollmaterialDto[] lossollmaterialFindByLosIIdOrderByISort(
 			Integer losIId) throws NamingException, RemoteException, EJBExceptionLP {
 		return getFac().lossollmaterialFindByLosIIdOrderByISort(losIId) ;
 	}
 	
+	@Override
 	public LosistmaterialDto[] losistmaterialFindByLossollmaterialIId(
 			Integer lossollmaterialIId) throws NamingException, RemoteException, EJBExceptionLP {
 		return getFac().losistmaterialFindByLossollmaterialIId(lossollmaterialIId) ;
 	}
 	
+	@Override
 	public void updateLosistmaterialMenge(Integer losistmaterialIId,
 			BigDecimal bdMengeNeu) throws NamingException, RemoteException, EJBExceptionLP {
 		getFac().updateLosistmaterialMenge(losistmaterialIId, bdMengeNeu, globalInfo.getTheClientDto()) ;
-	}	
+	}
+	
+	@Override
+	public LosistmaterialDto createLosistmaterial(
+			LosistmaterialDto losistmaterialDto, String sSerienChargennummer) throws NamingException, RemoteException,
+			EJBExceptionLP {
+		return getFac().createLosistmaterial(losistmaterialDto, sSerienChargennummer, globalInfo.getTheClientDto()) ;
+	}
+	
+	@Override
+	public LossollmaterialDto lossollmaterialFindByPrimaryKey(Integer iId)
+			throws NamingException, RemoteException, EJBExceptionLP {
+		return getFac().lossollmaterialFindByPrimaryKeyOhneExc(iId) ;
+	}
+	
+	@Override
+	public void updateLossollmaterialMenge(Integer lossollmaterialId, BigDecimal mengeNeu) 
+			throws NamingException, RemoteException, EJBExceptionLP {
+		LossollmaterialDto dto = getFac().lossollmaterialFindByPrimaryKey(lossollmaterialId) ;
+		dto.setNMenge(mengeNeu);
+		getFac().updateLossollmaterial(dto, globalInfo.getTheClientDto()) ;
+	}
+	
+	@Override
+	public LossollarbeitsplanDto lossollarbeitsplanFindByPrimaryKey(Integer iId) throws NamingException, RemoteException, EJBExceptionLP {
+		return getFac().lossollarbeitsplanFindByPrimaryKey(iId)	;	
+	}
+	
+	public LossollarbeitsplanDto updateLossollarbeitsplan(
+			LossollarbeitsplanDto lossollarbeitsplanDto) throws NamingException, RemoteException, EJBExceptionLP {
+		return getFac().updateLossollarbeitsplan(lossollarbeitsplanDto, globalInfo.getTheClientDto()) ;
+	}
 }

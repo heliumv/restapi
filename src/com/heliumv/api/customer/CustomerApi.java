@@ -50,6 +50,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.heliumv.api.BaseApi;
+import com.heliumv.factory.IAnsprechpartnerCall;
 import com.heliumv.factory.IArtikelCall;
 import com.heliumv.factory.IKundeCall;
 import com.heliumv.factory.IKundeReportCall;
@@ -57,18 +58,17 @@ import com.heliumv.factory.IParameterCall;
 import com.heliumv.factory.IPersonalCall;
 import com.heliumv.factory.IVkPreisfindungCall;
 import com.heliumv.factory.query.CustomerQuery;
+import com.heliumv.feature.FeatureFactory;
 import com.heliumv.tools.FilterHelper;
 import com.heliumv.tools.FilterKriteriumCollector;
 import com.heliumv.tools.StringHelper;
 import com.lp.server.artikel.service.ArtgruDto;
 import com.lp.server.artikel.service.ArtklaDto;
-import com.lp.server.artikel.service.VkpfartikelpreislisteDto;
 import com.lp.server.partner.service.CustomerPricelistReportDto;
 import com.lp.server.partner.service.KundeDto;
 import com.lp.server.partner.service.KundeFac;
 import com.lp.server.partner.service.KundenpreislisteParams;
 import com.lp.server.partner.service.PartnerFac;
-import com.lp.server.personal.service.PersonalDto;
 import com.lp.server.util.Facade;
 import com.lp.server.util.fastlanereader.service.query.FilterBlock;
 import com.lp.server.util.fastlanereader.service.query.FilterKriterium;
@@ -96,6 +96,16 @@ public class CustomerApi extends BaseApi implements ICustomerApi {
 	private IPersonalCall personalCall ;
 	@Autowired
 	private CustomerEntryMapper customerEntryMapper ;
+	@Autowired
+	private PartnerEntryMapper partnerEntryMapper ;
+	@Autowired
+	private AnsprechpartnerMapper ansprechpartnerMapper ;
+	@Autowired
+	private IAnsprechpartnerCall ansprechpartnerCall ;	
+	@Autowired
+	private FeatureFactory featureFactory ;
+	@Autowired
+	private CustomerService customerService ;
 	
 	@Override
 	@GET
@@ -150,26 +160,63 @@ public class CustomerApi extends BaseApi implements ICustomerApi {
 	@Produces({FORMAT_JSON, FORMAT_XML})
 	public CustomerDetailEntry getCustomer(
 			@QueryParam(Param.USERID) String userId,
-			@PathParam(Param.CUSTOMERID)  Integer customerId) {
-		try {
-			if(connectClient(userId) == null) return null ;
-			
-			KundeDto kundeDto = kundeCall.kundeFindByPrimaryKeyOhneExc(customerId) ;
-			if(kundeDto == null ) {
-				respondNotFound(Param.CUSTOMERID, customerId.toString());
-				return null ;
-			}
-			
-			PersonalDto personalDto = getPersonal(kundeDto.getPersonaliIdProvisionsempfaenger()) ;
-			VkpfartikelpreislisteDto preislisteDto = getPreisliste(kundeDto.getVkpfArtikelpreislisteIIdStdpreisliste()) ;			
-			return customerEntryMapper.mapDetailEntry(kundeDto, personalDto, preislisteDto) ;
-		} catch(NamingException e) {
-			respondUnavailable(e) ;
-		} catch(RemoteException e) {
-			respondUnavailable(e);
+			@PathParam(Param.CUSTOMERID)  Integer customerId) throws NamingException, RemoteException {
+		if(connectClient(userId) == null) return null ;
+		
+		KundeDto kundeDto = kundeCall.kundeFindByPrimaryKeyOhneExc(customerId) ;
+		if(kundeDto == null ) {
+			respondNotFound(Param.CUSTOMERID, customerId.toString());
+			return null ;
 		}
+		
+		return customerService.getCustomerDetailEntry(kundeDto) ;		
+	}
 
-		return null;
+
+//	private CustomerDetailEntry getCustomerImpl(Integer customerId)
+//			throws RemoteException, NamingException {
+//		KundeDto kundeDto = kundeCall.kundeFindByPrimaryKeyOhneExc(customerId) ;
+//		if(kundeDto == null ) {
+//			respondNotFound(Param.CUSTOMERID, customerId.toString());
+//			return null ;
+//		}
+//		
+//		PersonalDto personalDto = getPersonal(kundeDto.getPersonaliIdProvisionsempfaenger()) ;
+//		VkpfartikelpreislisteDto preislisteDto = getPreisliste(kundeDto.getVkpfArtikelpreislisteIIdStdpreisliste()) ;			
+//		return customerEntryMapper.mapDetailEntry(kundeDto, personalDto, preislisteDto) ;
+//	}
+//
+
+
+	@Override
+	@GET
+	@Path("/loggedon")
+	@Produces({FORMAT_JSON, FORMAT_XML})
+	public CustomerDetailLoggedOnEntry getLoggedOnCustomer(
+			@QueryParam(Param.USERID) String userId) throws NamingException, RemoteException, Exception {
+		if(connectClient(userId) == null) return null ;
+		
+		if(!featureFactory.hasCustomerPartlist()) {
+			respondBadRequest(BaseApi.HvErrorCode.EXPECTATION_FAILED);
+			return null ;
+		}
+		
+		return featureFactory.getObject().getLoggedOnCustomerDetail() ;
+//		KundeDto kundeDto = kundeCall
+//				.kundeFindByAnsprechpartnerIdcNrMandantOhneExc(featureFactory.getAnsprechpartnerId()) ;
+//		if(kundeDto == null) {
+//			respondBadRequest("customer", featureFactory.getAnsprechpartnerId().toString());
+//			return null ;
+//		}
+//		
+//		AnsprechpartnerDto ansprechpartnerDto = ansprechpartnerCall
+//				.ansprechpartnerFindByPrimaryKey(featureFactory.getAnsprechpartnerId()) ;
+//		CustomerDetailEntry customerDetailEntry = customerService.getCustomerDetailEntry(kundeDto) ;
+//		CustomerDetailLoggedOnEntry entry = new CustomerDetailLoggedOnEntry(customerDetailEntry) ;
+//		PartnerEntry accountEntry = new PartnerEntry();
+//		ansprechpartnerMapper.mapAnsprechpartner(accountEntry, ansprechpartnerDto) ;
+//		entry.setAccountEntry(accountEntry);
+//		return entry ;
 	}
 
 
@@ -431,13 +478,13 @@ public class CustomerApi extends BaseApi implements ICustomerApi {
 				KundeFac.FLR_PARTNER + "." + PartnerFac.FLR_PARTNER_VERSTECKT) ;
 	}
 
-	private VkpfartikelpreislisteDto getPreisliste(Integer preislisteId) throws NamingException, RemoteException {
-		if(preislisteId == null) return null ;			
-		return vkpreisfindungCall.vkpfartikelpreislisteFindByPrimaryKey(preislisteId) ;
-	}
-	
-	private PersonalDto getPersonal(Integer personalId) throws NamingException, RemoteException {
-		if(personalId == null) return null ;
-		return personalCall.byPrimaryKeySmall(personalId) ;
-	}
+//	private VkpfartikelpreislisteDto getPreisliste(Integer preislisteId) throws NamingException, RemoteException {
+//		if(preislisteId == null) return null ;			
+//		return vkpreisfindungCall.vkpfartikelpreislisteFindByPrimaryKey(preislisteId) ;
+//	}
+//	
+//	private PersonalDto getPersonal(Integer personalId) throws NamingException, RemoteException {
+//		if(personalId == null) return null ;
+//		return personalCall.byPrimaryKeySmall(personalId) ;
+//	}
 }

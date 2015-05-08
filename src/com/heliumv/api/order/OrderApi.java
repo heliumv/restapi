@@ -174,8 +174,8 @@ public class OrderApi extends BaseApi implements IOrderApi  {
 			positions = orderPositionQuery.getResultList(result) ;
 		} catch(NamingException e) {
 			respondUnavailable(e) ;
-//		} catch(RemoteException e) {
-//			respondUnavailable(e) ;
+		} catch(RemoteException e) {
+			respondUnavailable(e) ;
 		} finally {
 		}
 		return positions ;

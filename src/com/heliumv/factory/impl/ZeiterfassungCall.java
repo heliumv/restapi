@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -48,6 +49,7 @@ import org.springframework.stereotype.Component;
 
 import com.heliumv.annotation.HvJudge;
 import com.heliumv.annotation.HvModul;
+import com.heliumv.api.worktime.DayTypeEntry;
 import com.heliumv.api.worktime.DocumentType;
 import com.heliumv.api.worktime.SpecialActivity;
 import com.heliumv.factory.BaseCall;
@@ -55,12 +57,14 @@ import com.heliumv.factory.IGlobalInfo;
 import com.heliumv.factory.IJudgeCall;
 import com.heliumv.factory.IZeiterfassungCall;
 import com.lp.server.benutzer.service.RechteFac;
+import com.lp.server.personal.service.MaschineDto;
 import com.lp.server.personal.service.TaetigkeitDto;
 import com.lp.server.personal.service.ZeitdatenDto;
 import com.lp.server.personal.service.ZeiterfassungFac;
 import com.lp.server.system.service.LocaleFac;
 import com.lp.server.system.service.TheClientDto;
 import com.lp.util.EJBExceptionLP;
+import com.lp.util.Helper;
 
 @Component
 public class ZeiterfassungCall extends BaseCall<ZeiterfassungFac> implements IZeiterfassungCall {
@@ -119,6 +123,8 @@ public class ZeiterfassungCall extends BaseCall<ZeiterfassungFac> implements IZe
 
 	private void modifyKommtGehtToNow(ZeitdatenDto zDto) throws RemoteException, NamingException, EJBExceptionLP {
 		Integer taetigkeitId = zDto.getTaetigkeitIId() ;
+		if(taetigkeitId == null) return ;
+		
 		if(taetigkeitId.equals(getCachedTaetigkeitId(ZeiterfassungFac.TAETIGKEIT_KOMMT)) ||
 		   taetigkeitId.equals(getCachedTaetigkeitId(ZeiterfassungFac.TAETIGKEIT_GEHT))  ||
 		   taetigkeitId.equals(getCachedTaetigkeitId(ZeiterfassungFac.TAETIGKEIT_UNTER))) {
@@ -144,7 +150,7 @@ public class ZeiterfassungCall extends BaseCall<ZeiterfassungFac> implements IZe
 			modifyKommtGehtToNow(zeitdatenDto) ;
 		}
 		return getFac().createZeitdaten(zeitdatenDto, bBucheAutoPausen,
-				bBucheMitternachtssprung, bZeitverteilen, globalInfo.getTheClientDto()) ;
+				bBucheMitternachtssprung, bZeitverteilen, false, globalInfo.getTheClientDto()) ;
 	}
 
 	@HvModul(modul=LocaleFac.BELEGART_AUFTRAG) 
@@ -175,6 +181,11 @@ public class ZeiterfassungCall extends BaseCall<ZeiterfassungFac> implements IZe
 	}
 
 	@HvModul(modul=LocaleFac.BELEGART_ZEITERFASSUNG)
+	public List<DocumentType> getBebuchbareBelegarten() throws NamingException {
+		return getBebuchbareBelegarten(globalInfo.getTheClientDto()) ;
+	}
+	
+	@HvModul(modul=LocaleFac.BELEGART_ZEITERFASSUNG)
 	@HvJudge(recht=RechteFac.RECHT_PERS_ZEITERFASSUNG_R)
 	public ZeitdatenDto zeitdatenFindByPrimaryKey(Integer id) throws NamingException, RemoteException {
 //		return getFac().zeitdatenFindByPrimaryKeyOhneExc(id) ;
@@ -186,6 +197,24 @@ public class ZeiterfassungCall extends BaseCall<ZeiterfassungFac> implements IZe
 	public void removeZeitdaten(ZeitdatenDto zeitdatenDto) throws NamingException, RemoteException, EJBExceptionLP {
 		getFac().removeZeitdaten(zeitdatenDto, globalInfo.getTheClientDto()) ;
 	}
+	
+	
+	public List<DayTypeEntry> getAllSprTagesarten() throws NamingException, RemoteException {
+		return getAllSprTagesarten(globalInfo.getTheClientDto().getLocUi()) ;
+	}
+	
+	public List<DayTypeEntry> getAllSprTagesarten(Locale locale) throws NamingException, RemoteException {
+		return convertFromDayTypes(getFac().getAllSprTagesarten(Helper.locale2String(locale))) ;		
+	}
+
+	
+	private List<DayTypeEntry> convertFromDayTypes(Map<?, ?> allDayTypes) {
+		List<DayTypeEntry> daytypes = new ArrayList<DayTypeEntry>() ;
+		for (Entry<?,?> entry : allDayTypes.entrySet()) {
+			daytypes.add(new DayTypeEntry((Integer) entry.getKey(), (String) entry.getValue())) ;
+		}
+		return daytypes ;
+ 	}
 	
 	private List<SpecialActivity> convertFromActivities(Map<?, ?> allActivities) {
 		List<SpecialActivity> activities = new ArrayList<SpecialActivity>() ;
@@ -204,4 +233,14 @@ public class ZeiterfassungCall extends BaseCall<ZeiterfassungFac> implements IZe
 		
 		return documents ;
 	}
+
+	public MaschineDto maschineFindByPrimaryKey(Integer maschineId) throws NamingException, RemoteException {
+		MaschineDto maschineDto = getFac().maschineFindByPrimaryKey(maschineId) ;
+		if(!globalInfo.getMandant().equals(maschineDto.getMandantCNr())) {
+			throw new EJBExceptionLP(EJBExceptionLP.FEHLER_BEI_FINDBYPRIMARYKEY, maschineId.toString());
+		}
+		
+		return maschineDto ;
+	}
+
 }

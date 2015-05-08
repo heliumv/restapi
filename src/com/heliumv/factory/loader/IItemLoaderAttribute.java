@@ -32,9 +32,9 @@
  ******************************************************************************/
 package com.heliumv.factory.loader;
 
-import com.heliumv.api.item.ItemEntry;
+import com.heliumv.api.item.ItemEntryInternal;
 import com.lp.server.artikel.service.ArtikelDto;
 
 public interface IItemLoaderAttribute {
-	ItemEntry load(ItemEntry entry, ArtikelDto artikelDto) ;
+	ItemEntryInternal load(ItemEntryInternal entry, ArtikelDto artikelDto) ;
 }

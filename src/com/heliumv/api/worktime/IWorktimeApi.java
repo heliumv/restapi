@@ -34,8 +34,6 @@ package com.heliumv.api.worktime;
 
 import java.util.List;
 
-import javax.ws.rs.core.Response;
-
 import com.heliumv.api.item.ItemEntry;
 import com.heliumv.api.order.OrderApi;
 import com.heliumv.api.production.ProductionApi;
@@ -51,33 +49,29 @@ public interface IWorktimeApi {
 	/**
 	 * Eine KOMMT-Buchung durchf&uuml;hren.</br>
 	 * @param entry ist die Standardzeitbuchung Datenstruktur <code>TimeRecordingEntry</code>
-	 * @return
 	 */
-	Response bookComing(TimeRecordingEntry entry) ;
+	void bookComing(TimeRecordingEntry entry) ;
 	
 	/**
 	 * Eine GEHT-Buchung durchf&uuml;hren.</br>
 	 * @param entry ist die Standardzeitbuchung Datenstruktur <code>TimeRecordingEntry</code>
-	 * @return
 	 */
-	Response bookGoing(TimeRecordingEntry entry) ;
+	void bookGoing(TimeRecordingEntry entry) ;
 
 	/**
 	 * Eine PAUSE (Unterbrechung)-Buchung durchf&uuml;hren.</br>
 	 * <p>Eine Pause (zum Beispiel Mittagspause) wird durch <b>zwei</b> PAUSE
 	 * Buchungen erzielt.</p>
 	 * @param entry ist die Standardzeitbuchung Datenstruktur <code>TimeRecordingEntry</code>
-	 * @return
 	 */
-	Response bookPausing(TimeRecordingEntry entry) ;
+	void bookPausing(TimeRecordingEntry entry) ;
 
 	/**
 	 * Eine ENDE Buchung durchf&uuml;hren</br>
 	 * <p>Eine Belegbuchung wie beispielsweise Auftrags-, Projekt oder Los-Buchung beenden</p>
 	 * @param entry
-	 * @return
 	 */
-	Response bookStopping(TimeRecordingEntry entry) ;
+	void bookStopping(TimeRecordingEntry entry) ;
 
 //	Response bookComing(String userId,
 //			Integer year, Integer month, Integer day,
@@ -89,10 +83,8 @@ public interface IWorktimeApi {
 	 * @param entry ist die Datenstruktur zur Speicherung einer Los-Buchung</br>
 	 * <p>Die anzugebende Los-Id kann &uuml;ber die Resource <code>production</code> ermittelt werden @see {@link ProductionApi}
 	 * {@link ProductionApi} </p>
-	 * 
-	 * @return
 	 */
-	Response bookProduction(ProductionRecordingEntry entry) ;
+	void bookProduction(ProductionRecordingEntry entry) ;
 
 	/** 
 	 * Eine (Beginn) Buchung eines Projekts durchf&uuml;hren.
@@ -100,9 +92,8 @@ public interface IWorktimeApi {
 	 * @param entry ist die Datenstruktur zur Speicherung einer Projekt-Buchung</br>
 	 * <p>Die anzugebende Project-Id kann &uuml;ber die Resource <code>project</code> ermittelt werden
 	 * @see {@link ProjectApi} </p>
-	 * @return
 	 */
-	Response bookProject(ProjectRecordingEntry entry) ;
+	void bookProject(ProjectRecordingEntry entry) ;
 	
 	/**
 	 * Eine (Beginn) Buchung mit Auftragsbezug erzeugen.</br>
@@ -112,9 +103,8 @@ public interface IWorktimeApi {
 	 * ermittelt werden.</p>
 	 *
 	 * @param entry ist dabei die Auftragszeit Datenstruktur
-	 * @return
 	 */
-	Response bookOrder(OrderRecordingEntry entry) ;
+	void bookOrder(OrderRecordingEntry entry) ;
 
 	/**
 	 * Liefert eine Liste aller verf&uuml;gbaren T&auml;tigkeiten (Arbeitszeitartikel) die innerhalb der Zeiterfassung 
@@ -140,7 +130,7 @@ public interface IWorktimeApi {
 	 * @param userId
 	 * @return eine (leere) Liste der f&uuml;r den Benutzer verf&uuml;gbaren Sondert&auml;tigkeiten
 	 */
-	public List<SpecialActivity> getSpecialActivities(String userId) ;
+	List<SpecialActivity> getSpecialActivities(String userId) ;
 	
 	/**
 	 * Liefert eine Liste aller verf&uuml;gbaren Belegarten die f&uuml;r die Zeiterfassung verwendet werden k&ouml;nnen.</br>
@@ -159,6 +149,8 @@ public interface IWorktimeApi {
 	 * @param month ist das Monat (1-12) 
 	 * @param day der Tag (1-31)
 	 * @param forStaffId ist jene Benutzer-Id f&uuml;r welche die Zeitdaten abgerufen werden sollen. Kann auch leer sein
+	 * @param forStaffCnr ist jene Personalnummer f&uuml;r welche die Zeitdaten abgerufen werden soll. Kann auch leer sein.
+	 *  Ist sowohl forStaffId als auch forStaffCnr angegeben, gilt forStaffId
 	 * @param limit Ist die maximale Anzahl an Datens&auml;tzen. Default 50.
 	 * @return eine (leere) Liste von <code>ZeitdatenEntry </code> f&uuml;r den gew&uuml;nschten Tag
 	 */
@@ -168,6 +160,7 @@ public interface IWorktimeApi {
 			Integer month,
 			Integer day,
 			Integer forStaffId,
+			String  forStaffCnr,
 			Integer limit) ;
 	
 	/**
@@ -179,10 +172,13 @@ public interface IWorktimeApi {
 	 * @param forStaffId ist die optionale PersonalId f&uuml;r die gel&ouml;scht werden soll. 
 	 * <p>Der angemeldete Benutzer kann f&uuml;r jene Personen f&uuml;r die er ausreichend Rechte hat Zeitbuchungen l&ouml;schen.
 	 * </p>
-	 * <p>Wird sie nicht angegeben, so wird der Zeitbuchung mit der angemeldeten Person verkn&uuml;pft.
+	 * @param forStaffCnr ist die optionale Personalnummer f&uuml;r die gel&ouml;scht werden soll.
+	 *  Sind sowohl forStaffId als auch forStaffCnr angegeben, wird forStaffId verwendet. Sind beide
+	 *  nicht angegeben, wird das L&ouml;schen mit dem angemeldeten Benutzer durchgef&uuml;hrt
 	 */
 	void removeWorktime(
 			String userId,
 			Integer worktimeId,
-			Integer forStaffId) ;
+			Integer forStaffId, 
+			String  forStaffCnr) ;
 }

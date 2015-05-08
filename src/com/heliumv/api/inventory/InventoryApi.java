@@ -53,8 +53,9 @@ import org.springframework.stereotype.Service;
 import com.heliumv.api.BaseApi;
 import com.heliumv.api.item.InventoryEntry;
 import com.heliumv.api.item.InventoryStockEntryMapper;
-import com.heliumv.factory.GlobalInfo;
+import com.heliumv.api.production.IdentityAmountEntry;
 import com.heliumv.factory.IArtikelCall;
+import com.heliumv.factory.IGlobalInfo;
 import com.heliumv.factory.IInventurCall;
 import com.heliumv.factory.ILagerCall;
 import com.heliumv.tools.StringHelper;
@@ -77,7 +78,7 @@ public class InventoryApi extends BaseApi implements IInventoryApi {
 	private ILagerCall lagerCall ;
 
 	@Autowired
-	private GlobalInfo globalInfo ;
+	private IGlobalInfo globalInfo ;
 	
 	@Override
 	@GET
@@ -99,18 +100,19 @@ public class InventoryApi extends BaseApi implements IInventoryApi {
 
 	@PUT
 	@Path("/{inventoryid}/entry")
-	@Consumes({"application/json", "application/xml"})
+	@Consumes({FORMAT_JSON, FORMAT_XML})
 	public void updateInventoryDataEntry(
 		@PathParam("inventoryid") Integer inventoryId,
-		@QueryParam("userid") String userId,
+		@QueryParam(Param.USERID) String userId,
 		InventoryDataEntry inventoryEntry,
-		@QueryParam("changeAmountTo") Boolean changeAmountTo		
-	) {
+		@QueryParam("changeAmountTo") Boolean changeAmountTo) {
+
 		if(StringHelper.isEmpty(inventoryEntry.getItemCnr())) {
-			respondBadRequest("itemCnr", inventoryEntry.getItemCnr()) ;
+			respondBadRequestValueMissing("itemCnr") ;
 			return ;
 		}
-		if(inventoryEntry.getAmount() == null || inventoryEntry.getAmount().signum() <= 0) {
+
+		if(inventoryEntry.getAmount() == null || inventoryEntry.getAmount().signum() < 0) {
 			respondBadRequest("amount", "null/<0") ;
 			return ;
 		}
@@ -126,9 +128,8 @@ public class InventoryApi extends BaseApi implements IInventoryApi {
 				respondNotFound("itemCnr", inventoryEntry.getItemCnr()) ;
 				return ;
 			}
-			Integer itemId = itemDto.getIId() ;
 			
-			updateInventoryEntryImpl(inventoryId, itemId, inventoryEntry.getAmount(), changeAmountTo, inventurDto);
+			updateInventoryEntryImpl(inventoryId, itemDto, inventoryEntry, changeAmountTo, inventurDto);
 		} catch(NamingException e) {
 			respondUnavailable(e) ;
 		} catch(RemoteException e) {
@@ -139,21 +140,49 @@ public class InventoryApi extends BaseApi implements IInventoryApi {
 	}
 	
 	
+	protected InventoryDataEntry getInventoryDataEntry(BigDecimal amount) {
+		InventoryDataEntry inventoryEntry = new InventoryDataEntry() ;
+		inventoryEntry.setIdentities(new ArrayList<IdentityAmountEntry>());
+		inventoryEntry.setAmount(amount) ;
+		return inventoryEntry ;
+	}
+
+	protected InventoryDataEntry getInventoryDataEntry(BigDecimal amount, String identity) {
+		InventoryDataEntry inventoryEntry = getInventoryDataEntry(amount) ;
+		if(!StringHelper.isEmpty(identity)) {
+			IdentityAmountEntry entry = new IdentityAmountEntry() ;
+			entry.setAmount(amount) ;
+			entry.setIdentity(identity);
+			inventoryEntry.getIdentities().add(entry) ;
+		}
+		return inventoryEntry ;
+	}
+
+	
 	@PUT
 	@Path("/{inventoryid}/entry/{itemid}/{amount}")
 	public void updateInventoryEntry(
 			@PathParam("inventoryid") Integer inventoryId,
-			@PathParam("itemid") Integer itemId,
+			@PathParam(Param.ITEMID) Integer itemId,
 			@PathParam("amount") BigDecimal amount,
-			@QueryParam("userid") String userId,
-			@QueryParam("changeAmountTo") Boolean changeAmountTo) {		
+			@QueryParam(Param.USERID) String userId,
+			@QueryParam("changeAmountTo") Boolean changeAmountTo,
+			@QueryParam("identity") String identity) {		
 		if(connectClient(userId) == null) return ;
 		
 		try {
 			InventurDto inventurDto = findInventurDtoById(inventoryId) ;
 			if(inventurDto == null) return ;
 			
-			updateInventoryEntryImpl(inventoryId, itemId, amount, changeAmountTo, inventurDto);
+			ArtikelDto itemDto = artikelCall.artikelFindByPrimaryKeySmallOhneExc(itemId) ;
+			if(itemDto == null) {
+				respondBadRequest(Param.ITEMID, itemId.toString());
+				return ;
+			}
+			
+			InventoryDataEntry inventoryEntry = getInventoryDataEntry(amount, 
+					itemDto.istArtikelSnrOderchargentragend() ? identity : null) ;
+			updateInventoryEntryImpl(inventoryId, itemDto, inventoryEntry, changeAmountTo, inventurDto);
 		} catch(NamingException e) {
 			respondUnavailable(e) ;
 		} catch(RemoteException e) {
@@ -166,18 +195,18 @@ public class InventoryApi extends BaseApi implements IInventoryApi {
 	
 	@POST
 	@Path("/{inventoryid}/entry")
-	@Consumes({"application/json", "application/xml"})
+	@Consumes({FORMAT_JSON, FORMAT_XML})
 	public void createInventoryDataEntry(
 		@PathParam("inventoryid") Integer inventoryId,
 		InventoryDataEntry inventoryEntry,
-		@QueryParam("userid") String userId,
+		@QueryParam(Param.USERID) String userId,
 		@QueryParam("largeDifference") Boolean largeDifference
 	) {
 		if(StringHelper.isEmpty(inventoryEntry.getItemCnr())) {
-			respondBadRequest("itemCnr", inventoryEntry.getItemCnr()) ;
+			respondBadRequestValueMissing("itemCnr") ;
 			return ;
 		}
-		if(inventoryEntry.getAmount() == null || inventoryEntry.getAmount().signum() <= 0) {
+		if(inventoryEntry.getAmount() == null || inventoryEntry.getAmount().signum() < 0) {
 			respondBadRequest("amount", "null/<0") ;
 			return ;
 		}		
@@ -193,16 +222,26 @@ public class InventoryApi extends BaseApi implements IInventoryApi {
 				respondNotFound("itemCnr", inventoryEntry.getItemCnr()) ;
 				return ;
 			}
-			Integer itemId = itemDto.getIId() ;
 			
 			InventurlisteDto[] inventurlisteDtos = inventurCall
-					.inventurlisteFindByInventurIIdLagerIIdArtikelIId(inventoryId, inventurDto.getLagerIId(), itemId) ;
-			if(inventurlisteDtos != null && inventurlisteDtos.length > 0) {
-				respondUnprocessableEntity("amount", inventurlisteDtos[0].getNInventurmenge().toPlainString());
-				return ;
+					.inventurlisteFindByInventurIIdLagerIIdArtikelIId(inventoryId, inventurDto.getLagerIId(), itemDto.getIId()) ;
+			if(itemDto.istArtikelSnrOderchargentragend()) {
+				for (IdentityAmountEntry identityEntry : inventoryEntry.getIdentities()) {
+					for(int i = 0 ; i < inventurlisteDtos.length; i++) {
+						if(identityEntry.getIdentity().compareTo(inventurlisteDtos[i].getCSeriennrchargennr()) == 0) {
+							respondUnprocessableEntity("identity exists", identityEntry.getIdentity()) ;
+							return ;
+						}
+					}
+				}
+			} else {
+				if(inventurlisteDtos != null && inventurlisteDtos.length > 0) {
+					respondUnprocessableEntity("amount", inventurlisteDtos[0].getNInventurmenge().toPlainString());
+					return ;
+				}
 			}
 			
-			createInventurlisteImpl(inventoryId, inventurDto, itemId, inventoryEntry.getAmount(), largeDifference);
+			createInventurlisteImpl(inventoryId, inventurDto, itemDto, inventoryEntry, largeDifference);
 		} catch(NamingException e) {
 			respondUnavailable(e) ;
 		} catch(RemoteException e) {
@@ -216,10 +255,11 @@ public class InventoryApi extends BaseApi implements IInventoryApi {
 	@Path("/{inventoryid}/entry/{itemid}/{amount}")
 	public void createInventoryEntry(
 			@PathParam("inventoryid") Integer inventoryId,
-			@PathParam("itemid") Integer itemId,
+			@PathParam(Param.ITEMID) Integer itemId,
 			@PathParam("amount") BigDecimal amount,
-			@QueryParam("userid") String userId,
-			@QueryParam("largeDifference") Boolean largeDifference) {
+			@QueryParam(Param.USERID) String userId,
+			@QueryParam("largeDifference") Boolean largeDifference,
+			@QueryParam("identity") String identity) {
 		if(connectClient(userId) == null) return ;
 		
 		try {
@@ -236,7 +276,15 @@ public class InventoryApi extends BaseApi implements IInventoryApi {
 				return ;
 			}
 
-			createInventurlisteImpl(inventoryId, inventurDto, itemId, amount, largeDifference);
+			ArtikelDto itemDto = artikelCall.artikelFindByPrimaryKeySmallOhneExc(itemId) ;
+			if(itemDto == null) {
+				respondBadRequest(Param.ITEMID, itemId.toString());
+				return ;
+			}
+			
+			InventoryDataEntry inventoryEntry = getInventoryDataEntry(
+					amount, itemDto.istArtikelSnrOderchargentragend() ? identity : null)  ;
+			createInventurlisteImpl(inventoryId, inventurDto, itemDto, inventoryEntry, largeDifference);
 		} catch(NamingException e) {
 			respondUnavailable(e) ;
 		} catch(RemoteException e) {
@@ -275,43 +323,113 @@ public class InventoryApi extends BaseApi implements IInventoryApi {
 		return inventurDto ;
 	}
 	
-	private void createInventurlisteImpl(Integer inventoryId, InventurDto inventurDto, Integer itemId,
-			BigDecimal amount, Boolean largeDifference) throws NamingException, RemoteException {	    
-		BigDecimal lagerstandVeraenderung = lagerCall.
-	          getLagerstandsVeraenderungOhneInventurbuchungen(
-	              itemId, inventurDto.getLagerIId(), inventurDto.getTInventurdatum(),
-	              new java.sql.Timestamp(System.currentTimeMillis()));
+	/**
+	 * Mengen &uuml;berpr&uuml;fen</b>
+	 * <p>Die Gesamtsumme der identity.amount muss ident mit der angegebenen Menge sein<p>
+	 * <p>Es d&uuml;rfen nur positive Mengen in den identities vorhanden sein.</p>
+	 * <p>Seriennummernbehaftete Artikel d&uuml;rfen nur die Menge 1.0 haben</p>
+	 * @param amount
+	 * @param identities
+	 * @return
+	 */
+	private boolean verifyAmounts(ArtikelDto itemDto, BigDecimal amount, List<IdentityAmountEntry> identities) {
+		if(!itemDto.istArtikelSnrOderchargentragend()) return true ;
+		if(identities == null || identities.size() == 0) {
+			respondBadRequestValueMissing("identities");
+			return false ;
+		}
+		
+		BigDecimal amountIdentities = BigDecimal.ZERO ;
+		for (IdentityAmountEntry entry : identities) {
+			if(entry.getAmount() == null) {
+				respondBadRequestValueMissing("amount");
+				appendBadRequestData(entry.getIdentity(), "amount missing");
+				return false ;
+			}
+			
+			if(entry.getAmount().signum() != 1) {
+				respondBadRequest("amount", "positive");
+				appendBadRequestData(entry.getIdentity(), entry.getAmount().toPlainString());
+				return false ;
+			}
 
-	    if (amount.subtract(lagerstandVeraenderung).signum() < 0) {
-			respondBadRequest("amount", "negativeInventoryAmount");
-			return ;
-	    }
-	    
-		BigDecimal stockAmount = lagerCall.getLagerstandOhneExc(itemId, inventurDto.getLagerIId()) ;
-		if(isDifferenceToLarge(stockAmount, amount)) {
-			if(largeDifference == null || !largeDifference) {
-				respondBadRequest("amount", "largeDifference");
+			if(itemDto.isSeriennrtragend()) {
+				if(BigDecimal.ONE.compareTo(entry.getAmount()) != 0) {
+					respondBadRequest("snr-amount", "1 (is: " + entry.getAmount().toPlainString() + ")");
+					return false ;
+				}
+			}
+			
+			amountIdentities = amountIdentities.add(entry.getAmount()) ;
+		}
+		
+		if(amountIdentities.compareTo(amount.abs()) != 0) {
+			respondBadRequest("totalamount != identityamount", amount.toPlainString()) ;
+			appendBadRequestData("identityamount", amountIdentities.toPlainString()) ;
+			return false ;
+		}
+		
+		return true ;
+	}
+	
+	private void createInventurlisteImpl(Integer inventoryId, InventurDto inventurDto, ArtikelDto itemDto,
+			InventoryDataEntry inventoryEntry, Boolean largeDifference) throws NamingException, RemoteException {
+		if(!itemDto.istArtikelSnrOderchargentragend()) {
+			BigDecimal lagerstandVeraenderung = lagerCall.
+		          getLagerstandsVeraenderungOhneInventurbuchungen(
+		              itemDto.getIId(), inventurDto.getLagerIId(), inventurDto.getTInventurdatum(),
+		              new java.sql.Timestamp(System.currentTimeMillis()));
+	
+		    if (inventoryEntry.getAmount().subtract(lagerstandVeraenderung).signum() < 0) {
+				respondBadRequest("amount", "negativeInventoryAmount");
 				return ;
+		    }
+		}
+		
+		if(!itemDto.istArtikelSnrOderchargentragend()) {
+			BigDecimal stockAmount = lagerCall.getLagerstandOhneExc(itemDto.getIId(), inventurDto.getLagerIId()) ;
+			if(isDifferenceToLarge(stockAmount, inventoryEntry.getAmount())) {
+				if(largeDifference == null || !largeDifference) {
+					respondBadRequest("amount", "largeDifference");
+					return ;
+				}
 			}
 		}
 		
-		InventurlisteDto entry = new InventurlisteDto() ;
-		entry.setArtikelIId(itemId) ;
-		entry.setInventurIId(inventoryId) ;
-		entry.setLagerIId(inventurDto.getLagerIId()) ;
-		entry.setNInventurmenge(amount) ;
-		
-		inventurCall.createInventurliste(entry, false, globalInfo.getTheClientDto()) ;
+		if(!verifyAmounts(itemDto, inventoryEntry.getAmount(), inventoryEntry.getIdentities())) {
+			return ;
+		}		
+
+		if(itemDto.istArtikelSnrOderchargentragend()) {
+			for (IdentityAmountEntry amountEntry : inventoryEntry.getIdentities()) {
+				InventurlisteDto entry = new InventurlisteDto() ;
+				entry.setArtikelIId(itemDto.getIId()) ;
+				entry.setInventurIId(inventoryId) ;
+				entry.setLagerIId(inventurDto.getLagerIId()) ;
+				entry.setNInventurmenge(amountEntry.getAmount()) ;
+				entry.setCSeriennrchargennr(amountEntry.getIdentity());
+				
+				inventurCall.createInventurliste(entry, false, globalInfo.getTheClientDto()) ;				
+			}
+		} else {
+			InventurlisteDto entry = new InventurlisteDto() ;
+			entry.setArtikelIId(itemDto.getIId()) ;
+			entry.setInventurIId(inventoryId) ;
+			entry.setLagerIId(inventurDto.getLagerIId()) ;
+			entry.setNInventurmenge(inventoryEntry.getAmount()) ;
+			
+			inventurCall.createInventurliste(entry, false, globalInfo.getTheClientDto()) ;		
+		}
 	}
 	
-	private void updateInventoryEntryImpl(Integer inventoryId, Integer itemId,
-			BigDecimal amount, Boolean changeAmountTo, InventurDto inventurDto)
+	private void updateInventoryEntryImpl(Integer inventoryId, ArtikelDto itemDto,
+			InventoryDataEntry inventoryEntry, Boolean changeAmountTo, InventurDto inventurDto)
 			throws NamingException, RemoteException {
 		
 		InventurlisteDto[] inventurlisteDtos = inventurCall
-				.inventurlisteFindByInventurIIdLagerIIdArtikelIId(inventoryId, inventurDto.getLagerIId(), itemId) ;
+				.inventurlisteFindByInventurIIdLagerIIdArtikelIId(inventoryId, inventurDto.getLagerIId(), itemDto.getIId()) ;
 		if(inventurlisteDtos == null || inventurlisteDtos.length == 0) {
-			createInventurlisteImpl(inventoryId, inventurDto, itemId, amount, false) ;
+			createInventurlisteImpl(inventoryId, inventurDto, itemDto, inventoryEntry, false) ;
 			return ;
 		}
 
@@ -319,20 +437,64 @@ public class InventoryApi extends BaseApi implements IInventoryApi {
 			respondBadRequest("changeAmountTo", "missing") ;
 			return ;
 		}
-
-		BigDecimal newAmount = amount ;
 		
+		if(!verifyAmounts(itemDto, inventoryEntry.getAmount(), inventoryEntry.getIdentities())) {
+			return ;
+		}		
+		
+		InventurlisteDto workListeDto = null ;
+		if(itemDto.istArtikelSnrOderchargentragend()) {
+			for (IdentityAmountEntry identityEntry : inventoryEntry.getIdentities()) {
+				String snr = identityEntry.getIdentity() ;
+				workListeDto = null ;
+				for(int i = 0 ; workListeDto == null && i < inventurlisteDtos.length; i++) {
+					if(snr.compareTo(inventurlisteDtos[i].getCSeriennrchargennr()) == 0) {
+						workListeDto = inventurlisteDtos[i] ;
+					}
+				}
+
+				if(workListeDto != null) {
+					if(!updateInventurliste(itemDto, identityEntry.getAmount(), changeAmountTo,
+							workListeDto)) {
+						break ;
+					}
+				} else {
+//					createInventurlisteImpl(inventoryId, inventurDto, itemDto, inventoryEntry, false);
+				}
+			}
+		} else {
+			workListeDto = inventurlisteDtos[0] ;
+			updateInventurliste(itemDto, inventoryEntry.getAmount(), changeAmountTo,
+					workListeDto);
+		}		
+	}
+
+	private boolean updateInventurliste(ArtikelDto itemDto, BigDecimal newAmount,
+			Boolean changeAmountTo, InventurlisteDto workListeDto) throws NamingException,
+			RemoteException {		
 		if(!changeAmountTo) {
-			BigDecimal oldAmount = inventurlisteDtos[0].getNInventurmenge() ;
-			newAmount = oldAmount.add(amount) ;
+			BigDecimal oldAmount = workListeDto.getNInventurmenge() ;
+			newAmount = oldAmount.add(newAmount) ;
 		}
+		
 		if(newAmount.signum() < 0) {
 			respondBadRequest("amount", "<0") ;
-			return ;
+			return false ;
+		}
+
+		if(newAmount.signum() == 0) {
+			inventurCall.removeInventurListe(workListeDto) ;
+		} else {
+			if(itemDto.isSeriennrtragend() && newAmount.compareTo(BigDecimal.ONE) > 0) {
+				respondBadRequest("serialnr", "amount has to be 1") ;
+				return false ;
+			}
+
+			workListeDto.setNInventurmenge(newAmount) ;			
+			inventurCall.updateInventurliste(workListeDto, false) ;
 		}
 		
-		inventurlisteDtos[0].setNInventurmenge(newAmount) ;			
-		inventurCall.updateInventurliste(inventurlisteDtos[0], false) ;
+		return true ;
 	}
 	
 	/**

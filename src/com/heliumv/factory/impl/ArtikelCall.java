@@ -33,7 +33,9 @@
 package com.heliumv.factory.impl;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.naming.NamingException;
 
@@ -44,6 +46,7 @@ import com.heliumv.annotation.HvModul;
 import com.heliumv.factory.BaseCall;
 import com.heliumv.factory.IArtikelCall;
 import com.heliumv.factory.IGlobalInfo;
+import com.heliumv.factory.legacy.AllArtikelgruppeEntry;
 import com.lp.server.artikel.service.ArtgruDto;
 import com.lp.server.artikel.service.ArtikelDto;
 import com.lp.server.artikel.service.ArtikelFac;
@@ -123,5 +126,17 @@ public class ArtikelCall extends BaseCall<ArtikelFac> implements IArtikelCall {
 		} catch(EJBExceptionLP e) {
 			return null ;
 		}
-	}	
+	}
+
+	@Override
+	public List<AllArtikelgruppeEntry> getAllArtikelgruppeSpr() throws NamingException, RemoteException {
+		@SuppressWarnings("unchecked")
+		Map<String, String> map = getFac().getAllSprArtgru(globalInfo.getTheClientDto()) ;
+		List<AllArtikelgruppeEntry> entries = new ArrayList<AllArtikelgruppeEntry>() ;
+		for (Map.Entry<String, String> mapEntry : map.entrySet()) {
+			entries.add(new AllArtikelgruppeEntry(mapEntry.getKey(), mapEntry.getValue())) ;
+		}
+		
+		return entries ;
+	}
 }

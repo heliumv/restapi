@@ -34,12 +34,16 @@ package com.heliumv.factory;
 
 import java.rmi.RemoteException;
 import java.sql.Timestamp;
+import java.util.List;
 
 import javax.naming.NamingException;
+
+import com.heliumv.factory.legacy.AllEinheitEntry;
 
 public interface ISystemCall {
 	String getHauptmandant() throws NamingException ;
 	String getServerVersion() throws NamingException ;	
 	Integer getServerBuildNumber() throws NamingException ;
 	Timestamp getServerTimestamp() throws RemoteException, NamingException ; 	
+	List<AllEinheitEntry> getAllEinheiten() throws RemoteException, NamingException ;
 }

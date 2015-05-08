@@ -35,17 +35,15 @@ package com.heliumv.factory.query;
 import java.util.List;
 
 import com.heliumv.api.order.OrderpositionEntry;
-import com.heliumv.api.order.OrderpositionEntryTransformer;
 import com.lp.server.auftrag.service.AuftragFac;
 import com.lp.server.auftrag.service.AuftragpositionFac;
 import com.lp.server.util.fastlanereader.service.query.FilterKriterium;
 import com.lp.server.util.fastlanereader.service.query.QueryParameters;
 
 public class AuftragpositionQuery extends BaseQuery<OrderpositionEntry> {
-
+	
 	public AuftragpositionQuery() {
 		super(QueryParameters.UC_ID_AUFTRAGPOSITION) ;
-		setTransformer(new OrderpositionEntryTransformer()) ;
 	}
 
 	@Override

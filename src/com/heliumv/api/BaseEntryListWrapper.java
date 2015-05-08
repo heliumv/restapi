@@ -35,16 +35,28 @@ package com.heliumv.api;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Java-Technisch okay, aber funktioniert leider nicht so praktikabel f&uuml;r enunciate,
+ * da der Anwender dann noch eine Ebene tiefer nachsehen muss und dort erst recht nicht
+ * den Datentyp entdeckt den er eigentlich sucht.
+ * @author Gerold
+ *
+ * @param <T>
+ */
 public class BaseEntryListWrapper<T> {
-	protected List<T> entries ;
+	private List<T> entries ;
 
-	public BaseEntryListWrapper() {
+	protected BaseEntryListWrapper() {
 		entries = new ArrayList<T>() ;
 	}
 	
-//	public List<T> getEntries() {
-//		return entries ;
-//	}
+	/**
+	 * Die (leere) Liste der Eintr&auml;ge
+	 * @return die (leere) Liste der Eintr&auml;ge
+	 */
+	public List<T> getEntries() {
+		return entries ;
+	}
 	
 	public void setEntries(List<T> newEntries) {
 		entries = newEntries ;

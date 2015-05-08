@@ -40,9 +40,20 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 /**
- * Ein bestimmtes Recht muss fuer den angemeldeten Benutzer in HELIUM V freigeschaltet sein
+ * Der "FLR" Name des Attributs (Datenfelds)
  */
 public @interface HvFlrMapper {
+	/**
+	 * Der Name des Eintrags. Beispielsweise artikel.artikelnummerlang
+	 * @return der Viewname des Eintrags (TableColumnInformation.viewName)
+	 */
 	String flrName() default "" ;
 	String[] flrNames() default {""};
+	
+	/**
+	 * Der Name des Datenbankfeldes
+	 * 
+	 * @return der Name des "Datenbankfelds" (TableColumnInformation.dbFieldColumName)
+	 */
+	String flrFieldName() default "" ;
 }

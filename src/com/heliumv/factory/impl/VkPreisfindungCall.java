@@ -32,18 +32,25 @@
  ******************************************************************************/
 package com.heliumv.factory.impl;
 
+import java.math.BigDecimal;
 import java.rmi.RemoteException;
 
 import javax.naming.NamingException;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.heliumv.factory.BaseCall;
+import com.heliumv.factory.IGlobalInfo;
 import com.heliumv.factory.IVkPreisfindungCall;
 import com.lp.server.artikel.service.VkPreisfindungFac;
 import com.lp.server.artikel.service.VkpfartikelpreislisteDto;
+import com.lp.server.artikel.service.VkpreisfindungDto;
 import com.lp.util.EJBExceptionLP;
 
 public class VkPreisfindungCall extends BaseCall<VkPreisfindungFac> implements IVkPreisfindungCall {
-
+	@Autowired
+	private IGlobalInfo globalInfo ;
+	
 	protected VkPreisfindungCall() {
 		super(VkPreisfindungFacBean) ;
 	}
@@ -62,4 +69,13 @@ public class VkPreisfindungCall extends BaseCall<VkPreisfindungFac> implements I
 			throw e ;
 		}
 	}
+
+	@Override
+	public VkpreisfindungDto verkaufspreisfindung(Integer itemId, Integer customerId, BigDecimal amount, 
+			java.sql.Date date, Integer pricelistId, Integer mwstsatzbezId, String currencyCnr) throws NamingException, RemoteException, EJBExceptionLP {
+		VkpreisfindungDto dto = getFac().verkaufspreisfindung(itemId, customerId, amount, 
+				date, pricelistId, mwstsatzbezId, currencyCnr, globalInfo.getTheClientDto()) ;
+		return dto ;
+	};
+
 }

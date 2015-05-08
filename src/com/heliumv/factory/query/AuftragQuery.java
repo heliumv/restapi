@@ -41,8 +41,7 @@ import javax.naming.NamingException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.heliumv.api.order.OrderEntry;
-import com.heliumv.api.order.OrderEntryTransformer;
-import com.heliumv.factory.Globals;
+import com.heliumv.factory.IGlobalInfo;
 import com.heliumv.factory.IParameterCall;
 import com.heliumv.tools.FilterHelper;
 import com.heliumv.tools.StringHelper;
@@ -58,26 +57,11 @@ import com.lp.server.util.fastlanereader.service.query.QueryParameters;
 public class AuftragQuery extends BaseQuery<OrderEntry> {
 	@Autowired
 	private IParameterCall parameterCall ;
-
+	@Autowired
+	private IGlobalInfo globalInfo ;
+	
 	public AuftragQuery() {
 		super(QueryParameters.UC_ID_AUFTRAG) ;
-		setTransformer(new OrderEntryTransformer()) ;
-	}
-	
-	@Autowired
-	public AuftragQuery(IParameterCall parameterCall) throws NamingException {
-		super(QueryParameters.UC_ID_AUFTRAG) ;
-		setTransformer(new OrderEntryTransformer()) ;
-		this.parameterCall = parameterCall ;
-	}
-	
-	@Autowired 
-	public void setParameterCall(IParameterCall parameterCall) {
-		this.parameterCall = parameterCall ;
-	}
-
-	private IParameterCall getParameterCall() {
-		return parameterCall ;
 	}
 	
 	public FilterKriterium getFilterCnr(String cnr) {
@@ -147,22 +131,16 @@ public class AuftragQuery extends BaseQuery<OrderEntry> {
 	}
 	
 	
-	protected List<FilterKriterium> getRequiredFilters() {
+	protected List<FilterKriterium> getRequiredFilters() throws NamingException, RemoteException {
 		List<FilterKriterium> filters = new ArrayList<FilterKriterium>() ;
 
 		filters.add(getMandantFilter()) ;
 		
-		try {
-			if(getParameterCall().isZeitdatenAufErledigteBuchbar()) {
-				filters.add(getFilterErledigteBuchbar()) ;
-			} else {
-				filters.add(getFiltersErledigteNichtBuchbar()) ;
-			}
-		} catch(NamingException e) {			
+		if(parameterCall.isZeitdatenAufErledigteBuchbar()) {
+			filters.add(getFilterErledigteBuchbar()) ;
+		} else {
 			filters.add(getFiltersErledigteNichtBuchbar()) ;
-		} catch(RemoteException e) {
-			filters.add(getFiltersErledigteNichtBuchbar()) ;
- 		}
+		}
 		
 		return filters ;		
 	}
@@ -170,7 +148,7 @@ public class AuftragQuery extends BaseQuery<OrderEntry> {
 	private FilterKriterium getMandantFilter() {
 		return new FilterKriterium(
 				AuftragFac.FLR_AUFTRAG_MANDANT_C_NR, true, 
-				StringHelper.asSqlString(Globals.getTheClientDto().getMandant()),
+				StringHelper.asSqlString(globalInfo.getMandant()),
 				FilterKriterium.OPERATOR_EQUAL, false);		
 	}
 	

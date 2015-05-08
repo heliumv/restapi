@@ -37,6 +37,7 @@ import java.util.List;
 
 import javax.naming.NamingException;
 
+import com.heliumv.factory.legacy.AllArtikelgruppeEntry;
 import com.lp.server.artikel.service.ArtgruDto;
 import com.lp.server.artikel.service.ArtikelDto;
 import com.lp.server.artikel.service.ArtklaDto;
@@ -61,4 +62,12 @@ public interface IArtikelCall {
 	
 	ArtklaDto artikelklasseFindByCnrOhneExc(String artikelklasseCnr) throws NamingException, RemoteException ;
 	
+	/**
+	 * Eine Liste aller ArtikelgruppenSpr f&uuml;r den aktuellen Mandanten
+	 * 
+	 * @return eine (leere) Liste von Artikelgruppen
+	 * @throws NamingException
+	 * @throws RemoteException
+	 */
+	List<AllArtikelgruppeEntry> getAllArtikelgruppeSpr() throws NamingException, RemoteException ;
 }

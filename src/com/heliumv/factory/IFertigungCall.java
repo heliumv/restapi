@@ -45,6 +45,7 @@ import com.lp.server.fertigung.service.LosDto;
 import com.lp.server.fertigung.service.LosablieferungDto;
 import com.lp.server.fertigung.service.LosistmaterialDto;
 import com.lp.server.fertigung.service.LoslagerentnahmeDto;
+import com.lp.server.fertigung.service.LossollarbeitsplanDto;
 import com.lp.server.fertigung.service.LossollmaterialDto;
 import com.lp.util.EJBExceptionLP;
 
@@ -105,4 +106,32 @@ public interface IFertigungCall {
 	void updateLosistmaterialMenge(Integer losistmaterialIId, BigDecimal bdMengeNeu) 
 			throws NamingException, RemoteException, EJBExceptionLP ;	
 	
+	LosistmaterialDto createLosistmaterial(LosistmaterialDto losistmaterialDto,
+			String sSerienChargennummer) throws NamingException, RemoteException, EJBExceptionLP ; 	
+	
+	LossollmaterialDto lossollmaterialFindByPrimaryKey(Integer iId)
+			throws NamingException, RemoteException, EJBExceptionLP ;
+	
+	/**
+	 * Nur die Menge des Lossollmaterials auf die neue Menge &auml;ndern
+	 * 
+	 * @param lossollmaterialId
+	 * @param mengeNeu
+	 * @throws NamingException
+	 * @throws RemoteException
+	 * @throws EJBExceptionLP
+	 */
+	void updateLossollmaterialMenge(Integer lossollmaterialId, BigDecimal mengeNeu) 
+			throws NamingException, RemoteException, EJBExceptionLP ;
+	
+	/**
+	 * Den Arbeitsplan mittels Id ermitteln
+	 * 
+	 * @param iId
+	 * @return
+	 */
+	LossollarbeitsplanDto lossollarbeitsplanFindByPrimaryKey(Integer iId) throws NamingException, RemoteException, EJBExceptionLP ;
+	
+	LossollarbeitsplanDto updateLossollarbeitsplan(
+			LossollarbeitsplanDto lossollarbeitsplanDto) throws NamingException, RemoteException, EJBExceptionLP ;
 }

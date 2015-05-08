@@ -61,6 +61,10 @@
 			<ref bean="jsonProvider"/> 
  -->
  			<bean id="hvSimpleStringMessageBodyProvider" class="com.heliumv.tools.HvSimpleStringMessageBodyProvider" />
+
+ 			<bean id="hvEJBExceptionLPException" class="com.heliumv.api.HvEJBExceptionLPExceptionMapper"/> 			
+ 			<bean id="hvNamingException" class="com.heliumv.api.HvNamingExceptionMapper"/>
+ 			<bean id="hvRemoteException" class="com.heliumv.api.HvRemoteExceptionMapper"/>
   		</jaxrs:providers>
 
 <!--
@@ -81,8 +85,13 @@
 			<ref bean="hvProduction" />
 			<ref bean="hvStaff" />
 			<ref bean="hvSystem" />
+			<ref bean="hvStock" />
 			<ref bean="hvItemV11" />
+			<ref bean="hvPartlist"/>
+			<ref bean="hvMachine" />
 			<ref bean="hvClevercure" />
+			<ref bean="hvCruisecontrol" />
+			<ref bean="hvSoapCallsPersonal" />
 		</jaxrs:serviceBeans>
 	</jaxrs:server>	
 	
@@ -100,12 +109,22 @@
  -->
  
  	<bean id="modelMapper" class="org.modelmapper.ModelMapper" lazy-init="true"/>
+ 	<bean id="itemlistBuilder" class="com.heliumv.api.item.ItemListBuilder" lazy-init="true"/>
+ 	<bean id="featureFactory" class="com.heliumv.feature.FeatureFactory" lazy-init="true"/>
+ 	<bean id="featureService" factory-bean="&amp;featureFactory" factory-method="getObject" lazy-init="true"/>
+    <bean id="featureCustomerpartlist" class="com.heliumv.feature.HvCustomerPartlistFeature" lazy-init="true"/>
+    <bean id="featureDefault" class="com.heliumv.feature.HvDefaultFeature" lazy-init="true" />
+    <bean id="clientText" class="com.heliumv.api.HvClientText" lazy-init="true" />
  	
  	<bean id="baseCallRegistrant" class="com.heliumv.factory.BaseCallRegistrant" />
 <!--    <bean id="callTracer" class="com.heliumv.calltrace.CallTracer" /> -->
-    <bean id="callTracer" class="com.heliumv.calltrace.CallTracerDelaying" />
+	<bean id="callTracer" class="com.heliumv.calltrace.CallTracerDelaying" /> 
+<!--     <bean id="callTracer" class="com.heliumv.calltrace.CallTracerNop" />  -->
 	<bean id="globalInfo" class="com.heliumv.factory.GlobalInfo" />
+	<bean id="mandantFilter" class="com.heliumv.factory.filter.MandantFilterFactory" />
+	<bean id="sessionManager" class="com.heliumv.session.HvSessionManager" lazy-init="true" />
 	
+	<bean id="ansprechpartnerCall" class="com.heliumv.factory.impl.AnsprechpartnerCall" lazy-init="true" />
 	<bean id="artikelCall" class="com.heliumv.factory.impl.ArtikelCall" lazy-init="true"/>
 	<bean id="artikelkommentarCall" class="com.heliumv.factory.impl.ArtikelkommentarCall" lazy-init="true"/>
 	<bean id="auftragCall" class="com.heliumv.factory.impl.AuftragCall" lazy-init="true"/>
@@ -115,6 +134,7 @@
 	<bean id="fehlmengeCall" class="com.heliumv.factory.impl.FehlmengeCall" lazy-init="true" />
 	<bean id="fertigungCall" class="com.heliumv.factory.impl.FertigungCallJudge" lazy-init="true"/>
 	<bean id="inventurCall" class="com.heliumv.factory.impl.InventurCall" lazy-init="true"/>
+	<bean id="jcrDocCall" class="com.heliumv.factory.impl.JcrDocCall" lazy-init="true"/>
 	<bean id="judgeCall" class="com.heliumv.factory.impl.JudgeCall" lazy-init="true"/>
 	<bean id="kundeCall" class="com.heliumv.factory.impl.KundeCall" lazy-init="true" />
 	<bean id="kundeReportCall" class="com.heliumv.factory.impl.KundeReportCall" lazy-init="true" />
@@ -122,14 +142,19 @@
 	<bean id="lieferscheinCall" class="com.heliumv.factory.impl.LieferscheinCall" lazy-init="true" />
 	<bean id="logonCall" class="com.heliumv.factory.impl.LogonCall" lazy-init="true"/>
 	<bean id="mandantCall" class="com.heliumv.factory.impl.MandantCall" lazy-init="true"/>
+	<bean id="maschineCall" class="com.heliumv.factory.impl.MaschineCall" lazy-init="true"/>
 	<bean id="panelCall" class="com.heliumv.factory.impl.PanelCall" lazy-init="true" />
 	<bean id="parameterCall" class="com.heliumv.factory.impl.ParameterCall" lazy-init="true"/>
+	<bean id="partnerCall" class="com.heliumv.factory.impl.PartnerCall" lazy-init="true" />	
 	<bean id="personalCall" class="com.heliumv.factory.impl.PersonalCall" lazy-init="true"/>
+	<bean id="personalApiCall" class="com.heliumv.factory.impl.PersonalApiCall" lazy-init="true"/>
 	<bean id="projektCall" class="com.heliumv.factory.impl.ProjektCall" lazy-init="true"/>
 	<bean id="reservierungCall" class="com.heliumv.factory.impl.ReservierungCall" lazy-init="true"/>
 	<bean id="server" class="com.heliumv.factory.impl.ServerCall" lazy-init="true"/>
 	<bean id="stuecklisteCall" class="com.heliumv.factory.impl.StuecklisteCall" lazy-init="true"/>
+	<bean id="stuecklisteReportCall" class="com.heliumv.factory.impl.StuecklisteReportCall" lazy-init="true" />
 	<bean id="systemCall" class="com.heliumv.factory.impl.SystemCall" lazy-init="true"/>
+	<bean id="versandCall" class="com.heliumv.factory.impl.VersandCall" lazy-init="true" />
 	<bean id="vkpreisfindungCall" class="com.heliumv.factory.impl.VkPreisfindungCall" lazy-init="true"/>
 	<bean id="zeiterfassungCall" class="com.heliumv.factory.impl.ZeiterfassungCall" lazy-init="true"/>
 	
@@ -137,32 +162,123 @@
 	<bean id="itemloaderComments" class="com.heliumv.factory.loader.ItemLoaderComments" lazy-init="true"/>
 	<bean id="itemloaderStockinfoSummary" class="com.heliumv.factory.loader.ItemLoaderStockinfoSummary" lazy-init="true"/>
 	
+	<bean id="customerService" class="com.heliumv.api.customer.CustomerService" lazy-init="true"/>
+	
+	<bean id="ansprechpartnerMapper" class="com.heliumv.api.customer.AnsprechpartnerMapper" lazy-init="true" />
+	<bean id="customerEntryMapper" class="com.heliumv.api.customer.CustomerEntryMapper" lazy-init="true" />
 	<bean id="itemEntryMapper" class="com.heliumv.api.item.ItemEntryMapper" lazy-init="true" />
 	<bean id="itemgroupEntryMapper" class="com.heliumv.api.item.ItemGroupEntryMapper" lazy-init="true" />
 	<bean id="itempropertyEntryMapper" class="com.heliumv.api.item.ItemPropertyEntryMapper" lazy-init="true" />
-	<bean id="customerEntryMapper" class="com.heliumv.api.customer.CustomerEntryMapper" lazy-init="true" />
-	
-	<bean id="workItemQuery" class="com.heliumv.factory.query.ArtikelArbeitszeitQuery" lazy-init="true"/>
-	<bean id="orderQuery" class="com.heliumv.factory.query.AuftragQuery" lazy-init="true"/>
-	<bean id="offlineOrderQuery" class="com.heliumv.factory.query.AuftragQueryOffline" lazy-init="true" />
-	<bean id="orderPositionQuery" class="com.heliumv.factory.query.AuftragpositionQuery" lazy-init="true"/>
-	<bean id="customerQuery" class="com.heliumv.factory.query.CustomerQuery" lazy-init="true" />
-	<bean id="itemQuery" class="com.heliumv.factory.query.ItemQuery" lazy-init="true" />
-	<bean id="productionQuery" class="com.heliumv.factory.query.ProductionQuery" lazy-init="true"/>
-	<bean id="projectQuery" class="com.heliumv.factory.query.ProjectQuery" lazy-init="true"/>
-	<bean id="staffQuery" class="com.heliumv.factory.query.StaffQuery" lazy-init="true"/>
-	<bean id="zeitdatenQuery" class="com.heliumv.factory.query.ZeitdatenQuery" lazy-init="true"/>
+	<bean id="partlistPositionEntryMapper" class="com.heliumv.api.partlist.PartlistPositionEntryMapper" lazy-init="true" />
+	<bean id="partnerEntryMapper" class="com.heliumv.api.customer.PartnerEntryMapper" lazy-init="true"/>
 
+	<bean id="openWorkEntryTransformer" class="com.heliumv.api.production.OpenWorkEntryTransformer" lazy-init="true"/>		
+	<bean id="orderEntryTransformer" class="com.heliumv.api.order.OrderEntryTransformer" lazy-init="true" />
+	<bean id="orderEntryTransformerOffline" class="com.heliumv.api.order.OrderEntryTransformerOffline" lazy-init="true" />
+	<bean id="customerEntryTransformer" class="com.heliumv.api.customer.CustomerEntryTransformer" lazy-init="true" />
+	<bean id="workItemEntryTransformer" class="com.heliumv.api.worktime.WorkItemEntryTransformer" lazy-init="true" />
+    <bean id="orderpositionEntryTransformer" class="com.heliumv.api.order.OrderpositionEntryTransformer" lazy-init="true" />
+	<bean id="itemEntryTransformer" class="com.heliumv.api.item.ItemEntryTransformer" lazy-init="true" />
+	<bean id="itemV11EntryTransformer" class="com.heliumv.api.item.ItemV11EntryTransformer" lazy-init="true" />
+	<bean id="machineEntryTransformer" class="com.heliumv.api.machine.MachineEntryTransformer" lazy-init="true"/>
+	<bean id="machineGroupEntryTransformer" class="com.heliumv.api.machine.MachineGroupEntryTransformer" lazy-init="true" />
+
+	<bean id="partlistEntryTransformer" class="com.heliumv.api.partlist.PartlistEntryTransformer" lazy-init="true" />
+	<bean id="partlistPositionEntryTransformer" class="com.heliumv.api.partlist.PartlistPositionEntryTransformer" lazy-init="true" />
+	<bean id="productionEntryTransformer" class="com.heliumv.api.production.ProductionEntryTransformer" lazy-init="true" />
+	<bean id="projectEntryTransformer" class="com.heliumv.api.project.ProjectEntryTransformer" lazy-init="true" />
+	<bean id="staffEntryTransformer" class="com.heliumv.api.staff.StaffEntryTransformer" lazy-init="true" />
+	<bean id="shopGroupEntryTransformer" class="com.heliumv.api.item.ShopGroupEntryTransformer" lazy-init="true"/>
+	<bean id="zeitdatenEntryTransformer" class="com.heliumv.api.worktime.ZeitdatenEntryTransformer" lazy-init="true" />
+	<bean id="workItemQuery" class="com.heliumv.factory.query.ArtikelArbeitszeitQuery" lazy-init="true">
+		<property name="transformer" ref="workItemEntryTransformer"/>
+	</bean>
+
+	<bean id="machineQuery" class="com.heliumv.factory.query.MachineQuery" lazy-init="true">
+		<property name="transformer" ref="machineEntryTransformer"/>
+	</bean>
+
+	<bean id="machineGroupQuery" class="com.heliumv.factory.query.MachineGroupQuery" lazy-init="true">
+		<property name="transformer" ref="machineGroupEntryTransformer"/>
+	</bean>
+
+	<bean id="offeneAgQuery" class="com.heliumv.factory.query.OffeneAgQuery" lazy-init="true">
+		<property name="transformer" ref="openWorkEntryTransformer"/>
+	</bean>
+	
+	<bean id="orderQuery" class="com.heliumv.factory.query.AuftragQuery" lazy-init="true">
+		<property name="transformer" ref="orderEntryTransformer"/>
+	</bean>
+ 
+ 	<bean id="offlineOrderQuery" class="com.heliumv.factory.query.AuftragQueryOffline" lazy-init="true">
+ 		<property name="transformer" ref="orderEntryTransformerOffline"/>
+ 	</bean>
+ 	
+	<bean id="orderPositionQuery" class="com.heliumv.factory.query.AuftragpositionQuery" lazy-init="true">
+		<property name="transformer" ref="orderpositionEntryTransformer"/>
+	</bean>
+	
+	<bean id="customerQuery" class="com.heliumv.factory.query.CustomerQuery" lazy-init="true">
+		<property name="transformer" ref="customerEntryTransformer"/>
+	</bean>
+	
+	<bean id="itemQuery" class="com.heliumv.factory.query.ItemQuery" lazy-init="true">
+		<property name="transformer" ref="itemEntryTransformer"/>
+	</bean>
+
+	<bean id="itemV11Query" class="com.heliumv.factory.query.ItemV11Query" lazy-init="true">
+		<property name="transformer" ref="itemV11EntryTransformer"/>
+	</bean>
+
+	<bean id="partlistQuery" class="com.heliumv.factory.query.PartlistQuery" lazy-init="true">
+		<property name="transformer" ref="partlistEntryTransformer" />
+	</bean>	
+	
+	<bean id="partlistPositionQuery" class="com.heliumv.factory.query.PartlistPositionQuery" lazy-init="true">
+		<property name="transformer" ref="partlistPositionEntryTransformer" />
+	</bean>
+
+	<bean id="productionQuery" class="com.heliumv.factory.query.ProductionQuery" lazy-init="true">
+		<property name="transformer" ref="productionEntryTransformer"/>
+	</bean>
+	
+	<bean id="projectQuery" class="com.heliumv.factory.query.ProjectQuery" lazy-init="true">
+		<property name="transformer" ref="projectEntryTransformer"/>
+	</bean>
+	
+	<bean id="staffQuery" class="com.heliumv.factory.query.StaffQuery" lazy-init="true">
+		<property name="transformer" ref="staffEntryTransformer"/>
+	</bean>
+	
+	<bean id="shopGroupQuery" class="com.heliumv.factory.query.ShopGroupQuery" lazy-init="true">
+		<property name="transformer" ref="shopGroupEntryTransformer"/>
+	</bean>
+	
+	<bean id="zeitdatenQuery" class="com.heliumv.factory.query.ZeitdatenQuery" lazy-init="true">
+		<property name="transformer" ref="zeitdatenEntryTransformer"/>
+	</bean>
+	
+	<bean id="hvClevercure" class="com.heliumv.api.cc.ClevercureApi" lazy-init="true" />
  	<bean id="hvCustomer" class="com.heliumv.api.customer.CustomerApi" lazy-init="true" />
  	<bean id="hvInventory" class="com.heliumv.api.inventory.InventoryApi" lazy-init="true" />
  	<bean id="hvItem" class="com.heliumv.api.item.ItemApi" lazy-init="true" />
  	<bean id="hvItemV11" class="com.heliumv.api.item.ItemApiV11" lazy-init="true" />
- 	<bean id="hvUser" class="com.heliumv.api.user.UserApi" lazy-init="true" />
-	<bean id="hvWorktime" class="com.heliumv.api.worktime.WorktimeApi" lazy-init="true"/>
+ 	<bean id="hvMachine" class="com.heliumv.api.machine.MachineApi" lazy-init="true" />
 	<bean id="hvOrder" class="com.heliumv.api.order.OrderApi" lazy-init="true"/>
+	<bean id="hvPartlist" class="com.heliumv.api.partlist.PartlistApi" lazy-init="true"/>
+	<bean id="hvSoapCallsPersonal" class="com.heliumv.api.soapcalls.SoapCallsPersonalApi" lazy-init="true"/>
 	<bean id="hvProject" class="com.heliumv.api.project.ProjectApi" lazy-init="true"/>
 	<bean id="hvProduction" class="com.heliumv.api.production.ProductionApi" lazy-init="true" />
 	<bean id="hvStaff" class="com.heliumv.api.staff.StaffApi" lazy-init="true"/>
+	<bean id="hvStock"  class="com.heliumv.api.stock.StockApi" lazy-init="true" />
 	<bean id="hvSystem" class="com.heliumv.api.system.SystemApi" lazy-init="true" />
-	<bean id="hvClevercure" class="com.heliumv.api.cc.ClevercureApi" lazy-init="true" />
+ 	<bean id="hvUser" class="com.heliumv.api.user.UserApi" lazy-init="true" />
+	<bean id="hvWorktime" class="com.heliumv.api.worktime.WorktimeApi" lazy-init="true"/>
+	
+	<bean id="buildnrWorker" class="com.heliumv.api.internal.ProjectWorkerBuildNumber" lazy-init="true"/>
+	<bean id="deploynrWorker" class="com.heliumv.api.internal.ProjectWorkerDeployNumber" lazy-init="true" />
+	<bean id="hvCruisecontrol" class="com.heliumv.api.internal.CruisecontrolApi" lazy-init="true">
+		<property name="buildnrWorker" ref="buildnrWorker" />
+		<property name="deploynrWorker" ref="deploynrWorker" />
+	</bean>
 </beans>

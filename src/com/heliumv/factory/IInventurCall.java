@@ -58,6 +58,13 @@ public interface IInventurCall {
 	 */
 	InventurDto[] inventurFindOffene(String mandantCNr) throws NamingException, EJBExceptionLP ;
 
+	/**
+	 * Alle offenen Inventuren ermitteln
+	 * 
+	 * @return ein (leeres) Array von offenen Inventuren des angemeldeten Mandanten
+	 * @throws NamingException
+	 * @throws EJBExceptionLP
+	 */
 	InventurDto[] inventurFindOffene() throws NamingException, EJBExceptionLP ;
 	
 	InventurDto inventurFindByPrimaryKey(Integer inventurId) throws NamingException, RemoteException ;
@@ -67,4 +74,6 @@ public interface IInventurCall {
 
 	Integer updateInventurliste(InventurlisteDto inventurlisteDto,
 			boolean bPruefeAufZuGrosseMenge) throws NamingException, RemoteException, EJBExceptionLP ;	
+	void removeInventurListe(InventurlisteDto inventurlisteDto) throws NamingException, RemoteException, EJBExceptionLP ;
+	
 }

@@ -34,14 +34,25 @@ package com.heliumv.factory.impl;
 
 import java.rmi.RemoteException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.naming.NamingException;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.heliumv.factory.BaseCall;
+import com.heliumv.factory.IGlobalInfo;
 import com.heliumv.factory.ISystemCall;
+import com.heliumv.factory.legacy.AllEinheitEntry;
 import com.lp.server.system.service.SystemFac;
 
 public class SystemCall extends BaseCall<SystemFac> implements ISystemCall {
+	@Autowired 
+	private IGlobalInfo globalInfo ;
+	
 	public SystemCall() {
 		super(SystemFacBean) ;
 	}
@@ -66,4 +77,16 @@ public class SystemCall extends BaseCall<SystemFac> implements ISystemCall {
 		return getFac().getServerTimestamp() ;
 	}
 	
+	@Override
+	public List<AllEinheitEntry> getAllEinheiten() throws RemoteException, NamingException {
+		List<AllEinheitEntry> allEinheiten = new ArrayList<AllEinheitEntry>() ;
+		@SuppressWarnings("unchecked")
+		Map<String,String> m = (Map<String, String>)getFac()
+				.getAllEinheit(globalInfo.getTheClientDto()) ;		
+ 		for (Entry<String, String> entry : m.entrySet()) {
+			allEinheiten.add(new AllEinheitEntry(entry.getKey(), entry.getValue()));
+		}
+
+		return allEinheiten ;
+	}
 }

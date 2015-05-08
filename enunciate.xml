@@ -1,5 +1,5 @@
 <enunciate label="heliumv"
-	 xsi:noNamespaceSchemaLocation="http://enunciate.codehaus.org/schemas/enunciate-1.28.xsd">
+	 xsi:noNamespaceSchemaLocation="http://enunciate.codehaus.org/schemas/enunciate-1.29.xsd">
 <!--
 	<deployment host="www.ifyouwannabecool.com" context="api"/>
  -->
@@ -7,6 +7,7 @@
     <api-classes>
     	<exclude pattern="com.heliumv.api.cc.*" />
     	<exclude pattern="com.heliumv.api.delivery.*" />
+    	<exclude pattern="com.heliumv.api.internal.*" />
     </api-classes>
  <!--
 	<namespaces>
@@ -27,11 +28,11 @@
     	<basic-app disabled="true" />
     	<c disabled="true" />
     	<csharp disabled="true" />
-    	<java-client disabled="true" />
-	    <jaxws-client disabled="true" />
-	    <jaxws-ri disabled="true" />
-	    <jaxws-support disabled="true" />
-	    <jersey disabled="true" />
+    	<java-client disabled="false" />
+	    <jaxws-client disabled="false" />
+	    <jaxws-ri disabled="false" />
+	    <jaxws-support disabled="false" />
+	    <jersey disabled="false" />
 	    <obj-c disabled="true" />
 	    <xml disabled="true" />
 	    <ruby disabled="true" />

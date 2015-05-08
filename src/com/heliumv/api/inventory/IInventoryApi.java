@@ -43,25 +43,28 @@ public interface IInventoryApi {
 	/**
 	 * Einen Eintrag in der Inventurliste erzeugen
 	 * 
-	 * @param inventoryId
-	 * @param itemId
-	 * @param amount
-	 * @param userId
-	 * @param largeDifference
+	 * @param inventoryId die Id der Inventur
+	 * @param itemId die Id des Artikels
+	 * @param amount die Menge
+	 * @param userId der Token des aktuellen Benutzers
+	 * @param largeDifference ist true wenn gro&szlig;e Mengenabwechungen erlaubt sind
+	 * @param identity die (optionale) Serien/Chargennummer sofern es ein entsprechender Artikel ist
 	 */
 	void createInventoryEntry(
 			Integer inventoryId,
 			Integer itemId,
 			BigDecimal amount,
 			String userId,
-			Boolean largeDifference) ;
+			Boolean largeDifference,
+			String identity) ;
 
 	void updateInventoryEntry(
 			Integer inventoryId,
 			Integer itemId,
 			BigDecimal amount,
 			String userId,
-			Boolean changeAmountTo) ;	
+			Boolean changeAmountTo,
+			String identity) ;	
 	
 	void updateInventoryDataEntry(
 			Integer inventoryId,

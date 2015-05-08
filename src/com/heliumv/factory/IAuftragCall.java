@@ -36,11 +36,7 @@ import java.rmi.RemoteException;
 
 import javax.naming.NamingException;
 
-import com.heliumv.annotation.HvJudge;
-import com.heliumv.annotation.HvModul;
 import com.lp.server.auftrag.service.AuftragDto;
-import com.lp.server.benutzer.service.RechteFac;
-import com.lp.server.system.service.LocaleFac;
 import com.lp.server.system.service.TheClientDto;
 import com.lp.util.EJBExceptionLP;
 

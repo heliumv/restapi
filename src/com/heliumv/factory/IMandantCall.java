@@ -32,10 +32,12 @@
  ******************************************************************************/
 package com.heliumv.factory;
 
+import java.rmi.RemoteException;
 import java.util.Locale;
 
 import javax.naming.NamingException;
 
+import com.lp.server.system.service.MandantDto;
 import com.lp.server.system.service.ModulberechtigungDto;
 import com.lp.server.system.service.ZusatzfunktionberechtigungDto;
 import com.lp.util.EJBExceptionLP;
@@ -43,7 +45,10 @@ import com.lp.util.EJBExceptionLP;
 public interface IMandantCall {
 	
 	Locale getLocaleDesHauptmandanten() throws NamingException, EJBExceptionLP ;
-	
+	String getMandantEmailAddress() throws NamingException, RemoteException, EJBExceptionLP ;
+	MandantDto mandantFindByPrimaryKey(String mandantCnr) throws NamingException, RemoteException, EJBExceptionLP ;
+	MandantDto mandantFindByPrimaryKey() throws NamingException, RemoteException, EJBExceptionLP ;
+
 	ModulberechtigungDto[] modulberechtigungFindByMandantCnr(String mandantCnr) throws NamingException ;
 
 	ZusatzfunktionberechtigungDto[] zusatzfunktionberechtigungFindByMandantCnr(String mandantCnr) throws NamingException ;

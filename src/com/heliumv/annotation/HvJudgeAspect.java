@@ -41,6 +41,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -50,6 +52,7 @@ import com.lp.util.EJBExceptionLP;
 @Component
 @Aspect
 public class HvJudgeAspect extends BaseAspect {
+	private static Logger log = LoggerFactory.getLogger(HvJudgeAspect.class) ;
 
 	@Autowired
 	private IJudgeCall judgeCall ;
@@ -78,27 +81,33 @@ public class HvJudgeAspect extends BaseAspect {
 		HvJudge theModul = (HvJudge) method.getAnnotation(HvJudge.class);
 		if(theModul == null) return ;
 		
-		System.out.println("Having the HvJudge Annotation with name |'" + theModul.recht() + "'|" +
+//		System.out.println("Having the HvJudge Annotation with name |'" + theModul.recht() + "'|" +
+//				StringUtils.join(theModul.rechtOder(), "|") + "<") ;
+		log.debug("Having the HvJudge Annotation with name |'" + theModul.recht() + "'|" +
 				StringUtils.join(theModul.rechtOder(), "|") + "<") ;
 	
 		if(theModul.recht().length() > 0) {
 			if(!judgeCall.hatRecht(theModul.recht())) {
+				log.info("judge disallowed: '" + theModul.recht() + "' for '" + methodSig.getMethod().getName() +"'") ;
 				throw new EJBExceptionLP(EJBExceptionLP.FEHLER_UNZUREICHENDE_RECHTE,
 						methodSig.getMethod().getName() + ":" + theModul.recht() ) ;
 			}
 
-			System.out.println("judge allowed: '" + theModul.recht() + "'") ;
+//			System.out.println("judge allowed: '" + theModul.recht() + "'") ;
+			log.debug("judge allowed: '" + theModul.recht() + "'") ;
 			return ;
 		}
 		
 		if(theModul.rechtOder().length > 0) {
 			for (String recht : theModul.rechtOder()) {
 				if(judgeCall.hatRecht(recht)) {
-					System.out.println("judge allowed: '" + recht + "'") ;
+					log.debug("judge allowed: '" + recht + "'") ;
+//					System.out.println("judge allowed: '" + recht + "'") ;
 					return ;					
 				}
 			}
 
+			log.info("judge disallowed: '" + Arrays.toString(theModul.rechtOder()) + "' for '" + methodSig.getMethod().getName() +"'") ;
 			throw new EJBExceptionLP(EJBExceptionLP.FEHLER_UNZUREICHENDE_RECHTE,
 					methodSig.getMethod().getName() + ":" + Arrays.toString(theModul.rechtOder())) ;
 		}

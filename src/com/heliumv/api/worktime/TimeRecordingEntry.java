@@ -50,10 +50,12 @@ public class TimeRecordingEntry {
 	private int second ;
 	private Integer forStaffId ;
 	private String where ;
+	private String forStaffCnr ;
+
 	
 	/**
 	 * Die (optionale) PersonalId f&uuml;r die die Buchung gilt
-	 * @return
+	 * @return die PersonalId f&uuml;r die die Buchung gelten soll
 	 */
 	public Integer getForStaffId() {
 		return forStaffId;
@@ -63,6 +65,21 @@ public class TimeRecordingEntry {
 		this.forStaffId = forStaffId;
 	}
 	
+
+	/**
+	 * Die (optionale) Personalnummer f&uuml;r die die Buchung gilt</br>
+	 * <p>Wenn f&uuml;r eine andere Person gebucht werden soll, dann mu&szlig;
+	 * entweder forStaffId oder forStaffCnr gesetzt werden</p>
+	 * @return die Personalnummer f&uuml;r die die Buchung gelten soll
+	 */
+	public String getForStaffCnr() {
+		return forStaffCnr;
+	}
+
+	public void setForStaffCnr(String forStaffCnr) {
+		this.forStaffCnr = forStaffCnr;
+	}
+
 	/**
 	 * Die erforderliche BenutzerId desjenigen der am HELIUM V Server angemeldet ist.
 	 * @return

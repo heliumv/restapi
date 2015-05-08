@@ -40,6 +40,8 @@ import com.heliumv.api.BaseEntryId;
 public class ProjectEntry extends BaseEntryId {
 	private String cnr ;
 	private String customerName ;
+	private String category ;
+	private String title ;
 	
 	public String getCnr() {
 		return cnr;
@@ -52,5 +54,17 @@ public class ProjectEntry extends BaseEntryId {
 	}
 	public void setCustomerName(String customerName) {
 		this.customerName = customerName;
-	}	
+	}
+	public String getCategory() {
+		return category;
+	}
+	public void setCategory(String category) {
+		this.category = category;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
 }

@@ -34,14 +34,20 @@ package com.heliumv.factory.query;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.heliumv.api.order.OrderEntry;
 import com.heliumv.api.order.OrderEntryTransformerOffline;
 import com.lp.server.auftrag.service.AuftragQueryResult;
 import com.lp.server.util.fastlanereader.service.query.QueryResult;
 
 public class AuftragQueryOffline extends AuftragQuery {	
+	@Autowired
+	private OrderEntryTransformerOffline orderEntryTransformerOffline ;
+	
 	public AuftragQueryOffline() {
-		setTransformer(new OrderEntryTransformerOffline()) ;
+//		setTransformer(new OrderEntryTransformerOffline()) ;
+		setTransformer(orderEntryTransformerOffline) ;
 	}
 	
 	@Override

@@ -37,8 +37,8 @@ import com.lp.server.artikel.service.ArtikelsprDto;
 
 public class ItemEntryMapper {
 
-	public ItemEntry mapEntry(ArtikelDto artikelDto) {
-		ItemEntry entry = new ItemEntry() ;
+	public ItemEntryInternal mapEntry(ArtikelDto artikelDto) {
+		ItemEntryInternal entry = new ItemEntryInternal() ;
 		entry.setId(artikelDto.getIId()); 
 		entry.setCnr(artikelDto.getCNr());
 		ArtikelsprDto artikelSprDto = artikelDto.getArtikelsprDto() ;
@@ -54,20 +54,21 @@ public class ItemEntryMapper {
 		entry.setRevision(artikelDto.getCRevision());
 		entry.setReferenceNumber(artikelDto.getCReferenznr());
 		entry.setIndex(artikelDto.getCIndex());
-		
+		entry.setHasSerialnr(artikelDto.getBSeriennrtragend() == null ? false : artikelDto.getBSeriennrtragend() > 0);
+		entry.setHasChargenr(artikelDto.getBChargennrtragend() == null ? false : artikelDto.getBChargennrtragend() > 0);
 		mapItemGroup(entry, artikelDto) ;
 		mapItemClass(entry, artikelDto) ;
 		
 		return entry ;
 	}
 	
-	private void mapItemGroup(ItemEntry entry, ArtikelDto artikelDto) {
+	private void mapItemGroup(ItemEntryInternal entry, ArtikelDto artikelDto) {
 		if(artikelDto.getArtgruDto() != null) {
 			entry.setItemgroupCnr(artikelDto.getArtgruDto().getCNr()) ;
 		}		
 	}
 	
-	private void mapItemClass(ItemEntry entry, ArtikelDto artikelDto) {
+	private void mapItemClass(ItemEntryInternal entry, ArtikelDto artikelDto) {
 		if(artikelDto.getArtklaDto() != null) {
 			entry.setItemclassCnr(artikelDto.getArtklaDto().getCNr()) ;			
 		}
